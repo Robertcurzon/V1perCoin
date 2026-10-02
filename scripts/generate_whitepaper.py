@@ -87,6 +87,6 @@ for block in blocks:
         head=rows[0]
         body.append(r'\begin{'+env+r'}[H]\centering\small'+'\n'+r'\caption{'+captions[table_number]+'}\n'+r'\begin{tabularx}{'+width+'}{'+specs+'}\n'+r'\toprule'+'\n'+' & '.join(r'\textbf{'+escape(c)+'}' for c in head)+r' \\'+ '\n'+r'\midrule'+'\n'+'\n'.join(' & '.join(inline(c) for c in row)+r' \\' for row in rows[1:])+'\n'+r'\bottomrule\end{tabularx}'+'\n'+r'\end{'+env+'}')
     else: body.append(inline(block.replace('\n',' ')))
-refs=r'\begin{thebibliography}{9}'+'\n'+'\n'.join(r'\bibitem{ref'+str(i)+'} '+escape(title)+'. '+r'\url{'+url+'}.' for i,(title,url) in enumerate(references,1))+'\n'+r'\end{thebibliography}'
+refs=r'\begin{thebibliography}{9}'+'\n'+r'\footnotesize'+'\n'+'\n'.join(r'\bibitem{ref'+str(i)+'} '+escape(title)+'. '+r'\url{'+url+'}.' for i,(title,url) in enumerate(references,1))+'\n'+r'\end{thebibliography}'
 DEST.write_text(PREAMBLE+'\n\n'.join(body)+'\n\n'+refs+'\n'+r'\end{document}'+'\n')
 print(f'Generated {DEST}: {table_number} tables, {len(references)} references.')
