@@ -1,0 +1,21 @@
+{
+  "network": "testnet",
+  "status": "unpublished",
+  "packageId": "",
+  "coinType": "",
+  "currencyId": "",
+  "vaultId": "",
+  "claimsId": "",
+  "founder": "",
+  "community": "",
+  "publishDigest": "",
+  "allocationDigest": "",
+  "immutableDigest": "",
+  "dexPairId": "",
+  "publicReserve": "",
+  "initialLiquidity": "",
+  "laterLiquidity": "",
+  "vaultAdminCapId": "",
+  "claimsAdminCapId": "",
+  "metadataDigest": ""
+}

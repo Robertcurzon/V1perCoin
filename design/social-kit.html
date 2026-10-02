@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Viper Coin (V1PR) social kit preview</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@400;500;700&display=swap');
+    :root { font-family: 'DM Sans', sans-serif; color: #e9ecdf; background: #101510; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px; }
+    h1, h2, p { margin: 0; }
+    header { max-width: 1180px; margin: 0 auto 24px; }
+    header h1 { font: 800 42px/1 'Barlow Condensed', sans-serif; letter-spacing: .01em; text-transform: uppercase; }
+    header p { max-width: 680px; margin-top: 10px; color: #b9c4b4; line-height: 1.5; }
+    .gallery { max-width: 1180px; margin: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+    .item { min-width: 0; }
+    .label { color: #bdf332; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 9px; }
+    .card { position: relative; overflow: hidden; border: 1px solid #52694b; background: #101510; aspect-ratio: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 6%; isolation: isolate; }
+    .card::before { content: ''; position: absolute; inset: 0; z-index: -2; background-position: center; background-size: cover; }
+    .card::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(8,16,10,.54), rgba(8,16,10,.15) 37%, rgba(8,16,10,.88)); }
+    .character::before { background-image: url('../public/viper-art.jpg'); }
+    .hunt::before { background-image: url('../public/viper-meme-feast.webp'); background-position: 63% center; }
+    .wordmark, .eyebrow, .foot { font-weight: 700; text-transform: uppercase; letter-spacing: .13em; }
+    .wordmark { color: #bdf332; font-size: clamp(15px, 2vw, 24px); }
+    .eyebrow { color: #bdf332; font-size: clamp(11px, 1.3vw, 15px); }
+    .main { max-width: 95%; font: 900 clamp(52px, 8vw, 112px)/.81 'Barlow Condensed', sans-serif; letter-spacing: -.025em; text-transform: uppercase; text-wrap: balance; }
+    .main em { color: #bdf332; font-style: normal; }
+    .foot { display: flex; justify-content: space-between; gap: 12px; font-size: clamp(11px, 1.1vw, 15px); }
+    .wide { grid-column: 1 / -1; }
+    .wide .card { aspect-ratio: 16 / 9; }
+    .wide .card::before { background-image: url('../public/viper-meme-feast.webp'); background-position: center; }
+    .wide .card::after { background: linear-gradient(90deg, rgba(8,16,10,.94), rgba(8,16,10,.52) 44%, transparent 75%); }
+    .wide .main { max-width: 58%; }
+    .note { max-width: 1180px; margin: 18px auto 0; color: #b9c4b4; font-size: 13px; line-height: 1.5; }
+    [contenteditable] { outline-offset: 5px; }
+    [contenteditable]:focus { outline: 2px solid #bdf332; }
+    @media (max-width: 700px) { body { padding: 18px; } .gallery { grid-template-columns: 1fr; } .wide { grid-column: auto; } .wide .main { max-width: 75%; } .main { font-size: clamp(50px, 13vw, 100px); } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Viper Coin (V1PR) social kit</h1>
+    <p>Click a headline to edit it. These are layout previews using existing project art. Check image and remix rights before publishing; no claim, reward program, or product shown here is live.</p>
+  </header>
+  <main class="gallery">
+    <section class="item">
+      <p class="label">01 / Character reveal · square</p>
+      <article class="card character" aria-label="Viper character reveal card">
+        <div class="wordmark">Viper Coin · V1PR</div>
+        <div><p class="eyebrow">The jungle changes</p><h2 class="main" contenteditable="true" spellcheck="true">Cute had<br>its turn.<br><em>Meet the bite.</em></h2></div>
+        <div class="foot"><span>Memes with bite</span><span>Built on Sui</span></div>
+      </article>
+    </section>
+    <section class="item">
+      <p class="label">02 / Hunt Board prompt · square</p>
+      <article class="card hunt" aria-label="Hunt Board creative prompt card">
+        <div class="wordmark">Viper Coin · V1PR</div>
+        <div><p class="eyebrow">Creative prompt concept</p><h2 class="main" contenteditable="true" spellcheck="true">Enter the<br><em>food chain.</em></h2></div>
+        <div class="foot"><span>Hunt Board</span><span>Rules before launch</span></div>
+      </article>
+    </section>
+    <section class="item wide">
+      <p class="label">03 / Memes with Bite · wide</p>
+      <article class="card" aria-label="Memes with Bite wide card">
+        <div class="wordmark">Viper Coin · V1PR</div>
+        <div><p class="eyebrow">A new appetite</p><h2 class="main" contenteditable="true" spellcheck="true">No more<br>cuddly baby<br><em>animals.</em></h2></div>
+        <div class="foot"><span>Memes with bite</span><span>Sui first</span></div>
+      </article>
+    </section>
+  </main>
+  <p class="note">Working artwork and copy. Export only after confirming source-image rights, final wording, and platform dimensions. The verified Sui coin type must accompany any future claim or buy link.</p>
+</body>
+</html>

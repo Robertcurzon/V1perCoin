@@ -22,3 +22,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local research sources and document intermediates
+.bolt/
+legacy/
+design/source/
+viper/build/
+tmp/
+output/
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+public/whitepaper.pdf
+docs/*.pdf
