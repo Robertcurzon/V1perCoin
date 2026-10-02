@@ -5,7 +5,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage[a4paper,margin=22mm]{geometry}
-\usepackage{amsmath,amssymb,booktabs,tabularx,array,microtype,xcolor,fancyhdr}
+\usepackage{amsmath,amssymb,booktabs,tabularx,array,microtype,xcolor,fancyhdr,float}
 \usepackage{xurl}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 \definecolor{viper}{RGB}{37,75,37}
@@ -38,7 +38,7 @@ Viper Coin (V1PR) is a Sui meme coin with a once-minted supply, approved free co
 
 \section{Coin and supply}
 
-\begin{table}[t]\centering\small
+\begin{table}[H]\centering\small
 \caption{Coin identity and supply rules.}
 \begin{tabularx}{\textwidth}{lX}
 \toprule
@@ -59,7 +59,7 @@ Publication mints the full initial supply into a sealed, one-use LaunchCap. The 
 
 \section{Initial allocation}
 
-\begin{table}[t]\centering\small
+\begin{table}[H]\centering\small
 \caption{Initial allocation of the complete one-billion V1PR supply.}
 \begin{tabularx}{\textwidth}{X r r X}
 \toprule
@@ -100,7 +100,7 @@ r(M)=0.005\,10^{(M-1)/23},\quad M\in\{1,\ldots,24\}.
 
 The contract uses a fixed 24-entry table rounded down to integer parts per million. There is no floating-point computation onchain. The site uses the same generated table.
 
-\begin{table}[t]\centering\small
+\begin{table}[H]\centering\small
 \caption{Total-term net rewards after the mature-exit fee; before network gas.}
 \begin{tabularx}{\textwidth}{l r X X}
 \toprule

@@ -27,7 +27,7 @@ PREAMBLE=r'''% Generated from docs/WHITEPAPER.md by scripts/generate_whitepaper.
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage[a4paper,margin=22mm]{geometry}
-\usepackage{amsmath,amssymb,booktabs,tabularx,array,microtype,xcolor,fancyhdr}
+\usepackage{amsmath,amssymb,booktabs,tabularx,array,microtype,xcolor,fancyhdr,float}
 \usepackage{xurl}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 \definecolor{viper}{RGB}{37,75,37}
@@ -85,7 +85,7 @@ for block in blocks:
         specs={1:'lX',2:'X r r X',3:'l r X X'}[table_number]
         captions={1:'Coin identity and supply rules.',2:'Initial allocation of the complete one-billion V1PR supply.',3:'Total-term net rewards after the mature-exit fee; before network gas.'}
         head=rows[0]
-        body.append(r'\begin{'+env+r'}[t]\centering\small'+'\n'+r'\caption{'+captions[table_number]+'}\n'+r'\begin{tabularx}{'+width+'}{'+specs+'}\n'+r'\toprule'+'\n'+' & '.join(r'\textbf{'+escape(c)+'}' for c in head)+r' \\'+ '\n'+r'\midrule'+'\n'+'\n'.join(' & '.join(inline(c) for c in row)+r' \\' for row in rows[1:])+'\n'+r'\bottomrule\end{tabularx}'+'\n'+r'\end{'+env+'}')
+        body.append(r'\begin{'+env+r'}[H]\centering\small'+'\n'+r'\caption{'+captions[table_number]+'}\n'+r'\begin{tabularx}{'+width+'}{'+specs+'}\n'+r'\toprule'+'\n'+' & '.join(r'\textbf{'+escape(c)+'}' for c in head)+r' \\'+ '\n'+r'\midrule'+'\n'+'\n'.join(' & '.join(inline(c) for c in row)+r' \\' for row in rows[1:])+'\n'+r'\bottomrule\end{tabularx}'+'\n'+r'\end{'+env+'}')
     else: body.append(inline(block.replace('\n',' ')))
 refs=r'\begin{thebibliography}{9}'+'\n'+'\n'.join(r'\bibitem{ref'+str(i)+'} '+escape(title)+'. '+r'\url{'+url+'}.' for i,(title,url) in enumerate(references,1))+'\n'+r'\end{thebibliography}'
 DEST.write_text(PREAMBLE+'\n\n'.join(body)+'\n\n'+refs+'\n'+r'\end{document}'+'\n')
