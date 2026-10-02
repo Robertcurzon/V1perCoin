@@ -1,4 +1,4 @@
-"""Generate the standalone journal-style LaTeX source from the canonical white paper."""
+"""Generate the standalone full-width journal-style LaTeX source from the canonical white paper."""
 from pathlib import Path
 import re
 SOURCE = Path('docs/WHITEPAPER.md')
@@ -22,11 +22,11 @@ def inline(text):
     return ''.join(output)
 PREAMBLE=r'''% Generated from docs/WHITEPAPER.md by scripts/generate_whitepaper.py.
 % Standalone source: no external images, bibliography files or project inputs.
-\documentclass[10pt,twocolumn]{article}
+\documentclass[11pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage[a4paper,margin=19mm,columnsep=7mm]{geometry}
+\usepackage[a4paper,margin=22mm]{geometry}
 \usepackage{amsmath,amssymb,booktabs,tabularx,array,microtype,xcolor,fancyhdr}
 \usepackage{xurl}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
@@ -45,17 +45,15 @@ PREAMBLE=r'''% Generated from docs/WHITEPAPER.md by scripts/generate_whitepaper.
 \setlength{\emergencystretch}{1.5em}
 \urlstyle{same}
 \begin{document}
-\twocolumn[{
 \begin{center}
 {\small\sffamily\color{viper} SUI / FIXED SUPPLY / FUNDED LOCK REWARDS}\par\vspace{8pt}
 {\LARGE\bfseries Viper Coin (V1PR)}\par\vspace{4pt}
 {\large Protocol White Paper}\par\vspace{6pt}
 {\small Viper Coin / Release specification / 2 October 2026}\par\vspace{10pt}
 \end{center}
-\noindent\textbf{Abstract.} Viper Coin is a Sui meme token with a once-minted, burn-only supply of one billion V1PR. This paper specifies its seven allocation buckets, approved free claims, fully funded and non-transferable lock positions, exponential total-term rewards, time-tapered exit fees, supply-decreasing burns, and public onchain monitoring. Rewards distribute existing inventory and each accepted obligation is escrowed in full. Rates do not describe an annual yield or a guaranteed financial return. Website publication is separate from token deployment; no mainnet coin or funded exchange pool is live at the date of this specification.\par\vspace{6pt}
+\noindent\textbf{Abstract.} Viper Coin is a Sui meme token with a once-minted, burn-only supply of one billion V1PR. This paper specifies its seven allocation buckets, approved free claims, fully funded and non-transferable lock positions, exponential total-term rewards, time-tapered exit fees, supply-decreasing burns, public onchain monitoring, and the boundaries of optional privacy. Rewards distribute existing inventory and each accepted obligation is escrowed in full. Rates do not describe an annual yield or a guaranteed financial return. Website publication is separate from token deployment; no mainnet coin or funded exchange pool is live at the date of this specification.\par\vspace{6pt}
 \noindent\textbf{Keywords:} Sui; Move; burn-only currency; escrow; token rewards; public verification.\par\vspace{10pt}
 \hrule\vspace{14pt}
-}]
 '''
 FORMULAS = {
 '`total term reward rate = 0.5% × 10^((months − 1) / 23)`': r'''\begin{equation}
@@ -82,9 +80,8 @@ for block in blocks:
         table_number+=1
         rows=[[cell.strip() for cell in line.strip().strip('|').split('|')] for line in block.splitlines()]
         rows=[row for row in rows if not all(re.fullmatch(r':?-+:?',cell) for cell in row)]
-        wide=len(rows[0])>2
-        env='table*' if wide else 'table'
-        width=r'\textwidth' if wide else r'\columnwidth'
+        env='table'
+        width=r'\textwidth'
         specs={1:'lX',2:'X r r X',3:'l r X X'}[table_number]
         captions={1:'Coin identity and supply rules.',2:'Initial allocation of the complete one-billion V1PR supply.',3:'Total-term net rewards after the mature-exit fee; before network gas.'}
         head=rows[0]

@@ -48,7 +48,7 @@ Visit `/monitor` after configuration. Confirm Currency supply and vault accounti
 
 ### Website release checks
 
-- Open `/whitepaper`; verify all eight sections, economics tables, source links and the downloadable copy.
+- Open `/whitepaper`; verify all nine sections, economics tables, source links and the downloadable copy.
 - Populate `publicReserve`, `initialLiquidity`, `laterLiquidity`, `vaultAdminCapId`, `claimsAdminCapId`, and `metadataDigest` from the actual allocation and metadata-deletion receipts. The manifest refuses incomplete custody/authority records. A funded exchange pair is configured separately.
 - Compare every custody address and initial allocation against the allocation transaction; public labels do not prove that a wallet's current balance equals its original budget.
 - Compare Currency, vault and claim pool IDs, versions and last-change receipts against Suiscan on the same network. Test that retaining metadata authority causes the website to reject the currency.

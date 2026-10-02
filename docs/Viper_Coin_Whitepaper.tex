@@ -1,10 +1,10 @@
 % Generated from docs/WHITEPAPER.md by scripts/generate_whitepaper.py.
 % Standalone source: no external images, bibliography files or project inputs.
-\documentclass[10pt,twocolumn]{article}
+\documentclass[11pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage[a4paper,margin=19mm,columnsep=7mm]{geometry}
+\usepackage[a4paper,margin=22mm]{geometry}
 \usepackage{amsmath,amssymb,booktabs,tabularx,array,microtype,xcolor,fancyhdr}
 \usepackage{xurl}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
@@ -23,17 +23,15 @@
 \setlength{\emergencystretch}{1.5em}
 \urlstyle{same}
 \begin{document}
-\twocolumn[{
 \begin{center}
 {\small\sffamily\color{viper} SUI / FIXED SUPPLY / FUNDED LOCK REWARDS}\par\vspace{8pt}
 {\LARGE\bfseries Viper Coin (V1PR)}\par\vspace{4pt}
 {\large Protocol White Paper}\par\vspace{6pt}
 {\small Viper Coin / Release specification / 2 October 2026}\par\vspace{10pt}
 \end{center}
-\noindent\textbf{Abstract.} Viper Coin is a Sui meme token with a once-minted, burn-only supply of one billion V1PR. This paper specifies its seven allocation buckets, approved free claims, fully funded and non-transferable lock positions, exponential total-term rewards, time-tapered exit fees, supply-decreasing burns, and public onchain monitoring. Rewards distribute existing inventory and each accepted obligation is escrowed in full. Rates do not describe an annual yield or a guaranteed financial return. Website publication is separate from token deployment; no mainnet coin or funded exchange pool is live at the date of this specification.\par\vspace{6pt}
+\noindent\textbf{Abstract.} Viper Coin is a Sui meme token with a once-minted, burn-only supply of one billion V1PR. This paper specifies its seven allocation buckets, approved free claims, fully funded and non-transferable lock positions, exponential total-term rewards, time-tapered exit fees, supply-decreasing burns, public onchain monitoring, and the boundaries of optional privacy. Rewards distribute existing inventory and each accepted obligation is escrowed in full. Rates do not describe an annual yield or a guaranteed financial return. Website publication is separate from token deployment; no mainnet coin or funded exchange pool is live at the date of this specification.\par\vspace{6pt}
 \noindent\textbf{Keywords:} Sui; Move; burn-only currency; escrow; token rewards; public verification.\par\vspace{10pt}
 \hrule\vspace{14pt}
-}]
 Meme with a bite! No more cuddly baby-animal meme coins. Viper eats them for lunch.
 
 Viper Coin (V1PR) is a Sui meme coin with a once-minted supply, approved free community claims, a funded lock-reward program, and actual supply-reducing burns. Its identity is playful and predatory; its economics are explicit and inspectable. This document describes the implemented local release. No mainnet coin, exchange pool, or reward program is live yet. A ticker or logo cannot identify the authentic asset: use the verified Sui coin type and publication records displayed on the project site after deployment.
@@ -42,7 +40,7 @@ Viper Coin (V1PR) is a Sui meme coin with a once-minted supply, approved free co
 
 \begin{table}[t]\centering\small
 \caption{Coin identity and supply rules.}
-\begin{tabularx}{\columnwidth}{lX}
+\begin{tabularx}{\textwidth}{lX}
 \toprule
 \textbf{Property} & \textbf{Release rule} \\
 \midrule
@@ -61,7 +59,7 @@ Publication mints the full initial supply into a sealed, one-use LaunchCap. The 
 
 \section{Initial allocation}
 
-\begin{table*}[t]\centering\small
+\begin{table}[t]\centering\small
 \caption{Initial allocation of the complete one-billion V1PR supply.}
 \begin{tabularx}{\textwidth}{X r r X}
 \toprule
@@ -76,7 +74,7 @@ Lock rewards & 15\% & 150,000,000 & Shared vault; rewards escrowed per position 
 Ecosystem Operations & 10\% & 100,000,000 & Founder-controlled Operations wallet \\
 \textbf{Total} & \textbf{100\%} & \textbf{1,000,000,000} &  \\
 \bottomrule\end{tabularx}
-\end{table*}
+\end{table}
 
 Operations pays for development, hosting, design, administration and collaborators at the founder's discretion. There is no separate Team allocation, promised vesting, or automated spending restriction on Operations. Community and Operations must have distinct addresses. Liquidity reserves require a paired asset and an actual pool-creation transaction; allocating V1PR alone does not create market liquidity, establish a price, or lock LP ownership. Pool, pair, paired-asset funding, LP custodian and withdrawal policy must be published before a buy link appears.
 
@@ -102,7 +100,7 @@ r(M)=0.005\,10^{(M-1)/23},\quad M\in\{1,\ldots,24\}.
 
 The contract uses a fixed 24-entry table rounded down to integer parts per million. There is no floating-point computation onchain. The site uses the same generated table.
 
-\begin{table*}[t]\centering\small
+\begin{table}[t]\centering\small
 \caption{Total-term net rewards after the mature-exit fee; before network gas.}
 \begin{tabularx}{\textwidth}{l r X X}
 \toprule
@@ -114,7 +112,7 @@ The contract uses a fixed 24-entry table rounded down to integer parts per milli
 18 months & 540 & 2.7422\% & 27,422 V1PR \\
 24 months & 720 & 5.0000\% & 50,000 V1PR \\
 \bottomrule\end{tabularx}
-\end{table*}
+\end{table}
 
 Rewards are simple, not compounded. \textbf{The pool reserves a mature-fee offset plus the exponential reward. Every accepted lock held to maturity earns a positive net V1PR reward before network gas.} For 1,000,000 V1PR locked for one month, the pool reserves 8,000 V1PR: a 3,000 V1PR fee offset plus 5,000 V1PR net reward. The exit still charges 3,000 V1PR and splits it 70/20/10; the final payout is 1,005,000 V1PR. The fee offset is funded from the same finite reward pool and consumes capacity; it is not minted or charged to later users.
 
@@ -154,9 +152,25 @@ User principal is accounted for separately. The administrator can pause or resum
 
 The initial Community allocation funds creator grants (6\% of total supply), Hunt Board challenges (5\%), onboarding and education (3\%), community events and moderation (1\%), and a Community reserve (5\%). These total 20\%. Exit-fee receipts supplement this budget. Subbudgets are operating policy, not contract escrow restrictions. Publish recipients, purpose, amount and transaction digest for each award. There is no token-holder governance mechanism in this release.
 
-Pseudonymous participation is welcome. Personal identity need not be published to read, hold, or lock V1PR. Base transfers, claims, balances, positions and fee recipients remain public; pseudonymity is not confidential settlement. There is no private-transfer feature in this release. Public wallet labels and program ledgers provide accountability without asserting anyone's legal identity.
-
 Before mainnet, publish the authentic coin type, package, Currency, vault and claim pool IDs; allocation and publication digests; custodians; claim eligibility policy; metadata authority; and admin capability owners. Make the package immutable before accepting participant funds so upgrade authority cannot replace the stated rules. Independent review and a testnet wallet rehearsal remain deployment requirements, not claims of completed audits. Founder-controlled balances, discretionary eligibility, smart-contract failure and illiquid trading are material limitations.
+
+\section{Privacy and selective disclosure}
+
+\textbf{Public accountability does not require publishing a participant's legal name.} V1PR supports pseudonymous participation: the website does not require a real name, email address, social login, or identity-document upload to read the specification or connect a supported wallet. Community members can choose a public alias and decide whether to associate that alias with their wallet. The free-claim administrator still controls address eligibility; an approved address is not a proof of unique personhood or anonymity.
+
+\textbf{The token ledger is public.} Standard V1PR transfers, balances, claim approvals, position owners, principal, reward amounts, lock timing and exit-fee recipients can be inspected onchain. Funding a new wallet from an identified address or publicly linking accounts can reveal relationships between them. A different alias, an encrypted chat or a private browser does not conceal blockchain records. V1PR is not a confidential-transfer coin, and the current Move contracts contain no shielded balances, hidden amounts or zero-knowledge transfer protocol.
+
+Privacy has three distinct layers. Identity privacy limits what a participant voluntarily publishes about themselves. Data privacy protects offchain records such as a private community submission. Transaction privacy would conceal some payment information through a compatible cryptographic protocol. The implemented release supports participation without a mandatory identity form; it does not supply an encrypted submission portal or private settlement.
+
+Sui's privacy stack provides building blocks rather than automatic privacy for every coin. Seal supports encrypted data with access policies; Nautilus supports confidential offchain computation with verifiable outcomes; zero-knowledge proofs can establish facts without revealing their underlying data. zkLogin and passkeys concern authentication, not hidden V1PR balances. These tools can inform optional services around V1PR, but none is integrated into its current wallet or token flow. Sui privacy overview~\cite{ref5}.
+
+An optional encrypted community application would need a defined access policy, key-management and recovery process, retention rules, and explicit participant consent. Only the information necessary to decide an award should be disclosed to reviewers. Public spending records can still show the grant amount, purpose and payment receipt without publishing the applicant's private supporting documents. The current launch has no such application service; this describes a privacy boundary for any later service, not a claim of completed functionality.
+
+A private-transfer integration would require an external protocol that demonstrably supports the exact V1PR coin type, verified custody and withdrawal semantics, an independent security review, and clear disclosure of which amounts, addresses, timing and entry/exit links remain visible. Moving V1PR into a wrapper or third-party pool adds new contract and custody risks and may interrupt access to the native claim and lock functions. The authentic native coin type must remain distinguishable from every wrapper. No privacy protocol, bridge or external deposit address is endorsed by this release, and no participant must use one to hold or lock native V1PR.
+
+The site's local chart history contains aggregate observations, not a personal profile. Connecting a wallet exposes its public address to the application and relevant RPC requests. GitHub Pages, RPC providers, external font hosting, wallet software and the optional trading-volume provider can receive connection metadata under their own policies. Deleting browser history does not erase onchain records or third-party logs. The project must not describe its public website as providing absolute anonymity.
+
+Founder and Community custody remain publicly accountable through labeled addresses, explorer links and spending receipts. That accountability follows funds and authority, without requiring a claim about a custodian's legal identity. An optional privacy service must preserve verification of the initial supply, aggregate funded obligations and actual burns; privacy must not conceal an extra mint path or turn an unfunded reward promise into an apparent reserve.
 
 \section{Monitor}
 
@@ -164,21 +178,22 @@ The \texttt{/monitor} page reads the registered Currency, reward vault, claim po
 
 Charts refresh every 30 seconds and store up to 720 aggregate observations in the local browser. History starts when that browser observes the deployed project; it is not a complete historical index or a count of unique people. Total supply includes reserves and locked coins; it is not circulating supply. API failures preserve saved observations and mark them stale. Browser-cached observations are marked stale until a fresh RPC read succeeds; data older than 90 seconds is also marked stale. Object versions and last-change transaction links let readers inspect the provenance of each current read. The page refreshes on window focus and prevents overlapping refreshes. Reads are separate RPC observations rather than a single checkpoint snapshot.
 
-Trading volume uses DEX Screener only after a real mainnet pair is configured. The adapter checks chain, pair and the verified V1PR coin type. It charts the provider's rolling 24-hour USD volume for that single pair, not lifetime or all-exchange volume. Missing deployment/pair data is shown as unavailable; no activity is fabricated. DEX Screener API~\cite{ref5}.
+Trading volume uses DEX Screener only after a real mainnet pair is configured. The adapter checks chain, pair and the verified V1PR coin type. It charts the provider's rolling 24-hour USD volume for that single pair, not lifetime or all-exchange volume. Missing deployment/pair data is shown as unavailable; no activity is fabricated. DEX Screener API~\cite{ref6}.
 
  The custody directory publishes the founder/Operations, Community, public distribution, initial liquidity and later liquidity addresses, with their current V1PR wallet balances. A wallet balance is not proof of a remaining budget or active DEX liquidity. Roles can share an address; their displayed balances must not be added together. Principal and reserved rewards are held in user position objects and tracked by the vault, outside these wallet holdings.
 
 The recent activity feed decodes Move events for lock opens/closes, reward funding, deposit pause/resume, free claims and unclaimed-inventory burns. Each event is filtered to the configured vault or claim pool and links to its transaction and public participant address. The feed queries the latest 20 events per module and displays up to 20 matching entries; this is a bounded view, not a complete historical index. Equal-checkpoint entries do not imply a cross-transaction execution order. Ordinary transfers, holders and exchange transactions can be inspected through the coin explorer. Funding and pause events show a checkpoint instead of inventing a timestamp.
 
-The monitor links the exact coin type, Move package, Currency, vault, claim pool, admin capability objects, exchange pair and publication/allocation/immutability transactions on the appropriate Suiscan network. All five custody addresses, both admin capability IDs, and publication/allocation/immutability/metadata-deletion digests are required before website transactions are enabled. Exchange pair configuration remains optional until a funded pair exists. Unknown identifiers remain unavailable. Deployment transaction records are supplied by the operator and must be independently checked; a configuration flag is not an audit or proof that upgrade authority has been removed. Suiscan route documentation~\cite{ref6}, Sui SDK object and event queries~\cite{ref7}.
+The monitor links the exact coin type, Move package, Currency, vault, claim pool, admin capability objects, exchange pair and publication/allocation/immutability transactions on the appropriate Suiscan network. All five custody addresses, both admin capability IDs, and publication/allocation/immutability/metadata-deletion digests are required before website transactions are enabled. Exchange pair configuration remains optional until a funded pair exists. Unknown identifiers remain unavailable. Deployment transaction records are supplied by the operator and must be independently checked; a configuration flag is not an audit or proof that upgrade authority has been removed. Suiscan route documentation~\cite{ref7}, Sui SDK object and event queries~\cite{ref8}.
 
 \begin{thebibliography}{9}
 \bibitem{ref1} Sui Currency Standard. \url{https://docs.sui.io/onchain-finance/fungible-tokens/create-a-fungible-token}.
 \bibitem{ref2} Coin Registry. \url{https://docs.sui.io/references/framework/sui_sui/coin_registry}.
 \bibitem{ref3} Sui tokenomics. \url{https://docs.sui.io/paper/tokenomics.pdf}.
 \bibitem{ref4} Sui Coin Registry burn operations. \url{https://docs.sui.io/references/framework/sui_sui/coin_registry}.
-\bibitem{ref5} DEX Screener API. \url{https://docs.dexscreener.com/api/reference}.
-\bibitem{ref6} Suiscan route documentation. \url{https://docs.blockberry.one/docs/suiscan-routes}.
-\bibitem{ref7} Sui SDK object and event queries. \url{https://sdk.mystenlabs.com/sui/clients/querying}.
+\bibitem{ref5} Sui privacy overview. \url{https://www.sui.io/privacy}.
+\bibitem{ref6} DEX Screener API. \url{https://docs.dexscreener.com/api/reference}.
+\bibitem{ref7} Suiscan route documentation. \url{https://docs.blockberry.one/docs/suiscan-routes}.
+\bibitem{ref8} Sui SDK object and event queries. \url{https://sdk.mystenlabs.com/sui/clients/querying}.
 \end{thebibliography}
 \end{document}
