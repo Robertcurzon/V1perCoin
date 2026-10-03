@@ -16,10 +16,12 @@
     "postbuild": "node scripts/finalize_site.cjs",
     "test:deployment": "node scripts/test_deployment.mjs",
     "whitepaper:source": "python3 scripts/generate_whitepaper.py",
-    "test:feast": "node scripts/feast/test.mjs && node scripts/feast/properties.mjs",
+    "test:feast": "node scripts/feast/test.mjs && node scripts/feast/properties.mjs && npm run test:pyth",
     "pretest:economics": "node scripts/sync_whitepaper.cjs",
     "test:claims": "node scripts/claims/test.mjs",
-    "test:rehearsal": "node scripts/rehearse_localnet.mjs"
+    "test:rehearsal": "node scripts/rehearse_localnet.mjs",
+    "test:pyth": "node scripts/feast/test_pyth.mjs",
+    "check:pyth": "node scripts/feast/check_pyth.mjs"
   },
   "dependencies": {
     "@mysten/dapp-kit-react": "^2.1.37",
