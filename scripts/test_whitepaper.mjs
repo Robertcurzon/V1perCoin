@@ -6,13 +6,11 @@ const server = await createServer({ server: { middlewareMode: true, hmr: false, 
 try {
   const { default: Whitepaper } = await server.ssrLoadModule('/src/Whitepaper.tsx');
   const html = renderToStaticMarkup(React.createElement(Whitepaper));
-  assert.equal((html.match(/<h2 /g) || []).length, 9);
-  assert.equal((html.match(/<table>/g) || []).length, 3);
-  assert(html.includes('id="9-monitor"'));
-  assert(html.includes('Meme with a bite!'));
-  assert(html.includes('id="8-privacy-and-selective-disclosure"'));
-  assert(html.includes('Seal'));
-  assert(html.includes('not a confidential-transfer coin'));
-  assert(html.includes('5.0000%'));
-  console.log('White paper render passed: 9 navigable sections, 3 tables, branding and reward rates.');
+  assert(html.includes('<iframe'));
+  assert(html.includes('whitepaper.pdf#toolbar=0&amp;navpanes=0&amp;view=FitH'));
+  assert(html.includes('title="Viper Coin (V1PR) white paper PDF"'));
+  assert(html.includes('Download PDF'));
+  assert(html.includes('Open PDF'));
+  assert(!html.includes('paper-content'));
+  console.log('White paper page passed: embedded PDF and direct open/download links.');
 } finally { await server.close(); }
