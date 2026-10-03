@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { verifyMessage } from 'ethers';
@@ -8,6 +8,7 @@ import { ed25519 } from '@noble/curves/ed25519.js';
 import { fromBase58 } from '@mysten/sui/utils';
 import { secp256k1 } from '@noble/curves/secp256k1.js';
 import { normalizeAddress, assetKey, bindingMessage, lockMessage } from './networks.mjs';
+import { FINALITY_RULES,requireFinality,reconcile } from './integrity.mjs';
 export { bindingMessage, lockMessage } from './networks.mjs';
 export const DOGE_MESSAGE_PREFIX = '\x19Dogecoin Signed Message:\n';
 export function verifyDogeMessage(text, source, signature) {
@@ -69,6 +70,7 @@ export function validateConfig(config) {
   for (const c of config.coins) {
     if (typeof c.id !== 'string' || !/^[a-z0-9][a-z0-9-]*$/.test(c.id) || ids.has(c.id)) fail('Require distinct accepted-coin IDs');
     ids.add(c.id);
+    if(config.finalityRules?.[c.chain]!==FINALITY_RULES[c.chain])fail('Explicit release finality rules required for every source network');
     assetKey(c.chain,c.contract); const treasury=sourceAddress(c.chain,c.treasury,true);
     if (treasuries.has(c.chain) && treasuries.get(c.chain)!==treasury) fail('All coins on a chain must use its published Treasury');treasuries.set(c.chain,treasury);
     if ((c.chain==='dogecoin' && c.decimals!==8) || (c.chain==='memecore' && c.decimals!==18)) fail('Wrong native asset decimals');
@@ -82,7 +84,7 @@ export function score(config,bindings,transfers,prices) {
   for (const raw of bindings) { const b=verifyBinding(raw); if(b.windowStart!==config.windowStart)fail('Binding belongs to another campaign'); const key=`${b.chain}:${b.source}`;if(bound.has(key))fail('Duplicate source binding');if(choice.has(b.sui)&&choice.get(b.sui)!==b.lockMonths)fail('Conflicting lock choices for Sui wallet');bound.set(key,b);choice.set(b.sui,b.lockMonths); }
   const weights = new Map(), totals = new Map(config.coins.map(c=>[c.id,0n])), treasuryTotals = new Map(config.coins.map(c=>[c.id,0n])), audit = [], seen = new Set(); let totalUsd=0n;
   for (const t of transfers) {
-    integer(t.confirmedAt,'confirmation time');integer(t.index,'transfer index');
+    integer(t.confirmedAt,'confirmation time');integer(t.index,'transfer index'); requireFinality(t);
     if (!t.txHash || typeof t.txHash !== 'string' || !/^[1-9][0-9]*$/.test(t.amountBaseUnits)) fail('Invalid transfer');
     const key=`${t.chain}:${t.txHash}:${t.index}`;if(seen.has(key))fail('Duplicate transfer');seen.add(key);
     const c=config.coins.find(c=>assetKey(c.chain,c.contract)===assetKey(t.chain,t.contract));
@@ -109,14 +111,41 @@ export function score(config,bindings,transfers,prices) {
   }).filter(a=>BigInt(a.amountBaseUnits)>0n);
   const allocated=allocations.reduce((n,a)=>n+BigInt(a.amountBaseUnits),0n);if(allocated>POOL)fail('Allocation exceeds pool');
   const csv='sui_address,v1pr_amount_base_units,lock_months\n'+allocations.map(a=>`${a.sui},${a.amountBaseUnits},${a.lockMonths}\n`).join('');
+  audit.sort((a,b)=>a.key<b.key?-1:a.key>b.key?1:0);
   return {csv,summary:{windowStart:config.windowStart,treasuryReceivedBaseUnits:Object.fromEntries([...treasuryTotals].map(([k,v])=>[k,v.toString()])),csvSha256:hash(csv),totalUsdScaled:totalUsd.toString(),usdScale:USD.toString(),allocatedBaseUnits:allocated.toString(),burnAtFinalizeBaseUnits:(POOL-allocated).toString(),clearingPrice:allocated===0n?null:{usdNumerator:(totalUsd*UNIT).toString(),tokenDenominator:(allocated*USD).toString()},liquidityProceedsPercent:25,receivedBaseUnits:Object.fromEntries([...totals].map(([k,v])=>[k,v.toString()]))},audit,allocations};
 }
+export function readBundle(file) {
+  const raw=readFileSync(file),bundle=JSON.parse(raw),base=dirname(resolve(file));
+  if(!bundle.files || Object.keys(bundle.files).sort().join(',')!=='bindings,config,prices,reconciliation,transfers')fail('Require a five-file input manifest: config, bindings, transfers, prices, reconciliation');
+  const input={},inputFiles=[{role:'manifest',path:resolve(file),sha256:hash(raw)}];
+  for(const [role,path] of Object.entries(bundle.files)) {
+    if(typeof path!=='string'||!path)fail('Input file path required');
+    const absolute=resolve(base,path),bytes=readFileSync(absolute); input[role]=JSON.parse(bytes);
+    inputFiles.push({role,path:absolute,sha256:hash(bytes)});
+  }
+  if(!Array.isArray(bundle.evidenceFiles)||bundle.evidenceFiles.length<2)fail('Archive primary and independent source evidence files');
+  for(const path of bundle.evidenceFiles) {
+    if(typeof path!=='string'||!path)fail('Evidence path required');
+    const absolute=resolve(base,path);inputFiles.push({role:'evidence',path:absolute,sha256:hash(readFileSync(absolute))});
+  }
+  for(const source of [input.transfers.source,input.reconciliation.source])if(!inputFiles.some(f=>f.role==='evidence'&&f.sha256===source?.evidenceSha256))fail('Source evidence hash must match an archived input file');
+  return {input,inputFiles};
+}
+export function prepareReport(file) {
+  const {input,inputFiles}=readBundle(file); validateConfig(input.config);
+  if(!Array.isArray(input.transfers.receipts))fail('Transfers file requires receipts and source provenance');
+  const result=score(input.config,input.bindings,input.transfers.receipts,input.prices.prices??input.prices);
+  const reconciliation=reconcile(input.config,input.transfers.receipts,input.transfers.source,input.reconciliation);
+  return {result,inputFiles,reconciliation};
+}
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  const [file,out]=process.argv.slice(2);if(!file||!out)fail('Usage: node scripts/feast/score.mjs INPUT.json OUTPUT_DIRECTORY');
+  const [file,out]=process.argv.slice(2);if(!file||!out)fail('Usage: node scripts/feast/score.mjs INPUT_MANIFEST.json OUTPUT_DIRECTORY');
+  // All integrity checks precede directory creation or any CSV write.
+  const {result,inputFiles,reconciliation}=prepareReport(file);
   const repository=resolve(fileURLToPath(new URL('../..',import.meta.url)));
   if(execFileSync('git',['status','--porcelain','--','scripts/feast'],{cwd:repository,encoding:'utf8'}).trim()) fail('Commit a clean scoring release before publishing results');
-  const raw=readFileSync(file),input=JSON.parse(raw);const result=score(input.config,input.bindings,input.transfers,input.prices);
+  const scriptCommit=execFileSync('git',['rev-parse','HEAD'],{cwd:repository,encoding:'utf8'}).trim();
   mkdirSync(out,{recursive:true});writeFileSync(`${out}/allocations.csv`,result.csv);writeFileSync(`${out}/allocations.sha256`,result.summary.csvSha256+'\n');
-  writeFileSync(`${out}/results.json`,JSON.stringify({...result.summary,scriptCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:repository,encoding:'utf8'}).trim(),inputSha256:hash(raw),configSha256:hash(JSON.stringify(input.config)),audit:result.audit},null,2)+'\n');
+  writeFileSync(`${out}/results.json`,JSON.stringify({...result.summary,scriptCommit,inputFiles,reconciliation,audit:result.audit},null,2)+'\n');
   console.log(JSON.stringify(result.summary));
 }

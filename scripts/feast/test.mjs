@@ -7,8 +7,8 @@ import { score,verifyBinding,bindingMessage,lockMessage,earlyMultiplier,lockMult
 // Deterministic test keys only. No production signing material is generated or stored.
 const wallet=new Wallet('0x'+'11'.repeat(32)),sui='0x'+'aa'.repeat(32),treasury='0x'+'bb'.repeat(20),feed='ab'.repeat(32);
 async function binding(months=0,destination=sui) {const message=bindingMessage(wallet.address,destination,'ethereum',config.windowStart);return {chain:'ethereum',windowStart:config.windowStart,source:wallet.address,sui:destination,lockMonths:months,message,signature:await wallet.signMessage(message),lockSignature:await wallet.signMessage(lockMessage(message,months))};}
-const config={snapshotDate:'2026-10-03',snapshotSha256:'cc'.repeat(32),windowStart:1_000_000,liquidityProceedsPercent:25,coins:Array.from({length:10},(_,i)=>({id:`fixture${i}`,chain:'ethereum',contract:'0x'+(i+1).toString(16).padStart(40,'0'),decimals:6,pythFeed:feed,treasury}))};
-function transfer(time,amount='1000000',index=0) {return {chain:'ethereum',contract:config.coins[0].contract,txHash:'fixture-receipt',index,from:wallet.address,to:treasury,confirmedAt:time,amountBaseUnits:amount};}
+const config={snapshotDate:'2026-10-03',snapshotSha256:'cc'.repeat(32),finalityRules:{ethereum:'finalized-block',solana:'finalized-slot',dogecoin:'60-confirmations',memecore:'finalized-block'},windowStart:1_000_000,liquidityProceedsPercent:25,coins:Array.from({length:10},(_,i)=>({id:`fixture${i}`,chain:'ethereum',contract:'0x'+(i+1).toString(16).padStart(40,'0'),decimals:6,pythFeed:feed,treasury}))};
+function transfer(time,amount='1000000',index=0) {return {chain:'ethereum',finalityRule:'finalized-block',chainId:1,blockNumber:10,finalizedBlockNumber:20,finalized:true,receiptStatus:'success',contract:config.coins[0].contract,txHash:'fixture-receipt',index,from:wallet.address,to:treasury,confirmedAt:time,amountBaseUnits:amount};}
 function price(time,spot='100000000',average='100000000') {const o=(t,p)=>({feedId:feed,price:p,expo:-8,publishTime:t});return {provider:'Pyth Benchmarks',confirmedAt:time,spot:o(time,spot),history:Array.from({length:1440},(_,i)=>o(time-(i+1)*60,average))};}
 function prices(t) {return {[`${t.chain}:${t.txHash}:${t.index}`]:price(t.confirmedAt)};}
 assert.deepEqual(earlyMultiplier(1),[3n,2n]);assert.deepEqual(earlyMultiplier(5),[3n,2n]);assert.deepEqual(earlyMultiplier(6),[41n,28n]);assert.deepEqual(earlyMultiplier(19),[1n,1n]);assert.deepEqual(earlyMultiplier(21),[1n,1n]);assert.deepEqual(lockMultiplier(12),[11n,10n]);assert.deepEqual(lockMultiplier(24),[5n,4n]);
@@ -59,7 +59,7 @@ verifyBinding(doge);
 assert.throws(()=>verifyBinding({...doge,signature:doge.lockSignature}));
 assert.throws(()=>verifyBinding({...doge,windowStart:doge.windowStart+1}));
 const dogeConfig={...config,coins:[{...prod.coins.find(c=>c.id==='dogecoin'),treasury:doge.source},...config.coins.slice(1)]};
-const dt={chain:'dogecoin',contract:'native',from:doge.source,to:doge.source,txHash:'ef'.repeat(32),index:0,confirmations:60,inputAddresses:[doge.source],amountBaseUnits:'100000000',confirmedAt:config.windowStart};
+const dt={finalityRule:'60-confirmations',chain:'dogecoin',contract:'native',from:doge.source,to:doge.source,txHash:'ef'.repeat(32),index:0,confirmations:60,inputAddresses:[doge.source],amountBaseUnits:'100000000',confirmedAt:config.windowStart};
 const dogePrices={[`dogecoin:${dt.txHash}:0`]:price(dt.confirmedAt)};
 // Use the real feed identity with deterministic one-dollar observations.
 for(const obs of [dogePrices[`dogecoin:${dt.txHash}:0`].spot,...dogePrices[`dogecoin:${dt.txHash}:0`].history]) obs.feedId=dogeConfig.coins[0].pythFeed;
@@ -70,7 +70,7 @@ const mm=bindingMessage(wallet.address,sui,'memecore',config.windowStart);
 const mb={...b,chain:'memecore',message:mm,signature:await wallet.signMessage(mm),lockSignature:await wallet.signMessage(lockMessage(mm,0))};
 verifyBinding(mb); assert.throws(()=>verifyBinding({...mb,chain:'ethereum'}));
 const mc={...config,coins:[{...prod.coins.find(c=>c.id==='memecore'),treasury},...config.coins.slice(1)]};
-const mt={...t,chain:'memecore',contract:'native',chainId:4352,receiptStatus:'success',receiptKind:'native-transfer',finalized:true,amountBaseUnits:'1000000000000000000'};
+const mt={...t,chain:'memecore',contract:'native',chainId:4352,finalityRule:'finalized-block',receiptStatus:'success',receiptKind:'native-transfer',finalized:true,amountBaseUnits:'1000000000000000000'};
 const mp={[`memecore:${mt.txHash}:0`]:price(mt.confirmedAt)};
 for(const obs of [mp[`memecore:${mt.txHash}:0`].spot,...mp[`memecore:${mt.txHash}:0`].history])obs.feedId=mc.coins[0].pythFeed;
 assert.equal(score(mc,[mb],[mt],mp).allocations[0].amountBaseUnits,(15000n*UNIT).toString());
@@ -79,3 +79,51 @@ console.log('Native DOGE/M verified: independent DOGE vector, network/campaign-s
 assert.throws(()=>score(dogeConfig,[doge],[{...dt,confirmations:59}],dogePrices));
 assert.throws(()=>score(mc,[mb],[{...mt,chainId:1}],mp));
 assert.throws(()=>score(mc,[mb],[{...mt,finalized:false}],mp));
+
+const {FINALITY_RULES,requireFinality,reconcile}=await import('./integrity.mjs');
+const {prepareReport}=await import('./score.mjs');
+const {mkdtempSync,writeFileSync,existsSync,rmSync}=await import('node:fs');
+const {tmpdir}=await import('node:os');
+const {join}=await import('node:path');
+const {spawnSync}=await import('node:child_process');
+function independent(cfg,transfers) {
+ return {source:{provider:'second-provider',datasetId:'independent-balances-and-outflows',evidenceSha256:'22'.repeat(32),exportedAt:cfg.windowStart+22*DAY},records:cfg.coins.map(c=>{
+  const total=transfers.filter(t=>t.chain===c.chain&&t.contract===c.contract).reduce((n,t)=>n+BigInt(t.amountBaseUnits),0n);
+  const anchor={chain:c.chain,finalityRule:FINALITY_RULES[c.chain],finalized:true,receiptStatus:'success',chainId:c.chain==='memecore'?4352:1,blockNumber:10,finalizedBlockNumber:20,slot:10,finalizedSlot:20,commitment:'finalized',confirmations:60,blockHash:'ff'.repeat(32)};
+  return {chain:c.chain,contract:c.contract,wallet:c.treasury,windowStart:cfg.windowStart,windowEnd:cfg.windowStart+21*DAY,startBalanceBaseUnits:'50',endBalanceBaseUnits:String(total+40n),outflowsBaseUnits:'10',startAnchor:anchor,endAnchor:anchor};
+ })};
+}
+const transferSource={provider:'primary-provider',datasetId:'full-inbound-receipts',evidenceSha256:'11'.repeat(32),exportedAt:config.windowStart+22*DAY};
+const reconciled=independent(config,[t,unbound]);
+assert.equal(reconcile(config,[t,unbound],transferSource,reconciled).records.length,10);
+assert.throws(()=>reconcile(config,[t],transferSource,reconciled),/mismatch/); // missing unbound receipt
+assert.throws(()=>reconcile(config,[t,unbound],transferSource,{...reconciled,source:transferSource}),/independent/);
+assert.throws(()=>reconcile(config,[t,unbound],transferSource,{...reconciled,records:reconciled.records.slice(1)}),/every/);
+assert.throws(()=>reconcile(config,[t,unbound],transferSource,{...reconciled,records:[...reconciled.records,reconciled.records[0]]}),/duplicate/);
+assert.throws(()=>reconcile(config,[t,unbound],transferSource,{...reconciled,records:reconciled.records.map((r,i)=>i===0?{...r,outflowsBaseUnits:10}:r)}),/strings/);
+// Same-wallet assets cannot compensate for each other's discrepancies.
+const compensating={...reconciled,records:reconciled.records.map((r,i)=>({...r,endBalanceBaseUnits:String(BigInt(r.endBalanceBaseUnits)+(i===0?1n:i===1?-1n:0n))}))};
+assert.throws(()=>reconcile(config,[t,unbound],transferSource,compensating),/mismatch/);
+for(const candidate of [{...t,finalized:false},{...t,finalityRule:undefined},{...t,receiptStatus:'failure'},{...t,finalizedBlockNumber:9}])assert.throws(()=>score(config,[b],[candidate],prices(t)));
+assert.throws(()=>score({...config,finalityRules:{}},[b],[t],prices(t)),/rules/);
+requireFinality({chain:'solana',finalityRule:'finalized-slot',finalized:true,receiptStatus:'success',slot:10,finalizedSlot:20,commitment:'finalized'});
+assert.throws(()=>requireFinality({chain:'solana',finalityRule:'finalized-slot',finalized:true,receiptStatus:'success',slot:10,finalizedSlot:20,commitment:'confirmed'}));
+reconcile(dogeConfig,[dt],transferSource,independent(dogeConfig,[dt]));
+reconcile(mc,[mt],transferSource,independent(mc,[mt]));
+const directory=mkdtempSync(join(tmpdir(),'viper-scoring-test-'));
+try {
+ const inputs={config,bindings:[b],transfers:{source:transferSource,receipts:[t]},prices:prices(t),reconciliation:independent(config,[t])};
+ const evidence=[JSON.stringify([t]),JSON.stringify(inputs.reconciliation.records)];
+ evidence.forEach((raw,i)=>writeFileSync(join(directory,`evidence${i}.json`),raw));
+ inputs.transfers.source={...transferSource,evidenceSha256:hash(evidence[0])};inputs.reconciliation.source={...inputs.reconciliation.source,evidenceSha256:hash(evidence[1])};
+ const files=Object.fromEntries(Object.keys(inputs).map(role=>[role,`${role}.json`]));
+ for(const [role,input] of Object.entries(inputs))writeFileSync(join(directory,files[role]),JSON.stringify(input));
+ const manifest=join(directory,'manifest.json');writeFileSync(manifest,JSON.stringify({files,evidenceFiles:['evidence0.json','evidence1.json']}));
+ const prepared=prepareReport(manifest);assert.equal(prepared.inputFiles.length,8);
+ for(const file of prepared.inputFiles)assert.equal(file.sha256,hash(readFileSync(file.path)));
+ // CLI mismatch must not even create the requested output directory.
+ writeFileSync(join(directory,files.reconciliation),JSON.stringify({...inputs.reconciliation,records:[]}));
+ const out=join(directory,'refused-output'),cli=spawnSync(process.execPath,['scripts/feast/score.mjs',manifest,out],{encoding:'utf8'});
+ assert.notEqual(cli.status,0);assert.match(cli.stderr,/Reconcile every/);assert.equal(existsSync(out),false);
+} finally {rmSync(directory,{recursive:true,force:true});}
+console.log('Integrity gate passed: explicit finality, per-wallet/per-asset independent reconciliation, all-input hashes and CLI refusal before CSV writes.');

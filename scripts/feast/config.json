@@ -108,5 +108,11 @@
       "assetSource": "https://docs.memecore.com/memecore/token/usdm"
     }
   ],
-  "selectionPolicy": "Curated ten-asset Feast list; native DOGE and native MemeCore M replace two Solana assets. Historical market snapshot is provenance, not an automatic selection rule."
+  "selectionPolicy": "Curated ten-asset Feast list; native DOGE and native MemeCore M replace two Solana assets. Historical market snapshot is provenance, not an automatic selection rule.",
+  "finalityRules": {
+    "ethereum": "finalized-block",
+    "solana": "finalized-slot",
+    "dogecoin": "60-confirmations",
+    "memecore": "finalized-block"
+  }
 }
