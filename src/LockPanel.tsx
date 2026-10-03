@@ -72,7 +72,8 @@ export default function LockPanel() {
       const state = await readChainState(client);
       if (!account.chains.includes(`sui:${launch.network}`)) throw new Error('Connected wallet does not support the configured network.');
       if (action === 'claim') {
-        if (state.time >= BigInt(state.p.end_ms)) throw new Error('The free-claim window has ended.');
+        if (BigInt(state.p.end_ms) === 0n || state.time < BigInt(state.p.start_ms)) throw new Error('The free-claim window is not open.');
+        if (state.time >= BigInt(state.p.end_ms)) throw new Error('The 14-day free-claim window has ended.');
         let claimed: boolean;
         try {
           const { dynamicField } = await client.core.getDynamicField({ parentId: state.p.eligibility.id, name: { type: 'address', bcs: bcs.Address.serialize(account.address).toBytes() }, signal: AbortSignal.timeout(20_000) });
@@ -83,6 +84,7 @@ export default function LockPanel() {
         }
         if (claimed) throw new Error('This wallet already claimed its allocation.');
       }
+      if (action === 'deposit' && (launch.freeClaimsStartMs === 0 || state.time < BigInt(launch.freeClaimsStartMs))) throw new Error('New locks open at the published day-0 opening.');
       if (action === 'deposit' && state.v.paused) throw new Error('New locks are paused. Existing locks can still exit.');
       const tx = new Transaction();
       tx.setSender(account.address);
@@ -102,32 +104,34 @@ export default function LockPanel() {
     finally { setPending(false); }
   }
   const visiblePositions = loadedOwner === account?.address ? positions : [];
+  const lockOpen = configured && launch.freeClaimsStartMs > 0 && chainTime >= BigInt(launch.freeClaimsStartMs);
+  const freeOpen = lockOpen && chainTime < BigInt(launch.freeClaimsStartMs) + 14n * 86_400_000n;
   const capacity = vault ? BigInt(vault.rewards) : null;
   return <section id="lock" className="section lock-section">
-    <div className="kicker">03 / LOCK & EARN</div>
+    <div className="kicker">LOCK & EARN / FUNDED REWARDS</div>
     <h2>LONGER LOCK.<br/><em>BIGGER BITE.</em></h2>
     <p className="token-intro">First come, first served. The 150 million V1PR reward pool funds accepted locks until available capacity is exhausted. Your full reward is reserved when your lock opens.</p>
     <div className="lock-grid">
       <div className="lock-card">
         <label htmlFor="lock-amount">V1PR to lock</label><input id="lock-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <label htmlFor="lock-months">{months} program months · {months * 30} days</label><input id="lock-months" type="range" min="1" max="24" value={months} onChange={(e) => setMonths(Number(e.target.value))} />
-        <div className="facts"><div><span>ANNUAL TOKEN REWARD RATE</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>RESERVED TERM REWARD</span><strong>{formatAmount(reward)}</strong></div><div><span>MATURE EXIT FEE (0%)</span><strong>0 V1PR</strong></div><div><span>TOTAL TERM REWARD</span><strong>{formatAmount(reward)} V1PR</strong></div><div><span>FULL-TERM NET PAYOUT</span><strong>{formatAmount(principal + reward)} V1PR</strong></div><div><span>AVAILABLE REWARD CAPACITY</span><strong>{capacity === null ? 'NOT DEPLOYED / UNAVAILABLE' : `${formatAmount(capacity)} V1PR`}</strong></div></div>
+        <div className="facts"><div><span>ANNUAL TOKEN REWARD RATE</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>TOTAL TERM RATE</span><strong>{(Number(ratePpm(months)) / 10000 * months / 12).toFixed(4)}%</strong></div><div><span>MATURE EXIT FEE (0%)</span><strong>0 V1PR</strong></div><div><span>TOTAL TERM REWARD</span><strong>{formatAmount(reward)} V1PR</strong></div><div><span>FULL-TERM NET PAYOUT</span><strong>{formatAmount(principal + reward)} V1PR</strong></div><div><span>AVAILABLE REWARD CAPACITY</span><strong>{capacity === null ? 'NOT DEPLOYED / UNAVAILABLE' : `${formatAmount(capacity)} V1PR`}</strong></div></div>
         {inputError && <p role="alert">{inputError}</p>}{principal > 0n && netReward(principal, months) === 0n && <p role="alert">Increase the amount to earn at least one V1PR base unit for the selected term.</p>}
         <p className="fine-print">One month = 30 days. Simple rewards in V1PR; no compounding or dollar-return promise. No deposit fee. No fee at maturity. Early exit pays the reward for whole completed months and charges up to 5% of principal, tapering continuously to zero. Every completed lock earns a positive net V1PR reward before network gas. Early exits can return less than deposited.</p>
         <ConnectButton />
-        <div className="buttons"><button className="button lime" disabled={!configured || !account || !vault || vault.paused || pending || Boolean(inputError) || netReward(principal, months) === 0n || (capacity !== null && reward > capacity)} onClick={() => void submit('deposit')}>{pending ? 'PROCESSING…' : 'OPEN LOCK'}</button><button className="button outline" disabled={!configured || !account || !vault || pending} onClick={() => void submit('claim')}>CLAIM 10,000 V1PR</button></div>
+        <div className="buttons"><button className="button lime" disabled={!lockOpen || !account || !vault || vault.paused || pending || Boolean(inputError) || netReward(principal, months) === 0n || (capacity !== null && reward > capacity)} onClick={() => void submit('deposit')}>{pending ? 'PROCESSING…' : 'OPEN LOCK'}</button></div>
       </div>
       <div className="lock-card">
         <h3>FIRST COME. FULLY FUNDED.</h3><p>Annual simple token rates grow exponentially from 1% for a 1-month lock to 10% for a 24-month lock. Total reward is annual rate × months / 12: 20% for 24 months. The full term reward is escrowed. There is no new minting.</p>
-        <p>Early-exit fee = 5% × the fraction of the term remaining. It reaches zero at maturity. Of the fee, 50% is queued for permissionless burning, 40% goes to Community programs and 10% to the founder. Only completed program months earn rewards, at the rate for that completed length.</p>
-        <p>Free claims require an approved address: one 10,000 V1PR claim per approved wallet during the 90-day window. Unclaimed tokens can then be burned.</p>
+        <p>Early-exit fee = 5% × the fraction of the term remaining. It reaches zero at maturity. Of the fee, 50% is queued for permissionless burning, 40% goes to Community programs and 10% to the V1PR Foundation. Only completed program months earn rewards, at the rate for that completed length.</p>
+        <div id="claim-action" className="claim-action"><h3>FREE CLAIM STATUS</h3><p className="fine-print">{launch.freeClaimsStartMs > 0 ? `UTC window: ${new Date(launch.freeClaimsStartMs).toISOString()} → ${new Date(launch.freeClaimsStartMs + 14 * 86400000).toISOString()} · ${freeOpen ? 'OPEN' : 'NOT OPEN'}` : 'Opening date not announced. Free claims are closed.'}</p><p>Free claims require an approved address: one 10,000 V1PR claim per approved wallet during the 14-day scheduled window. Approvals freeze at opening; unclaimed tokens can be burned after the deadline.</p><button className="button outline" disabled={!freeOpen || !account || !vault || pending} onClick={() => void submit('claim')}>CLAIM 10,000 V1PR</button></div>
         <p className="fine-print">{configured ? `Network: ${launch.network}. Wallet approval is required for every transaction.` : 'Contracts are implemented locally. Transactions remain disabled until deployment records and verified object IDs are published.'}</p>
-        <a className="text-link" href={siteUrl('whitepaper/')}>READ THE WHITE PAPER ↗</a> · <a className="text-link" href={siteUrl('whitepaper.pdf')} target="_blank" rel="noreferrer">JOURNAL PDF ↗</a>
+        <a className="text-link" href={siteUrl('whitepaper/')}>READ THE WHITE PAPER ↗</a> · <a className="text-link" href={siteUrl('whitepaper/')} target="_blank" rel="noreferrer">JOURNAL PDF ↗</a>
       </div>
     </div>
     {visiblePositions.length > 0 && <div className="positions"><h3>YOUR LOCKS</h3>{visiblePositions.map((position) => {
       const quote = exitPreview(BigInt(position.principal), BigInt(position.reward), BigInt(position.duration_ms), chainTime - BigInt(position.start_ms));
-      return <article className="lock-card" key={position.id}><p>{formatAmount(BigInt(position.principal))} V1PR · {Number(BigInt(position.duration_ms) / MONTH_MS)} months</p><p><ExplorerLink kind="object" value={position.id}>View position</ExplorerLink></p><p>Matures {new Date(Number(BigInt(position.start_ms) + BigInt(position.duration_ms))).toLocaleString()}</p><p>Earned {formatAmount(quote.earned)} · Fee {formatAmount(quote.fee)} V1PR</p><p>Community {formatAmount(quote.community)} · Pending burn {formatAmount(quote.burn)} · Founder {formatAmount(quote.founder)}</p><p>Net payout: {formatAmount(quote.net)} V1PR</p><p className="fine-print">Preview uses the last fetched onchain clock. The transaction uses the current onchain time.</p><button className="button outline" disabled={pending || !vault} onClick={() => void submit('withdraw', position)}>WITHDRAW</button></article>;
+      return <article className="lock-card" key={position.id}><p>{formatAmount(BigInt(position.principal))} V1PR · {Number(BigInt(position.duration_ms) / MONTH_MS)} months</p><p><ExplorerLink kind="object" value={position.id}>View position</ExplorerLink></p><p>Matures {new Date(Number(BigInt(position.start_ms) + BigInt(position.duration_ms))).toLocaleString()}</p><p>Earned {formatAmount(quote.earned)} · Fee {formatAmount(quote.fee)} V1PR</p><p>Community {formatAmount(quote.community)} · Pending burn {formatAmount(quote.burn)} · Foundation {formatAmount(quote.founder)}</p><p>Net payout: {formatAmount(quote.net)} V1PR</p><p className="fine-print">Preview uses the last fetched onchain clock. The transaction uses the current onchain time.</p><button className="button outline" disabled={pending || !vault} onClick={() => void submit('withdraw', position)}>WITHDRAW</button></article>;
     })}<button className="button outline" disabled={pending} onClick={() => setRevision((value) => value + 1)}>REFRESH PREVIEW</button></div>}
     {error && <p role="alert" className="transaction-message">{error}</p>}{message && <p role="status" className="transaction-message">Confirmed: <ExplorerLink kind="tx" value={message}>{message}</ExplorerLink></p>}
   </section>;

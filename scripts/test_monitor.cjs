@@ -13,7 +13,7 @@ function load(file) {
     if (!name.startsWith('.')) return require(name);
     const resolved = path.resolve(path.dirname(file), name);
     if (fixtures.has(resolved)) return fixtures.get(resolved);
-    return name.endsWith('.json') ? JSON.parse(fs.readFileSync(resolved, 'utf8')) : load(`${resolved}.ts`);
+    return name.endsWith('.json') ? JSON.parse(fs.readFileSync(resolved, 'utf8')) : load(/\.(mjs|ts)$/.test(resolved) ? resolved : `${resolved}.ts`);
   } });
   return exports;
 }
@@ -36,7 +36,7 @@ const position = PositionBcs.parse(PositionBcs.serialize({ id, vault: id, owner:
 assert.equal(position.reward, '53000000000'); assert.equal(position.owner, other);
 const vault = VaultBcs.parse(VaultBcs.serialize({ id, rewards: '100', community: id, founder: other, paused: false, total_locked: '1000', reward_committed: '30', reward_paid: '20', reward_funded: '150', community_paid: '7', founder_paid: '1', burned: '2', pending_burn: '3', locks_opened: '5', locks_closed: '2' }).toBytes());
 assert.equal(BigInt(vault.rewards) + BigInt(vault.reward_committed) + BigInt(vault.reward_paid), BigInt(vault.reward_funded));
-const pool = ClaimsBcs.parse(ClaimsBcs.serialize({ id, inventory: '99990000000000', eligibility: { id, size: '1' }, approved: '1', claimed: '1', end_ms: '7776000000' }).toBytes());
+const pool = ClaimsBcs.parse(ClaimsBcs.serialize({ id, inventory: '99990000000000', eligibility: { id, size: '1' }, approved: '1', claimed: '1', start_ms: '604800000', end_ms: '1814400000' }).toBytes());
 assert.equal(pool.claimed, '1');
 console.log('Monitor checks passed: verified-pair volume rejects mismatches and missing data; BCS supply, escrow, claim, and activity fields preserve integer precision.');
 
@@ -61,7 +61,7 @@ const claimEvent = { ...event, eventType: `${id}::free_claims::Claimed`, bcs: Ev
 assert.equal(decodeActivity(claimEvent, id, id, id).label, 'Free claim paid');
 assert.equal(decodeActivity(claimEvent, id, id, other), null);
 const feast = FeastBcs.parse(FeastBcs.serialize({id, inventory:'0', allocations:{id,size:'2'}, allocated:'10000000000000',claimed:'10000000000000',burned:'90000000000000',finalized:true,start_ms:'1'}).toBytes());
-fixtures.set(path.resolve('src/launch.json'), { currencyId: id, vaultId: id, claimsId: id, feastId: id, founder: other, community: id });
+fixtures.set(path.resolve('src/launch.json'), { currencyId: id, vaultId: id, claimsId: id, feastId: id, founder: other, community: id, freeClaimsStartMs:604800000 });
 const { validateState } = load('src/chainState.ts');
 validateState(currency, vault, pool, feast);
 for (const [c,v,p] of [
@@ -73,12 +73,15 @@ for (const [c,v,p] of [
   [currency,{ ...vault, locks_closed: '6' },pool],
   [currency,vault,{ ...pool, claimed: '2' }],
   [currency,vault,{ ...pool, approved: '10001' }],
+  [currency,vault,{ ...pool, end_ms: '1814400001' }],
+  [currency,vault,{ ...pool, eligibility: {id,size:'2'} }],
+  [currency,vault,{ ...pool, end_ms:'0',start_ms:'0' }],
   [currency,vault,{ ...pool, inventory: '100000000000000' }],
 ]) assert.throws(() => validateState(c,v,p,feast));
 console.log('Verification checks passed: explorer routing, freshness, scoped event decoding and fail-closed currency/accounting checks.');
 
 const { isManifestConfigured } = load('src/manifest.ts');
-const manifest = { network: 'testnet', status: 'verified', packageId: id, currencyId: id, vaultId: id, claimsId: id, founder: other, community: id, feastId:id, feastAdminCapId:id, upgradeCapId:id, feastOpen:false, feastStartMs:0, feastSubmissionUrl:'', feastTreasury:{ethereum:'',solana:''}, initialLiquidity: `0x${'c'.repeat(64)}`, laterLiquidity: `0x${'d'.repeat(64)}`, vaultAdminCapId: id, claimsAdminCapId: id, coinType: coin, publishDigest: txDigest, allocationDigest: txDigest, immutableDigest: txDigest, metadataDigest: txDigest, dexPairId: '' };
+const manifest = { network: 'testnet', status: 'verified', packageId: id, currencyId: id, vaultId: id, claimsId: id, founder: other, community: id, feastId:id, feastAdminCapId:id, upgradeCapId:id, feastOpen:false, feastStartMs:0, feastSubmissionUrl:'', freeClaimsStartMs:604800000, freeClaimsApplicationUrl:'https://example.com/apply', feastTreasury:{ethereum:'',solana:'',dogecoin:'',memecore:''}, initialLiquidity: `0x${'c'.repeat(64)}`, laterLiquidity: `0x${'d'.repeat(64)}`, vaultAdminCapId: id, claimsAdminCapId: id, coinType: coin, publishDigest: txDigest, allocationDigest: txDigest, immutableDigest: txDigest, metadataDigest: txDigest, dexPairId: '' };
 assert.equal(isManifestConfigured(manifest), true);
 for (const patch of [{ network: 'devnet' },{ feastId: '' },{ upgradeCapId:'' },{ initialLiquidity:other },{ feastOpen:true },{ metadataDigest: '' },{ founder: id },{ vaultAdminCapId: `0x${'0'.repeat(64)}` },{ publishDigest: '<script>' },{ coinType: `${other}::v1pr::V1PR` }]) assert.equal(isManifestConfigured({ ...manifest, ...patch }), false);
 console.log('Manifest checks passed: required custody, authorities, network, coin type and receipts.');
@@ -91,6 +94,12 @@ assert.equal(objectAbsent(new ObjectError('deleted','deleted',{reason:'deleted',
 assert.equal(objectAbsent(new ObjectError('UNKNOWN','unknown',{reason:'unknown',objectId:id})),false);
 assert.equal(objectAbsent(new Error('not found')),false);
 const { vestedAllocation, treasuryExplorer } = load('src/feastData.ts');
+const { parseFeastReport } = load('src/feastReport.ts');
+const report = {csvSha256:'a'.repeat(64),scriptCommit:'b'.repeat(40),windowStart:1000,liquidityProceedsPercent:25,usdScale:'100000000',receivedBaseUnits:{dogecoin:'100'},treasuryReceivedBaseUnits:{dogecoin:'101'},totalUsdScaled:'100000000',allocatedBaseUnits:'1000000',burnAtFinalizeBaseUnits:'99999999000000',clearingPrice:{usdNumerator:'100000000000000',tokenDenominator:'100000000000000'}};
+assert.equal(parseFeastReport(report,['dogecoin'],1000),report);
+for(const changed of [{receivedBaseUnits:{}},{treasuryReceivedBaseUnits:{}},{receivedBaseUnits:{dogecoin:'102'}},{treasuryReceivedBaseUnits:{dogecoin:'101',unexpected:'0'}},{allocatedBaseUnits:'1000001'},{burnAtFinalizeBaseUnits:'0'},{clearingPrice:null},{clearingPrice:{usdNumerator:'1',tokenDenominator:'1'}},{liquidityProceedsPercent:24},{windowStart:1001},{usdScale:'1'}]) assert.throws(()=>parseFeastReport({...report,...changed},['dogecoin'],1000));
+assert.equal(parseFeastReport({...report,receivedBaseUnits:{dogecoin:'0'},treasuryReceivedBaseUnits:{dogecoin:'0'},totalUsdScaled:'0',allocatedBaseUnits:'0',burnAtFinalizeBaseUnits:'100000000000000',clearingPrice:null},['dogecoin'],1000).clearingPrice,null);
+console.log('Feast report checks passed: explicit per-asset zeros, complete receipt totals, allocation conservation and exact clearing-price accounting.');
 assert.equal(vestedAllocation({amount:'1001',claimed:'0',lock_months:'0'},0n),500n);
 assert.equal(vestedAllocation({amount:'1001',claimed:'0',lock_months:'0'},30n*86400000n),750n);
 assert.equal(vestedAllocation({amount:'1001',claimed:'0',lock_months:'0'},60n*86400000n),1001n);

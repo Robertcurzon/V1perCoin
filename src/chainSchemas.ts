@@ -13,7 +13,7 @@ export const ClockBcs = bcs.struct('Clock', { id: bcs.Address, timestamp_ms: bcs
 export const ClaimsBcs = bcs.struct('Pool', {
   id: bcs.Address, inventory: bcs.u64(),
   eligibility: bcs.struct('Table', { id: bcs.Address, size: bcs.u64() }),
-  approved: bcs.u64(), claimed: bcs.u64(), end_ms: bcs.u64(),
+  approved: bcs.u64(), claimed: bcs.u64(), start_ms: bcs.u64(), end_ms: bcs.u64(),
 });
 export const CurrencyBcs = bcs.struct('Currency', {
   id: bcs.Address, decimals: bcs.u8(), name: bcs.string(), symbol: bcs.string(),

@@ -293,7 +293,6 @@ fun recorded_owner_is_enforced() {
 #[test, expected_failure(abort_code = EAdmin)]
 fun another_vault_admin_cannot_pause() {
     let mut ctx = tx_context::dummy();
-    let clock = sui::clock::create_for_testing(&mut ctx);
     let (mut first, _first_cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
     let (_second, second_cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
     set_paused(&mut first, &second_cap, true); abort 999
@@ -332,18 +331,30 @@ fun dust_lock_cannot_open_with_zero_net_reward() {
 #[test]
 fun completed_months_never_exceed_finished_shorter_lock() {
     let p = 1_000_000_000_000;
+    let mut ctx = tx_context::dummy();
+    let mut clock = sui::clock::create_for_testing(&mut ctx);
+    let (mut vault,cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,&mut ctx);
     let mut term = 1;
     while (term <= 24) {
+        let start = clock.timestamp_ms();
+        let position = open(&mut vault,coin::mint_for_testing<V1PR>(p,&mut ctx),term,&clock,&mut ctx);
         let mut completed = 0;
         while (completed < term) {
-            let reward = if (completed == 0) 0 else net_reward(p, completed);
-            let fee = exit_fee(p, term * MONTH_MS, completed * MONTH_MS);
-            assert!(p - fee + reward <= p + reward);
-            assert!(reward <= full_reward(p, term));
+            sui::clock::set_for_testing(&mut clock,start+completed*MONTH_MS);
+            let (principal,earned,fee,_,_,_) = preview(&position,&clock);
+            let shorter_reward = if (completed == 0) 0 else net_reward(p,completed);
+            assert!(principal == p && earned == shorter_reward);
+            assert!(principal-fee+earned <= p+shorter_reward);
+            assert!(earned <= position.reward.value());
             completed = completed + 1;
         };
+        sui::clock::set_for_testing(&mut clock,start+term*MONTH_MS);
+        let payout = close(&mut vault,position,&clock,&mut ctx);
+        assert!(payout.value() == p+full_reward(p,term)); coin::burn_for_testing(payout);
         term = term + 1;
     };
+    assert_balanced(&vault);
+    std::unit_test::destroy(vault); std::unit_test::destroy(cap); sui::clock::destroy_for_testing(clock);
 }
 
 #[test_only]

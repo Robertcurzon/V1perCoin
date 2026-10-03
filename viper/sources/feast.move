@@ -119,19 +119,50 @@ fun liquid_claims_and_expiry_reconcile() {
     assert!(pool.inventory.value() == 0 && pool.claimed == 1_000);
     std::unit_test::destroy(pool);std::unit_test::destroy(cap);std::unit_test::destroy(currency);std::unit_test::destroy(metadata);sui::clock::destroy_for_testing(clock);s.end();
 }
-#[test]
-fun locked_claim_opens_correct_position() {
+#[test_only]
+fun check_locked_claim(term: u64) {
     let mut s = sui::test_scenario::begin(@0xA); let clock = sui::clock::create_for_testing(s.ctx());
     let (mut currency, metadata) = viper::v1pr::test_currency(s.ctx()); let (mut pool,cap) = setup(s.ctx());
     let (mut vault, vcap) = viper::lock_vault::create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(),s.ctx()),@0xC,@0xF,s.ctx());
-    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000_000_000],vector[24],&clock); finalize(&mut pool,&cap,&mut currency,&clock);
+    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000_000_000],vector[term],&clock); finalize(&mut pool,&cap,&mut currency,&clock);
     claim_locked(&mut pool,&mut vault,&clock,s.ctx()); s.next_tx(@0xA);
     let p = s.take_from_sender<viper::lock_vault::Position>();
     let (owner,duration,principal,reward) = viper::lock_vault::position_details(&p);
-    assert!(owner == @0xA && duration == 24*2_592_000_000 && principal == 1_000_000_000 && reward == 200_000_000);
+    assert!(owner == @0xA && duration == term*2_592_000_000 && principal == 1_000_000_000 && reward == viper::lock_vault::full_reward(principal,term));
     let coin = viper::lock_vault::close(&mut vault,p,&clock,s.ctx()); coin::burn_for_testing(coin); viper::lock_vault::flush_burns(&mut vault,&mut currency);
     assert!(pool.claimed == 1_000_000_000 && pool.inventory.value()+pool.claimed+pool.burned == viper::allocation::public_reserve());
     std::unit_test::destroy(pool);std::unit_test::destroy(cap);std::unit_test::destroy(vault);std::unit_test::destroy(vcap);std::unit_test::destroy(currency);std::unit_test::destroy(metadata);sui::clock::destroy_for_testing(clock);s.end();
+}
+#[test]
+fun locked_claim_opens_correct_position() { check_locked_claim(24); }
+#[test]
+fun twelve_month_claim_opens_correct_position() { check_locked_claim(12); }
+#[test, expected_failure(abort_code = EAdmin)]
+fun wrong_admin_cannot_finalize() {
+    let mut ctx = tx_context::dummy(); let clock = sui::clock::create_for_testing(&mut ctx);
+    let (mut currency,_metadata) = viper::v1pr::test_currency(&mut ctx);
+    let (mut pool,_cap) = setup(&mut ctx); let (_other,wrong) = setup(&mut ctx);
+    finalize(&mut pool,&wrong,&mut currency,&clock); abort 999
+}
+#[test, expected_failure(abort_code = 3, location = viper::lock_vault)]
+fun locked_claim_requires_full_reward_capacity() {
+    let mut s = sui::test_scenario::begin(@0xA); let clock = sui::clock::create_for_testing(s.ctx());
+    let (mut currency,_metadata) = viper::v1pr::test_currency(s.ctx()); let (mut pool,cap) = setup(s.ctx());
+    let (mut vault,_vcap) = viper::lock_vault::create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(),s.ctx()),@0xC,@0xF,s.ctx());
+    let _existing = viper::lock_vault::open(&mut vault,coin::mint_for_testing<V1PR>(750_000_000_000_000,s.ctx()),24,&clock,s.ctx());
+    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000_000_000],vector[12],&clock);
+    finalize(&mut pool,&cap,&mut currency,&clock);
+    claim_locked(&mut pool,&mut vault,&clock,s.ctx()); abort 999
+}
+#[test, expected_failure(abort_code = 2, location = viper::lock_vault)]
+fun locked_claim_respects_deposit_pause() {
+    let mut s = sui::test_scenario::begin(@0xA); let clock = sui::clock::create_for_testing(s.ctx());
+    let (mut currency,_metadata) = viper::v1pr::test_currency(s.ctx()); let (mut pool,cap) = setup(s.ctx());
+    let (mut vault,vcap) = viper::lock_vault::create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(),s.ctx()),@0xC,@0xF,s.ctx());
+    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000_000_000],vector[24],&clock);
+    finalize(&mut pool,&cap,&mut currency,&clock);
+    viper::lock_vault::set_paused(&mut vault,&vcap,true);
+    claim_locked(&mut pool,&mut vault,&clock,s.ctx()); abort 999
 }
 #[test, expected_failure(abort_code = EAdmin)]
 fun wrong_admin_fails() { let mut ctx = tx_context::dummy(); let clock = sui::clock::create_for_testing(&mut ctx); let (mut p,_c) = setup(&mut ctx);let (_q,c) = setup(&mut ctx);set_allocations(&mut p,&c,vector[@0xA],vector[1],vector[0],&clock);abort 999 }

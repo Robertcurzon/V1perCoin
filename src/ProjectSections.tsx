@@ -1,0 +1,78 @@
+import { ArrowUpRight, Flame, Fingerprint, Gift, Eye } from 'lucide-react';
+import { siteUrl } from './site';
+import { FEAST_DISCLOSURE } from './feastData';
+import FreeClaimApplication from './FreeClaimApplication';
+
+const allocations = [
+  { name: 'Free claims', percent: 10, color: '#bdf332', description: '100M · approved community addresses' },
+  { name: 'Feast claims', percent: 10, color: '#84c942', description: '100M · contributor allocation pool' },
+  { name: 'Initial exchange liquidity', percent: 20, color: '#65bfbd', description: '200M · reserve for initial exchange liquidity' },
+  { name: 'Later liquidity reserve', percent: 15, color: '#5895be', description: '150M · future exchange depth' },
+  { name: 'Community programs', percent: 20, color: '#e6c768', description: '200M · creators, challenges and onboarding' },
+  { name: 'Lock rewards', percent: 15, color: '#d79263', description: '150M · escrowed rewards, no new minting' },
+  { name: 'Ecosystem Operations', percent: 10, color: '#af92c5', description: '100M · V1PR Foundation' },
+];
+
+export function AllocationSection() {
+  return <section id="allocation" className="section allocation">
+    <div className="section-heading"><div><div className="kicker">THE INITIAL SUPPLY / 100%</div><h2>EVERY TOKEN.<br/><em>ACCOUNTED FOR.</em></h2></div><p>One billion V1PR minted once. Claims and rewards use this inventory; burns reduce it.</p></div>
+    <div className="allocation-bar" aria-hidden="true">{allocations.map(a => <span key={a.name} style={{ width: `${a.percent}%`, background: a.color }} />)}</div>
+    <div className="allocation-grid">{allocations.map(a => <article key={a.name}><div><i style={{ background: a.color }} /><span>{a.name}</span><strong>{a.percent}%</strong></div><p>{a.description}</p></article>)}</div>
+    <p className="fine-print">Liquidity allocations are token reserves, not evidence of a funded exchange pool. Operations is controlled through the V1PR Foundation. <a href="#foundation">Read the custody and funding policy ↓</a></p>
+  </section>;
+}
+
+export function FreeClaimsSection() {
+  return <section id="claims" className="section free-claims-section">
+    <div className="claim-callout"><Gift size={32} aria-hidden="true" /><div><div className="kicker">FREE COMMUNITY CLAIMS / 10% OF SUPPLY</div><h2>A FIRST BITE.<br/><em>ON THE HOUSE.</em></h2><p>10,000 V1PR per approved Sui address. Up to 10,000 addresses. One claim each, within the 14-day scheduled claim window; network gas only.</p><p className="fine-print">Apply during the seven days before opening with a wallet-signed application and one original community entry. Review checks authorship and repeated entries; approvals freeze at opening. A wallet is not proof of one person. No paid referral or promotional purchase is required. Unclaimed tokens can be burned after expiry; the administrator cannot withdraw them.</p></div><a className="button outline" href="#claim-action">CLAIM STATUS <ArrowUpRight size={18} /></a></div><FreeClaimApplication />
+  </section>;
+}
+
+export function BurnsSection() {
+  return <section id="burns" className="section feature-section">
+    <div className="section-heading"><div><div className="kicker">DEFLATIONARY SUPPLY</div><h2>LESS SUPPLY.<br/><em>SAME BITE.</em></h2></div><p>No subsequent minting. No tax on ordinary transfers or DEX swaps. Every actual burn can be inspected on Sui.</p></div>
+    <div className="feature-grid">
+      <article className="feature-card"><Flame aria-hidden="true" /><h3>Early exits</h3><p>The fee is 5% of principal × the fraction of the lock remaining, tapering to zero at maturity.</p><div className="split-strip"><span>50% burn</span><span>40% Community</span><span>10% Foundation</span></div><p className="fine-print">Burns queue in the vault. Anyone can flush them; total supply only falls when the tokens are destroyed.</p></article>
+      <article className="feature-card"><Eye aria-hidden="true" /><h3>Unused inventory</h3><p>Unclaimed free tokens can be burned after the 14-day window. Feast finalization burns unallocated tokens; remaining claim inventory can be burned after its deadline.</p><a className="text-link" href={siteUrl('monitor/')}>TRACK ACTUAL & PENDING BURNS <ArrowUpRight size={16} /></a></article>
+    </div>
+    <p className="fine-print">Burning does not guarantee demand, liquidity or price appreciation. Mature lock exits have no project fee.</p>
+  </section>;
+}
+
+export function CommunitySection() {
+  return <section id="community" className="section feature-section community-section">
+    <div className="section-heading"><div><div className="kicker">COMMUNITY PROGRAMS / 20% OF SUPPLY</div><h2>BUILD THE<br/><em>FOOD CHAIN.</em></h2></div><p>Make the memes. Welcome the next wallet. Grow the jungle together. Programs are budgeted; award rounds will be announced separately.</p></div>
+    <div className="program-grid">{[
+      ['6%', 'Creator grants', 'Art, videos, meme packs and community tools.'],
+      ['5%', 'Hunt Board', 'Creative challenges and useful contributions.'],
+      ['3%', 'Onboarding', 'Wallet education, guides and safety resources.'],
+      ['1%', 'Events & moderation', 'Community events and day-to-day support.'],
+      ['5%', 'Community reserve', 'Future programs and changing needs.'],
+    ].map(([percent, title, text]) => <article key={title}><span>{percent}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
+    <p className="fine-print">Percentages are of total initial supply. Subbudgets are operating policy, not contract-enforced restrictions. Award recipients, purposes, amounts and transaction receipts should be published. There is no token-holder governance or paid affiliate program in this release.</p>
+    <details id="foundation" className="info-detail"><summary>V1PR Foundation: operations, custody and liquidity</summary><div>
+      <p>V1PR Foundation is the project's operating name for its founder-controlled funds and receiving wallets. It does not imply independent governance or a separate legal entity.</p>
+      <p>The 10% Ecosystem Operations allocation pays for development, hosting, design, administration and collaborators at its controller's discretion, without contractual vesting. Community, initial liquidity, later liquidity and Operations use four separate published Sui custody addresses.</p>
+      <p>{FEAST_DISCLOSURE}</p>
+      <p>25% of Feast proceeds is committed to liquidity; the opening DEX price must be no lower than the Feast clearing price. The opening token deposit is sized to verified paired funding and the pool's price and range; unused tokens stay in the initial reserve. Remaining proceeds are discretionary Foundation funds. Cross-chain conversions and spending are operating commitments, not automatically enforced by the Sui contract. Paired funding, balances, custody and LP-lock terms must be published before trading is announced.</p>
+      <a className="text-link" href={siteUrl('monitor/')}>INSPECT THE CUSTODY DIRECTORY <ArrowUpRight size={16} /></a>
+    </div></details>
+  </section>;
+}
+
+export function PrivacySection() {
+  return <section id="privacy" className="section feature-section privacy-section">
+    <div className="privacy-copy"><div className="kicker">PRIVACY & ACCOUNTABILITY</div><h2>YOUR ALIAS.<br/><em>PUBLIC PROOF.</em></h2><p className="token-intro">Join pseudonymously. No legal name, email or social login is required to read the paper or connect a wallet. Choose what identity information you share.</p><a className="text-link" href={siteUrl('whitepaper/')}>READ THE PRIVACY SECTION <ArrowUpRight size={16} /></a></div>
+    <div className="feature-card"><Fingerprint size={36} aria-hidden="true" /><h3>Know what stays visible</h3><p>Sui addresses, transfers, balances, claims and locks remain public. Feast bindings publicly link your source wallet to your Sui destination. Fresh wallets and aliases do not guarantee unlinkability.</p><p>V1PR has no confidential transfers or shielded balances. Seal and Nautilus are external Sui privacy tools; neither is integrated into this release.</p><p className="fine-print">Wallet, hosting and RPC providers may receive connection metadata. Clearing browser-local charts does not erase blockchain records or provider logs.</p></div>
+  </section>;
+}
+
+export function QuestionsSection() {
+  return <section id="questions" className="section questions-section"><div className="kicker">BEFORE YOUR FIRST BITE</div><h2>KNOW THE<br/><em>RULES.</em></h2><div className="question-list">
+    <details className="info-detail"><summary>What happens when lock rewards run out?</summary><div><p>New reward-bearing locks stop when the vault cannot reserve the full term reward. Existing principal and accepted rewards remain escrowed. Unused early-exit reservations return to capacity; anyone can fund the vault with existing V1PR. There is no inflation or promise of perpetual yield.</p></div></details>
+    <details className="info-detail"><summary>Can I leave a lock early?</summary><div><p>Yes. The fee tapers from 5% of principal to zero over your agreed term. Rewards use whole completed 30-day months, at the rate for that completed length; before one month, earned reward is zero. Early exits can return less than deposited. A deposit pause never blocks existing exits. Positions cannot be transferred, extended or topped up.</p></div></details>
+    <details className="info-detail"><summary>Where can I buy V1PR?</summary><div><p>No verified mainnet trading pool is live. The token-status section will publish the complete coin type; the monitor will link the verified exchange pair and Suiscan records when configured. Pool funding, contract review, rehearsal and custody checks must precede participant use. Never use a lookalike ticker as proof of authenticity.</p></div></details>
+    <details className="info-detail"><summary>What does the monitor show?</summary><div><p>Supply, actual and pending burns, reward inventory and reservations, locks, claims, fee receipts, Feast allocation and published custody. After verified deployment it refreshes every 30 seconds, retaining up to 720 observations in your browser. This is not a full historical index or circulating-supply estimate. DEX volume covers only the verified configured pair; contribution receipts are from a dated, hash-verified report. Missing and stale data are labeled.</p></div></details>
+    <details className="info-detail"><summary>Does “feeding” or locking guarantee gains?</summary><div><p>No. “Venom” means participation and community momentum. Rewards are paid in V1PR, not guaranteed purchasing power or dollar returns. Market demand, liquidity, Foundation discretion and contract security all affect risk. V1PR locks do not earn Sui validator rewards.</p></div></details>
+  </div></section>;
+}

@@ -42,10 +42,20 @@ jobs:
           working_directory: docs
           root_file: Viper_Coin_Whitepaper.tex
           texlive_version: 2026
+      - name: Record PDF provenance
+        run: |
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          digest = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
+          Path('docs/whitepaper.provenance.json').write_text(json.dumps({'sourceSha256': digest('docs/Viper_Coin_Whitepaper.tex'), 'pdfSha256': digest('docs/Viper_Coin_Whitepaper.pdf')}) + '\n')
+          PY
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: whitepaper-pdf
-          path: docs/Viper_Coin_Whitepaper.pdf
+          path: |
+            docs/Viper_Coin_Whitepaper.pdf
+            docs/whitepaper.provenance.json
           if-no-files-found: error
   website:
     timeout-minutes: 15
@@ -63,7 +73,9 @@ jobs:
           name: whitepaper-pdf
           path: tmp/whitepaper
       - name: Include the PDF in the website
-        run: cp tmp/whitepaper/Viper_Coin_Whitepaper.pdf public/whitepaper.pdf
+        run: |
+          cp tmp/whitepaper/Viper_Coin_Whitepaper.pdf public/whitepaper.pdf
+          cp tmp/whitepaper/whitepaper.provenance.json public/whitepaper.provenance.json
       - run: npm run test:economics
       - run: npm run test:monitor
       - run: npm run test:whitepaper
@@ -73,8 +85,10 @@ jobs:
         env:
           VITE_BASE_PATH: /ViperCoin/
       - run: npm run test:deployment
-      - name: Require the published PDF
-        run: test -s dist/whitepaper.pdf
+      - name: Require the published PDF and provenance
+        run: |
+          test -s dist/whitepaper.pdf
+          test -s dist/whitepaper.provenance.json
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
           path: dist

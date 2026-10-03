@@ -1,0 +1,13 @@
+{
+  "provenance": "Independent bitcoinjs-message 2.2.0 compact-signature vector, deterministic TEST key only; Dogecoin Core message prefix.",
+  "binding": {
+    "chain": "dogecoin",
+    "source": "DL54i6msdfchWaR7NHFA41HxSiYciTwhqW",
+    "sui": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "windowStart": 1000000,
+    "lockMonths": 12,
+    "message": "Bind DL54i6msdfchWaR7NHFA41HxSiYciTwhqW to Sui 0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa for the V1PR Feast\nSource network: dogecoin\nCampaign start: 1000000",
+    "signature": "IGV41YNQ//79jBNqBYBSUBoGrdkOTCeBP/b9LQLFXKPuG+wm/HE2Oge5jOpMLHFcwz6lpK57VQyf9dJ8VtKus4Q=",
+    "lockSignature": "IPJfTwQjK0R5vZbgG4JI5sarmSfX+jBPzjMqBim409t1X3v+kisYVRpGYAAS9h2AaLvZjNH8SSn0IETi6WX23E4="
+  }
+}

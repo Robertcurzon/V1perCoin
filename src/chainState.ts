@@ -10,6 +10,7 @@ export function validateState(c: ReturnType<typeof CurrencyBcs.parse>, v: Return
   if (v.founder !== launch.founder.toLowerCase() || v.community !== launch.community.toLowerCase()) throw new Error('Fee destinations differ from the manifest.');
   if (BigInt(v.rewards) + BigInt(v.reward_committed) + BigInt(v.reward_paid) !== BigInt(v.reward_funded)) throw new Error('Reward accounting does not reconcile.');
   if (BigInt(c.supply.BurnOnly) > INITIAL_SUPPLY || BigInt(v.locks_closed) > BigInt(v.locks_opened) || BigInt(p.claimed) > BigInt(p.approved) || BigInt(p.approved) > 10_000n || BigInt(p.inventory) > 100_000_000_000_000n - BigInt(p.claimed) * 10_000_000_000n) throw new Error('Supply, claim or interaction counters are inconsistent.');
+  if ((BigInt(p.end_ms) === 0n && (BigInt(p.start_ms) !== 0n || BigInt(p.claimed) !== 0n)) || (BigInt(p.end_ms) > 0n && BigInt(p.end_ms) - BigInt(p.start_ms) !== 14n * 86_400_000n) || BigInt(p.eligibility.size) !== BigInt(p.approved)) throw new Error('Free-claim schedule or eligibility count is inconsistent.');
   if (BigInt(f.inventory) + BigInt(f.claimed) + BigInt(f.burned) !== 100_000_000_000_000n || BigInt(f.allocated) > 100_000_000_000_000n || BigInt(f.claimed) > BigInt(f.allocated) || (!f.finalized && (BigInt(f.claimed) !== 0n || BigInt(f.burned) !== 0n || BigInt(f.start_ms) !== 0n)) || (f.finalized && BigInt(f.inventory) > BigInt(f.allocated) - BigInt(f.claimed))) throw new Error('Feast accounting does not reconcile.');
 }
 export function objectAbsent(error: unknown): boolean {
@@ -39,6 +40,7 @@ export async function readChainState(client: ClientWithCoreApi, signal = AbortSi
   }
   const c = CurrencyBcs.parse(currency.object.content), v = VaultBcs.parse(vault.object.content), p = ClaimsBcs.parse(pool.object.content);
   const f = FeastBcs.parse(feast.object.content);
+  if (BigInt(p.end_ms) > 0n && BigInt(p.start_ms) !== BigInt(launch.freeClaimsStartMs)) throw new Error('Free-claim dates differ from the published schedule.');
   validateState(c, v, p, f);
   const time = BigInt(ClockBcs.parse(clock.object.content).timestamp_ms);
   if (time > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('Chain clock is out of range.');

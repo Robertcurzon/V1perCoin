@@ -20,3 +20,5 @@ Build with `npm ci` and `npm run build`, then serve `dist`. The default base is 
 ## Token activation is separate
 
 Website publication does not create a token or exchange pool. `src/launch.json` remains `unpublished` until actual Sui deployment and authority records have been independently verified. Follow `docs/LAUNCH.md` for funded testnet rehearsal, fixed metadata, immutable package, allocation, claim approvals and mainnet work. Do not invent identifiers or change the manifest merely to activate the buttons.
+
+The PDF job publishes whitepaper.provenance.json with SHA-256 hashes of the compiled LaTeX source and PDF. The website reader verifies both against the served files before embedding or offering download. A stale local PDF without matching provenance stays hidden; the current LaTeX source remains downloadable. The release pipeline rebuilds and includes both artifacts.

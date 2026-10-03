@@ -22,10 +22,14 @@
   "upgradeCapId": "",
   "feastTreasury": {
     "ethereum": "",
-    "solana": ""
+    "solana": "",
+    "dogecoin": "",
+    "memecore": ""
   },
   "feastOpen": false,
   "feastStartMs": 0,
   "feastSubmissionUrl": "",
-  "feastResultsSha256": ""
+  "feastResultsSha256": "",
+  "freeClaimsStartMs": 0,
+  "freeClaimsApplicationUrl": ""
 }

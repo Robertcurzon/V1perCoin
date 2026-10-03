@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
     "preview": "vite preview",
-    "test:economics": "node scripts/test_economics.cjs && npm run test:feast",
+    "test:economics": "node scripts/test_economics.cjs && npm run test:feast && npm run test:claims",
     "test:monitor": "node scripts/test_monitor.cjs",
     "prebuild": "node scripts/sync_whitepaper.cjs",
     "test:whitepaper": "node scripts/test_whitepaper.mjs",
@@ -17,7 +17,8 @@
     "test:deployment": "node scripts/test_deployment.mjs",
     "whitepaper:source": "python3 scripts/generate_whitepaper.py",
     "test:feast": "node scripts/feast/test.mjs",
-    "pretest:economics": "node scripts/sync_whitepaper.cjs"
+    "pretest:economics": "node scripts/sync_whitepaper.cjs",
+    "test:claims": "node scripts/claims/test.mjs"
   },
   "dependencies": {
     "@mysten/dapp-kit-react": "^2.1.37",

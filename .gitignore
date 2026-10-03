@@ -42,3 +42,6 @@ docs/*.pdf
 # Generated from canonical docs sources during prebuild
 public/WHITEPAPER.md
 public/Viper_Coin_Whitepaper.tex
+
+/public/whitepaper.provenance.json
+/docs/whitepaper.provenance.json

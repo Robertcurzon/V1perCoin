@@ -11,7 +11,9 @@ export function isManifestConfigured(manifest: typeof launch): boolean {
   && new Set(custody.map(a => a.toLowerCase())).size === custody.length
   && manifest.coinType === `${manifest.packageId}::v1pr::V1PR`
   && [manifest.publishDigest, manifest.allocationDigest, manifest.immutableDigest, manifest.metadataDigest].every((digest) => /^[1-9A-HJ-NP-Za-km-z]{43,44}$/.test(digest))
+  && Number.isSafeInteger(manifest.freeClaimsStartMs) && manifest.freeClaimsStartMs >= 0
+  && (manifest.freeClaimsStartMs === 0 || /^https:\/\//.test(manifest.freeClaimsApplicationUrl))
   && typeof manifest.feastOpen === 'boolean'
-  && (!manifest.feastOpen || (Number.isSafeInteger(manifest.feastStartMs) && manifest.feastStartMs > 0 && /^https:\/\//.test(manifest.feastSubmissionUrl) && Object.entries(manifest.feastTreasury).length === 2 && ['ethereum', 'solana'].every(chain => treasuryAddressValid(chain, manifest.feastTreasury[chain as keyof typeof manifest.feastTreasury]))));
+  && (!manifest.feastOpen || (manifest.network === 'mainnet' && Number.isSafeInteger(manifest.feastStartMs) && manifest.feastStartMs > 0 && manifest.feastStartMs % 1000 === 0 && /^https:\/\//.test(manifest.feastSubmissionUrl) && manifest.freeClaimsStartMs === manifest.feastStartMs && Object.entries(manifest.feastTreasury).length === 4 && ['ethereum', 'solana', 'dogecoin', 'memecore'].every(chain => treasuryAddressValid(chain, manifest.feastTreasury[chain as keyof typeof manifest.feastTreasury]))));
 }
 export const isLaunchConfigured = isManifestConfigured(launch);

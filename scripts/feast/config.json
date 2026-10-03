@@ -36,14 +36,15 @@
       "treasury": ""
     },
     {
-      "id": "official-trump",
-      "symbol": "TRUMP",
-      "chain": "solana",
-      "contract": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
-      "decimals": 6,
-      "pythFeed": "879551021853eec7a7dc827578e8e69da7e4fa8148339aa0d3d5296405be4b1a",
-      "pythSymbol": "Crypto.TRUMP/USD",
-      "treasury": ""
+      "id": "dogecoin",
+      "symbol": "DOGE",
+      "chain": "dogecoin",
+      "contract": "native",
+      "decimals": 8,
+      "pythFeed": "dcef50dd0a4cd2dcc17e45df1676dcb336a11a61c69df7a0299b0150c672d25c",
+      "pythSymbol": "Crypto.DOGE/USD",
+      "treasury": "",
+      "assetSource": "https://dogecoin.com/"
     },
     {
       "id": "pudgy-penguins",
@@ -96,14 +97,16 @@
       "treasury": ""
     },
     {
-      "id": "fartcoin",
-      "symbol": "FARTCOIN",
-      "chain": "solana",
-      "contract": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
-      "decimals": 6,
-      "pythFeed": "58cd29ef0e714c5affc44f269b2c1899a52da4169d7acc147b9da692e6953608",
-      "pythSymbol": "Crypto.FARTCOIN/USD",
-      "treasury": ""
+      "id": "memecore",
+      "symbol": "M",
+      "chain": "memecore",
+      "contract": "native",
+      "decimals": 18,
+      "pythFeed": "b6ce29b819a310fd10a24f1a056ab3926d1c3e436b746d941acaf11e1a9f7eac",
+      "pythSymbol": "Crypto.M/USD",
+      "treasury": "",
+      "assetSource": "https://docs.memecore.com/memecore/token/usdm"
     }
-  ]
+  ],
+  "selectionPolicy": "Curated ten-asset Feast list; native DOGE and native MemeCore M replace two Solana assets. Historical market snapshot is provenance, not an automatic selection rule."
 }

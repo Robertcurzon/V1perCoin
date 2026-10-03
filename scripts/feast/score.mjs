@@ -6,25 +6,40 @@ import { execFileSync } from 'node:child_process';
 import { verifyMessage } from 'ethers';
 import { ed25519 } from '@noble/curves/ed25519.js';
 import { fromBase58 } from '@mysten/sui/utils';
+import { secp256k1 } from '@noble/curves/secp256k1.js';
+import { normalizeAddress, assetKey, bindingMessage, lockMessage } from './networks.mjs';
+export { bindingMessage, lockMessage } from './networks.mjs';
+export const DOGE_MESSAGE_PREFIX = '\x19Dogecoin Signed Message:\n';
+export function verifyDogeMessage(text, source, signature) {
+  if (typeof signature !== 'string' || !/^[A-Za-z0-9+/]{87}=$/.test(signature)) return false;
+  const bytes = Buffer.from(signature,'base64'), message = Buffer.from(text,'utf8');
+  // Canonical campaign messages fit the single-byte CompactSize encoding.
+  if (bytes.length !== 65 || bytes[0] < 27 || bytes[0] > 34 || message.length >= 253 || bytes.toString('base64') !== signature) return false;
+  const sha = b => createHash('sha256').update(b).digest();
+  const digest = sha(sha(Buffer.concat([Buffer.from(DOGE_MESSAGE_PREFIX),Buffer.from([message.length]),message])));
+  try {
+    const flag = bytes[0]-27;
+    const pub = secp256k1.Signature.fromBytes(bytes.subarray(1),'compact').addRecoveryBit(flag & 3).recoverPublicKey(digest).toBytes(Boolean(flag & 4));
+    const pkh = createHash('ripemd160').update(sha(pub)).digest();
+    return pkh.equals(Buffer.from(fromBase58(source)).subarray(1,21));
+  } catch { return false; }
+}
 export const DAY = 86400, USD = 100_000_000n, UNIT = 1_000_000n, POOL = 100_000_000n * UNIT;
 export const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const fail = (message) => { throw new Error(message); };
 function integer(n, label) { if (!Number.isSafeInteger(n) || n < 0) fail(`Invalid ${label}`); return n; }
-export function sourceAddress(chain,address) {
-  if (chain === 'ethereum' && /^0x[0-9a-fA-F]{40}$/.test(address) && BigInt(address) !== 0n) return address.toLowerCase();
-  if (chain === 'solana') { try { if (fromBase58(address).length === 32 && fromBase58(address).some(n=>n!==0)) return address; } catch { /* reject invalid base58 */ } }
-  fail('Unsupported chain or invalid address');
-}
-export function bindingMessage(source, sui) { return `Bind ${source} to Sui ${sui} for the V1PR Feast`; }
-export function lockMessage(message,months) { return `${message}\nLock choice: ${months} months`; }
+export const sourceAddress = normalizeAddress;
 export function verifyBinding(b) {
   const source = sourceAddress(b.chain,b.source);
   if (!/^0x[0-9a-fA-F]{64}$/.test(b.sui) || BigInt(b.sui) === 0n || ![0,12,24].includes(b.lockMonths)) fail('Invalid Sui destination or lock choice');
   // Preserve exact source capitalization in the human-readable signed text.
-  const message = bindingMessage(b.source,b.sui);
+  const message = bindingMessage(b.source,b.sui,b.chain,b.windowStart);
   if (b.message !== message) fail('Binding text does not match');
   for (const [text,signature] of [[message,b.signature],[lockMessage(message,b.lockMonths),b.lockSignature]]) {
-    if (b.chain === 'ethereum') { if (verifyMessage(text,signature).toLowerCase() !== source) fail('Invalid Ethereum signature'); }
+    if (b.chain === 'ethereum' || b.chain === 'memecore') { if (verifyMessage(text,signature).toLowerCase() !== source) fail('Invalid EVM signature'); }
+    else if (b.chain === 'dogecoin') {
+      if (!verifyDogeMessage(text,source,signature)) fail('Invalid Dogecoin signature');
+    }
     else { if (!ed25519.verify(fromBase58(signature),new TextEncoder().encode(text),fromBase58(source),{zip215:false})) fail('Invalid Solana signature'); }
   }
   return { ...b,source,sui:b.sui.toLowerCase() };
@@ -48,27 +63,33 @@ export function priceAt(record,feed,time) {
 }
 export function validateConfig(config) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(config.snapshotDate) || !/^[a-f0-9]{64}$/.test(config.snapshotSha256) || config.coins?.length !== 10) fail('Require fixed dated snapshot and exactly ten coins');
+  if (config.liquidityProceedsPercent !== 25) fail('The release commits exactly 25% of Feast proceeds to liquidity');
   integer(config.windowStart,'window start'); if (config.windowStart === 0) fail('Window not configured');
-  const seen = new Set(), treasuries = new Map();
+  const seen = new Set(), ids = new Set(), treasuries = new Map();
   for (const c of config.coins) {
-    sourceAddress(c.chain,c.contract); const treasury=sourceAddress(c.chain,c.treasury);
+    if (typeof c.id !== 'string' || !/^[a-z0-9][a-z0-9-]*$/.test(c.id) || ids.has(c.id)) fail('Require distinct accepted-coin IDs');
+    ids.add(c.id);
+    assetKey(c.chain,c.contract); const treasury=sourceAddress(c.chain,c.treasury,true);
     if (treasuries.has(c.chain) && treasuries.get(c.chain)!==treasury) fail('All coins on a chain must use its published Treasury');treasuries.set(c.chain,treasury);
+    if ((c.chain==='dogecoin' && c.decimals!==8) || (c.chain==='memecore' && c.decimals!==18)) fail('Wrong native asset decimals');
     if (!Number.isInteger(c.decimals)||c.decimals<0||c.decimals>30||!/^[a-f0-9]{64}$/.test(c.pythFeed)) fail('Invalid coin decimals/feed');
-    const key=`${c.chain}:${sourceAddress(c.chain,c.contract)}`;if(seen.has(key))fail('Duplicate accepted coin');seen.add(key);
+    const key=assetKey(c.chain,c.contract);if(seen.has(key))fail('Duplicate accepted coin');seen.add(key);
   }
 }
 export function score(config,bindings,transfers,prices) {
   validateConfig(config);
   const bound = new Map(), choice = new Map();
-  for (const raw of bindings) { const b=verifyBinding(raw), key=`${b.chain}:${b.source}`;if(bound.has(key))fail('Duplicate source binding');if(choice.has(b.sui)&&choice.get(b.sui)!==b.lockMonths)fail('Conflicting lock choices for Sui wallet');bound.set(key,b);choice.set(b.sui,b.lockMonths); }
-  const weights = new Map(), totals = new Map(), treasuryTotals = new Map(), audit = [], seen = new Set(); let totalUsd=0n;
+  for (const raw of bindings) { const b=verifyBinding(raw); if(b.windowStart!==config.windowStart)fail('Binding belongs to another campaign'); const key=`${b.chain}:${b.source}`;if(bound.has(key))fail('Duplicate source binding');if(choice.has(b.sui)&&choice.get(b.sui)!==b.lockMonths)fail('Conflicting lock choices for Sui wallet');bound.set(key,b);choice.set(b.sui,b.lockMonths); }
+  const weights = new Map(), totals = new Map(config.coins.map(c=>[c.id,0n])), treasuryTotals = new Map(config.coins.map(c=>[c.id,0n])), audit = [], seen = new Set(); let totalUsd=0n;
   for (const t of transfers) {
     integer(t.confirmedAt,'confirmation time');integer(t.index,'transfer index');
     if (!t.txHash || typeof t.txHash !== 'string' || !/^[1-9][0-9]*$/.test(t.amountBaseUnits)) fail('Invalid transfer');
     const key=`${t.chain}:${t.txHash}:${t.index}`;if(seen.has(key))fail('Duplicate transfer');seen.add(key);
-    const c=config.coins.find(c=>c.chain===t.chain&&sourceAddress(c.chain,c.contract)===sourceAddress(t.chain,t.contract));
+    const c=config.coins.find(c=>assetKey(c.chain,c.contract)===assetKey(t.chain,t.contract));
     if(!c)fail('Unaccepted coin in transfer export');
-    if(sourceAddress(t.chain,t.to)!==sourceAddress(c.chain,c.treasury))fail('Wrong Treasury destination');
+    if(t.chain==='dogecoin' && (!/^[a-fA-F0-9]{64}$/.test(t.txHash) || !Array.isArray(t.inputAddresses) || t.inputAddresses.length===0 || !Number.isSafeInteger(t.confirmations) || t.confirmations<60 || !t.inputAddresses.every(a=>sourceAddress('dogecoin',a)===sourceAddress('dogecoin',t.from)))) fail('DOGE receipts require a txid, output index and exclusively bound P2PKH inputs');
+    if(t.chain==='memecore' && (t.chainId!==4352 || t.receiptStatus!=='success' || t.receiptKind!=='native-transfer' || t.finalized!==true)) fail('M receipts require a successful finalized native MemeCore mainnet transfer');
+    if(sourceAddress(t.chain,t.to,true)!==sourceAddress(c.chain,c.treasury,true))fail('Wrong Treasury destination');
     if(t.confirmedAt>=config.windowStart && t.confirmedAt<config.windowStart+21*DAY) treasuryTotals.set(c.id,(treasuryTotals.get(c.id)??0n)+BigInt(t.amountBaseUnits));
     const b=bound.get(`${t.chain}:${sourceAddress(t.chain,t.from)}`);
     if(t.confirmedAt<config.windowStart||t.confirmedAt>=config.windowStart+21*DAY||!b) {audit.push({key,excluded:!b?'unbound source':'outside window'});continue;}
@@ -81,7 +102,7 @@ export function score(config,bindings,transfers,prices) {
     audit.push({key,sui:b.sui,coin:c.id,confirmedAt:t.confirmedAt,amountBaseUnits:t.amountBaseUnits,spot:p.spot.toString(),average24h:p.average.toString(),priceUsed:p.used.toString(),usd:usd.toString(),day,early:[en.toString(),ed.toString()],lock:[ln.toString(),ld.toString()],points:points.toString()});
   }
   const totalPoints=[...weights.values()].reduce((a,b)=>a+b,0n);
-  const allocations=[...weights.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([sui,points])=>{
+  const allocations=[...weights.entries()].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([sui,points])=>{
     const proportional=totalPoints===0n?0n:POOL*points/totalPoints;
     const cap=points*10_000n*UNIT/(USD*280n);const amount=proportional<cap?proportional:cap;
     return {sui,amountBaseUnits:amount.toString(),lockMonths:choice.get(sui)};

@@ -1,70 +1,77 @@
 # Viper Coin (V1PR)
 
-**Release specification · 3 October 2026**
+Release specification · 3 October 2026
 
 Feed the Viper. Cute memes in. More venom out.
 
-No more cuddly baby-animal meme coins. Viper eats them for lunch. Babies grow fastest when you feed them: our baby Viper turns the meme jungle into a Feast. “Venom” is the campaign metaphor for participation and community momentum. The ambition is a thriving community and potential market upside; feeding and burning do not guarantee price appreciation. Contributions transfer assets to the V1PR Treasury (founder-controlled), rather than feeding an autonomous growth or investment engine.
+Viper eats cuddly meme coins for lunch. Our baby Viper grows through participation, creativity and community momentum. “Venom” is the campaign metaphor; feeding and burning do not guarantee price gains.
 
-Viper Coin (V1PR) is a Sui meme coin with a once-minted supply, approved free community claims, a funded lock-reward program, and actual supply-reducing burns. Its identity is playful and predatory; its economics are explicit and inspectable. This document describes the implemented local release. No mainnet coin, exchange pool, or reward program is live yet. A ticker or logo cannot identify the authentic asset: use the verified Sui coin type and publication records displayed on the project site after deployment.
+Viper Coin (V1PR) combines Deflationary Supply, free community claims and fully funded lock rewards on Sui. No mainnet coin or funded exchange pool is live. Verify the complete Sui coin type and publication records before using the token.
 
-## 1. Coin and supply
+## 1. Deflationary Supply
 
 | Property | Release rule |
 |---|---|
-| Name | Viper Coin |
-| Ticker | V1PR |
-| Chain | Sui |
-| Decimals | 6 |
+| Name / ticker | Viper Coin / V1PR |
+| Chain / decimals | Sui / 6 |
+| Supply model | Deflationary Supply |
 | Initial supply | 1,000,000,000 V1PR |
 | Subsequent minting | None |
-| Supply reductions | Currency burns |
+| Supply reductions | Onchain Currency burns |
 | Ordinary transfer or DEX swap tax | None |
 
-Publication mints the full initial supply into a sealed, one-use LaunchCap. The mint capability is locked into Sui Currency Standard burn-only mode. The allocation transaction consumes that object and distributes exactly the amounts below; there is no public mint function and no unrestricted initial coin handed to the publisher. Holders receive existing V1PR through claims, transfers, exchange trades, or rewards. [Sui Currency Standard](https://docs.sui.io/onchain-finance/fungible-tokens/create-a-fungible-token), [Coin Registry](https://docs.sui.io/references/framework/sui_sui/coin_registry).
+The full initial supply is minted once into a sealed LaunchCap. Allocation consumes that capability; Currency remains burn-only, with no public mint function. Claims and rewards distribute existing tokens. Actual burns reduce total supply; tokens awaiting a burn remain included until destroyed. [Sui Currency Standard](https://docs.sui.io/onchain-finance/fungible-tokens/create-a-fungible-token), [Coin Registry](https://docs.sui.io/references/framework/sui_sui/coin_registry).
 
-## 2. Initial allocation
+## 2. Allocation and V1PR Foundation
 
 | Bucket | Supply | V1PR | Control |
 |---|---:|---:|---|
-| Free claims | 10% | 100,000,000 | Shared claim pool; approved addresses |
-| Feast claims | 10% | 100,000,000 | Shared Feast pool; finalized allocations |
+| Free claims | 10% | 100,000,000 | Shared claim pool |
+| Feast claims | 10% | 100,000,000 | Shared Feast pool |
 | Initial exchange liquidity | 20% | 200,000,000 | Published liquidity custodian |
 | Later liquidity reserve | 15% | 150,000,000 | Published reserve custodian |
-| Community programs | 20% | 200,000,000 | Separate published Community wallet |
-| Lock rewards | 15% | 150,000,000 | Shared vault; rewards escrowed per position |
-| Ecosystem Operations | 10% | 100,000,000 | Founder-controlled Operations wallet |
-| **Total** | **100%** | **1,000,000,000** | |
+| Community programs | 20% | 200,000,000 | Separate Community wallet |
+| Lock rewards | 15% | 150,000,000 | Shared reward vault |
+| Ecosystem Operations | 10% | 100,000,000 | V1PR Foundation |
+| Total | 100% | 1,000,000,000 | |
 
-Operations pays for development, hosting, design, administration and collaborators at the founder's discretion. There is no separate Team allocation, promised vesting, or automated spending restriction on Operations. Community and Operations must have distinct addresses. Liquidity reserves require a paired asset and an actual pool-creation transaction; allocating V1PR alone does not create market liquidity, establish a price, or lock LP ownership. Pool, pair, paired-asset funding, LP custodian and withdrawal policy must be published before a buy link appears.
+V1PR Foundation is the project's operating name for its founder-controlled funds and receiving wallets. It does not imply independent governance or a separate legal entity. Operations funds development, hosting, design, administration and collaborators at its controller's discretion, without contractual vesting. The four Sui custody addresses must be nonzero and pairwise distinct.
 
-The 100-million Feast pool holds existing tokens onchain, not in a reserve custodian wallet. AdminCap controls allocations before finalization; finalization permanently freezes the list and burns unallocated inventory. Liquid allocations release 50% immediately and the remainder linearly over 60 days. Locked allocations create 12- or 24-month positions owned by claimants, using the ordinary vault and funded rewards. Locked terms start when claimed; insufficient rewards or a deposit pause prevents the entire claim transaction without consuming the allocation. After 90 days from finalization, anyone can burn remaining inventory. Claims stop at that deadline. Locked Feast allocations compete for available vault capacity; a chosen binding term does not reserve rewards. If capacity stays unavailable through the claim deadline, the unclaimed allocation can be burned without refunding contributed coins. No administrator may sweep the pool. The deterministic contribution scorer is implemented in scripts/feast; authenticated historical price access, verified transfer exports and website campaign configuration must be rehearsed and published before opening the Feast.
+Token reserves alone do not create exchange liquidity. The 200-million initial liquidity bucket is a reserve, not a requirement to deposit it all at opening. Size the deposit from verified paired funding and the promised opening price; leave unused inventory in custody. For Cetus, verify the initialized price, range and both token requirements together. Publish funding, pool balances, custody and LP-lock terms before announcing trading.
 
-The Feast runs for 21 days with a fixed ten-coin list from the 3 October 2026 CoinGecko meme-category snapshot: SHIB, PEPE, SPX and FLOKI on Ethereum; PUMP, TRUMP, PENGU, BONK, WIF and FARTCOIN on Solana. Only the exact contracts and decimals in the published scoring configuration are accepted; a matching name or ticker is insufficient. Source wallets sign a binding to their Sui destination and a separate signature authenticating the liquid, 12-month or 24-month choice. Eligible finalized transfers use the lesser of Pyth confirmation-time spot and the arithmetic average of 1,440 preceding one-minute as-of observations. Missing historical prices stop scoring. Early participation multiplies points by 1.50 on days 1–5, declining in daily steps to 1.00 on day 19; days 19–21 remain at 1.00. Lock choices multiply points by 1.00, 1.10 or 1.25.
+## 3. The Feast: Feed the Viper
 
-The 100-million pool is distributed proportionally to weighted USD points, capped at 10,000 V1PR per USD before multipliers. There is no wallet cap. Integer rounding and the price floor leave inventory burned at finalization. Publish the CSV, exact-byte SHA-256 hash, eligible receipt totals, per-transfer prices and clearing price (total eligible USD divided by allocated V1PR), plus the scoring script commit and input archives. The scorer verifies signatures and arithmetic; independent receipt finality and export completeness checks remain necessary.
+The 21-day Feast allocates up to 100 million V1PR. The curated menu is SHIB, PEPE, SPX and FLOKI on Ethereum; PUMP, PENGU, BONK and WIF on Solana; native DOGE on Dogecoin; and native M on MemeCore mainnet (chain ID 4352, 18 decimals). DOGE uses eight decimals. Wrapped substitutes are not accepted. Exact contracts, native networks and Pyth feed IDs are frozen in the published configuration. [Dogecoin](https://dogecoin.com/), [MemeCore M](https://docs.memecore.com/memecore/token/usdm), [MemeCore network](https://docs.memecore.com/memecore/connect-to-memecore).
 
-**Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PR founder (the "V1PR Treasury"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PR only, with no claim on Treasury assets or future income. Treasury addresses and all received transfers are published for verification.
+Participants bind their source wallet to a Sui destination and confirm a liquid, 12-month or 24-month allocation with a second signature. Both texts include the source network and campaign's Unix-second opening timestamp. Submit the signed receipt and confirm acceptance before transferring. Ethereum and MemeCore support EOA personal-sign; Solana uses Ed25519; DOGE supports manually imported Dogecoin compact signatures from P2PKH wallets. Contract-wallet signatures and mixed-source DOGE inputs are unsupported. Native DOGE receipts identify the transaction output, all input addresses and confirmation depth; all inputs must belong to the bound source. The website does not submit bindings or transfer source assets. All bound sources for one Sui destination must choose the same term. [Dogecoin signature verification](https://github.com/dogecoin/dogecoin/blob/master/src/rpc/misc.cpp).
 
-The DEX pool opens at no less than the Feast clearing price, paired with 25% of Feast proceeds. Remaining proceeds are founder-controlled and discretionary. This commitment requires source-chain asset conversion, paired-asset funding and verifiable pool transactions; it is not automatically enforced by the Sui Feast contract. Contributions have no refund path in this implementation. Do not open the campaign until the accepted contracts, Treasury addresses, dates, historical pricing access, binding submission channel and complete transfer-indexing process are published and rehearsed.
+Each finalized contribution is valued at the lesser of Pyth confirmation-time spot and the average of 1,440 preceding one-minute observations. Each observation must be no more than 60 seconds old at its sample time. Missing, stale or future prices stop scoring; receipt finality and export completeness require independent verification. Points equal eligible USD value multiplied by participation and lock bonuses. Days 1–5 receive 1.50×; the bonus declines in daily steps to 1.00× on day 19 and remains there through day 21. Liquid, 12-month and 24-month choices receive 1.00×, 1.10× and 1.25× respectively.
 
-## 3. Free claims
+Allocations follow each wallet's share of total points, limited to 10,000 V1PR per USD before bonuses. No wallet cap applies. Rounding and the price floor can leave inventory, burned at finalization. Publish inputs, finalized receipts, price archives, allocation CSV, SHA-256 hash and scoring commit. Clearing price is total eligible USD divided by V1PR allocated.
 
-The shared claim pool holds 100 million V1PR. Up to 10,000 approved Sui addresses may each claim exactly 10,000 V1PR once. The window is 90 × 24 hours from allocation, measured with the Sui Clock. Claimants pay only network gas, not a project claim fee. No referral purchase or promotional service is required.
+The Feast administrator sets or edits allocations before one-time finalization, within the 100-million-token pool limit. Finalization freezes allocations. Liquid claims release 50% immediately and 50% linearly over 60 days. Locked claims open the recorded 12/24-month position, starting at claim time and reserving its full reward. A binding does not reserve vault capacity: insufficient rewards or paused deposits prevent the claim without consuming its allocation. Claims end 90 days after finalization; anyone may then burn remaining inventory. No administrator can sweep the pool.
 
-The claim administrator registers eligible addresses before the window closes. Registration cannot overwrite an address, approve a zero address, exceed 10,000 addresses, or revoke an approved claim. Eligibility is discretionary, not a trustless proof of personhood: one wallet does not establish one human. Claim approvals and payouts are onchain. There is no affiliate payment per free claim and no automatic personal-data collection by the site. At expiry, anyone can invoke the burn of unclaimed inventory; that action permanently reduces supply. No administrator can sweep the claim pool into a wallet.
+Feast proceeds are sent to the V1PR Foundation. Contributed coins are not burned, held in trust or governed by participants. Its founder controls the wallets and may hold, sell, reinvest or spend proceeds. Participants receive V1PR only, with no claim on Foundation assets or future income. Receiving addresses and transfers are published. There is no contribution refund path, including if a locked allocation cannot be claimed before expiry.
 
-## 4. Lock rewards: first come, first served
+The DEX pool opens at no less than the Feast clearing price, paired with 25% of Feast proceeds. Remaining proceeds are discretionary V1PR Foundation funds. This is an operating commitment requiring verified conversions and funding transactions; the Sui contract does not automatically enforce cross-chain spending.
 
-**The 150 million V1PR reward pool funds accepted locks on a first-come, first-served basis until available reward capacity is exhausted. Each accepted lock immediately reserves its entire full-term V1PR reward.** Admission follows successful onchain transaction order, not website visits, wallet connections, or an offchain waiting list. The contract rejects a lock whose full reward cannot be funded; there is no partial reservation or dilution of existing locks. There is no annual emissions cap or time-limited enrollment season.
+## 4. Free claims
 
-Users choose any whole number of program months from 1 through 24. One month is exactly 30 days. The principal, term, owner and reward are fixed at opening. A position is individually owned and cannot be transferred. A top-up or extension requires a new lock. There is no deposit fee. Each position holds its own principal and full reward in separate balances; payout does not depend on later participants depositing.
+The 100-million-token pool admits at most 10,000 distinct approved Sui addresses, each entitled to one 10,000 V1PR claim (0.001% of initial supply). Claimants pay network gas only. The free-claim window precedes the planned exchange opening; receiving tokens is not a promise of immediate trading liquidity. Applications run for the seven days before day 0; claims run for 14 days from day 0. There is no open-ended mint, extension or recurring free allocation.
 
-The annual simple token rate grows exponentially:
+Applicants submit a wallet-signed application and one original meme, useful guide or valid testnet issue report through the published channel. Review checks authorship and duplicate work. Accepted applications are ordered by channel receipt time, with address and entry-link ordering breaking ties. The preparation tool verifies Sui signatures, rejects missing reviews and deduplicates wallet addresses, entry links and archived content hashes. Publish the reviewed manifest, reasons, exclusions, input hash and approval transaction receipts. Submissions do not guarantee approval; the channel, receipt timestamp and original-work review remain operator responsibilities.
+
+Approval cannot overwrite or revoke an eligible address, include a zero address or exceed 10,000 recipients. The administrator schedules the opening once, at least seven days ahead. Approvals stop automatically at opening; claims are rejected before opening and at or after the 14-day deadline. Anyone may then burn unclaimed inventory; the administrator cannot withdraw it. One wallet or reviewed entry is not proof of one human: review reduces obvious farming but cannot eliminate multiple identities. No promotional purchase, paid referral or legal-name upload is required; submitted entries and wallet proofs are public.
+
+## 5. Lock rewards
+
+The 150-million V1PR reward pool accepts locks first come, first served by successful transaction order. Each accepted position immediately escrows its complete term reward. If capacity is insufficient, the contract rejects the deposit. Accepted obligations remain funded.
+
+Choose 1–24 whole program months; each month is 30 days. Principal, term, owner and reward are set at opening. Positions cannot be transferred, extended or topped up; those actions require a new lock. No deposit fee or automatic compounding applies.
 
 `annual rate = 1% × 10^((months − 1) / 23)`
 
-The generated annual rate table is rounded down to integer parts per million. Term reward in base units is `floor(principal × annual_rate_ppm(months) × months / 12,000,000)`. A year is twelve 30-day program months. No automatic compounding occurs.
+Annual rates round down to integer parts per million. For principal in base units, term reward is `floor(principal × annual_rate_ppm(months) × months / 12,000,000)`.
 
 | Term | Days | Annual token rate | Total term reward on 1,000,000 V1PR |
 |---|---:|---:|---:|
@@ -74,74 +81,71 @@ The generated annual rate table is rounded down to integer parts per million. Te
 | 18 months | 540 | 5.4844% | 82,266 V1PR |
 | 24 months | 720 | 10.0000% | 200,000 V1PR |
 
-The reward pool reserves exactly the entire term reward; there is no mature fee or fee offset. A 24-month lock earns 20% of its initial principal: 10,000 V1PR becomes 12,000 V1PR before network gas. Tiny deposits earning zero base units are rejected. Every shorter term compounded over 24 months earns less than one 24-month term. This comparison assumes repeated admission and sufficient future capacity, neither of which is promised.
+A 24-month lock earns 20% of initial principal: 10,000 V1PR becomes 12,000 V1PR before gas. Deposits earning zero base units are rejected. Shorter terms compounded over 24 months earn less, assuming continued admission and capacity.
 
-“Staking” is shorthand for this lock-reward vault. V1PR locks do not validate Sui or earn native SUI validator rewards. Rewards distribute existing V1PR and do not guarantee purchasing power, liquidity, growth, or a dollar return. [Sui tokenomics](https://docs.sui.io/paper/tokenomics.pdf).
+These locks distribute existing V1PR; they do not validate Sui or earn native validator rewards. Token rewards do not guarantee purchasing power or dollar returns. [Sui tokenomics](https://docs.sui.io/paper/tokenomics.pdf).
 
-## 5. Exit fees and burn
+## 6. Exits, burns and reward capacity
 
-The owner may close a position at any time. Finished locks have no project exit fee. Early-exit fees taper continuously from 5% to zero:
+Owners may exit at any time. Mature exits have no project fee. Early exits earn the reward for whole completed program months at that completed length's rate, capped by the original escrow. Before one complete month, earned reward is zero. Unused escrow returns to the vault.
 
-`fee = floor(principal × 5% × remaining time / agreed duration)`
+`fee = floor(principal × 5% × max(remaining time, 0) / agreed duration)`
 
-At opening the fee is 5%; after 10% of the term, 4.5%; after 90%, 0.5%; at maturity, zero. Earned reward is recalculated using the annual rate for the whole completed program months, rather than the chosen longer term's rate. Before one complete month, earned reward is zero. Earned reward cannot exceed the original escrow. Unused escrow returns to available capacity.
+The early-exit fee starts at 5%, falls to 2.5% halfway through the term and reaches zero at maturity. Its split is 50% pending burn, 40% Community and 10% V1PR Foundation. Burn and Foundation shares round down; Community receives rounding dust. Early exits can return less than deposited.
 
-Fees split 50% pending burn, 40% Community and 10% founder. Burn and founder round down; rounding dust goes to Community. A 1,000,000 V1PR lock exited after 10% of its term charges 45,000 V1PR: 22,500 pending burn, 18,000 Community and 4,500 founder. Ordinary transfers and DEX swaps remain untaxed.
+Exit burns accumulate separately in the vault. Anyone may call `flush_burns` to destroy that balance through Currency; closing a position does not require mutating Currency. Free-claim expiry, Feast finalization and Feast expiry also support actual supply-reducing burns. Ordinary transfers and swaps are untaxed.
 
-Closing queues the burn share in the vault without touching the shared Currency. Anyone may call `flush_burns` to destroy this balance through Currency and emit a BurnsFlushed event. Pending tokens are not spendable rewards and are still part of total supply until flushed. The monitor distinguishes pending burns from actually destroyed supply. Burning does not guarantee price appreciation. [Sui Coin Registry burn operations](https://docs.sui.io/references/framework/sui_sui/coin_registry).
-
-## 6. Exhaustion and replenishment
-
-“Available rewards” excludes rewards already escrowed for accepted positions. Zero available capacity stops new reward-bearing locks; it does not erase accepted rewards or lock principal. Early exits release unused reservations. Anyone may fund the vault with existing V1PR, reopening capacity without minting. Replenishment is voluntary and cannot be promised as perpetual yield. Actual operating receipts can support later funding only after those receipts exist; no automatic LP revenue strategy, external lending, or founder subsidy is assumed.
-
-The contract accounting invariant is:
+When available rewards run out, new reward-bearing locks stop. Existing principal and rewards remain escrowed. Early exits release unused reservations, and anyone may replenish capacity with existing V1PR; there is no inflation or promise of perpetual yield.
 
 `available reward inventory + outstanding reserved rewards + rewards paid = rewards funded`
 
-User principal is accounted for separately. The administrator can pause or resume new deposits, but cannot withdraw principal or reward inventory, change fee recipients, change rates, or block exits through the pause flag. Exits still require a functioning Sui network, access to the user's wallet, and the shared vault object.
+Principal is separate. The administrator may pause new deposits but cannot withdraw escrow, change rates or recipients, or block exits through the pause flag.
 
-## 7. Community programs and accountability
+## 7. Community programs
 
-The initial Community allocation funds creator grants (6% of total supply), Hunt Board challenges (5%), onboarding and education (3%), community events and moderation (1%), and a Community reserve (5%). These total 20%. Exit-fee receipts supplement this budget. Subbudgets are operating policy, not contract escrow restrictions. Publish recipients, purpose, amount and transaction digest for each award. There is no token-holder governance mechanism in this release.
+The 20% Community allocation budgets 6% of supply for creator grants, 5% for Hunt Board challenges, 3% for onboarding and education, 1% for events and moderation, and 5% as reserve. Community's share of early-exit fees supplements these funds.
 
-Before mainnet, publish the authentic coin type, package, Currency, vault and claim pool IDs; allocation and publication digests; custodians; claim eligibility policy; metadata authority; and admin capability owners. Make the package immutable before accepting participant funds so upgrade authority cannot replace the stated rules. Independent review and a testnet wallet rehearsal remain deployment requirements, not claims of completed audits. Founder-controlled balances, discretionary eligibility, smart-contract failure and illiquid trading are material limitations.
+These subbudgets are operating policy, not contract-enforced spending restrictions. Publish each award's recipient, purpose, amount and transaction digest. The release has no token-holder governance mechanism.
 
-## 8. Privacy and selective disclosure
+## 8. Privacy
 
-**Public accountability does not require publishing a participant's legal name.** V1PR supports pseudonymous participation: the website does not require a real name, email address, social login, or identity-document upload to read the specification or connect a supported wallet. Community members can choose a public alias and decide whether to associate that alias with their wallet. The free-claim administrator still controls address eligibility; an approved address is not a proof of unique personhood or anonymity.
+Participation can be pseudonymous. The site does not require a legal name, email, social login or identity upload to read the paper or connect a wallet. Community members choose what identity information to disclose.
 
-**The token ledger is public.** Standard V1PR transfers, balances, claim approvals, position owners, principal, reward amounts, lock timing and exit-fee recipients can be inspected onchain. Funding a new wallet from an identified address or publicly linking accounts can reveal relationships between them. A different alias, an encrypted chat or a private browser does not conceal blockchain records. V1PR is not a confidential-transfer coin, and the current Move contracts contain no shielded balances, hidden amounts or zero-knowledge transfer protocol.
+The native ledger remains public: addresses, transfers, balances, claims, positions and fees are inspectable. Feast bindings publicly link source wallets to Sui destinations. Aliases and fresh wallets do not guarantee unlinkability. V1PR has no shielded balances or confidential transfers.
 
-Privacy has three distinct layers. Identity privacy limits what a participant voluntarily publishes about themselves. Data privacy protects offchain records such as a private community submission. Transaction privacy would conceal some payment information through a compatible cryptographic protocol. The implemented release supports participation without a mandatory identity form; it does not supply an encrypted submission portal or private settlement.
+Sui's privacy tools can support separate applications: Seal for controlled access to encrypted data and Nautilus for confidential computation. zkLogin concerns authentication, not hidden balances. None is integrated into V1PR. Any external privacy service must support the exact coin type and disclose its custody, security and entry/exit visibility. [Sui privacy overview](https://www.sui.io/privacy).
 
-Sui's privacy stack provides building blocks rather than automatic privacy for every coin. Seal supports encrypted data with access policies; Nautilus supports confidential offchain computation with verifiable outcomes; zero-knowledge proofs can establish facts without revealing their underlying data. zkLogin and passkeys concern authentication, not hidden V1PR balances. These tools can inform optional services around V1PR, but none is integrated into its current wallet or token flow. [Sui privacy overview](https://www.sui.io/privacy).
+Wallet software, hosting and RPC providers may receive connection metadata. Browser-local charts store aggregate observations; deleting them does not erase blockchain records or provider logs.
 
-An optional encrypted community application would need a defined access policy, key-management and recovery process, retention rules, and explicit participant consent. Only the information necessary to decide an award should be disclosed to reviewers. Public spending records can still show the grant amount, purpose and payment receipt without publishing the applicant's private supporting documents. The current launch has no such application service; this describes a privacy boundary for any later service, not a claim of completed functionality.
+## 9. Verification and monitor
 
-A private-transfer integration would require an external protocol that demonstrably supports the exact V1PR coin type, verified custody and withdrawal semantics, an independent security review, and clear disclosure of which amounts, addresses, timing and entry/exit links remain visible. Moving V1PR into a wrapper or third-party pool adds new contract and custody risks and may interrupt access to the native claim and lock functions. The authentic native coin type must remain distinguishable from every wrapper. No privacy protocol, bridge or external deposit address is endorsed by this release, and no participant must use one to hold or lock native V1PR.
+Before participant use, publish the authentic coin type, package and shared-object IDs, custody addresses, AdminCaps and transaction receipts. Delete metadata authority and make the package immutable. Use Sui multisigs for custody and AdminCaps, and chain-appropriate multisigs for Foundation receiving wallets. Complete independent review, testnet rehearsal, historical-price coverage and receipt-indexing checks before opening the Feast. The contribution campaign remains disabled until verified deployment records, receiving addresses, dates and a binding-submission channel are configured.
 
-The site's local chart history contains aggregate observations, not a personal profile. Connecting a wallet exposes its public address to the application and relevant RPC requests. GitHub Pages, RPC providers, external font hosting, wallet software and the optional trading-volume provider can receive connection metadata under their own policies. Deleting browser history does not erase onchain records or third-party logs. The project must not describe its public website as providing absolute anonymity.
+The monitor verifies Currency metadata and burn-only state, object types and ownership, fee destinations and pool accounting. It requires explicit deleted/missing status for the published UpgradeCap ID; network errors are not evidence of immutability. Match that ID independently to the publication receipt. Wallet actions repeat state and eligibility checks before signatures.
 
-Founder and Community custody remain publicly accountable through labeled addresses, explorer links and spending receipts. That accountability follows funds and authority, without requiring a claim about a custodian's legal identity. An optional privacy service must preserve verification of the initial supply, aggregate funded obligations and actual burns; privacy must not conceal an extra mint path or turn an unfunded reward promise into an apparent reserve.
+The website reader checks published source and PDF hashes before displaying the paper or offering its download.
 
-## 9. Monitor
+Live metrics show actual supply and burns, pending burns, reward capacity and obligations, locked principal, successful lock opens/closes, claims and fee receipts. The custody directory and scoped activity feed link balances, object versions and transaction receipts to Suiscan. Charts refresh every 30 seconds and retain up to 720 local observations, not a full historical index. Stale or unavailable data is labeled; total supply is not circulating supply. DEX Screener volume covers only the verified configured pair. [DEX Screener API](https://docs.dexscreener.com/api/reference).
 
-The `/monitor` page reads the registered Currency, reward vault, free claim pool, Feast pool and Sui Clock. It rejects an extant upgrade capability and accepts only an explicit deleted/missing lookup for the configured capability ID; timeouts, network errors and unknown errors never prove immutability. The configured ID must be independently matched to the actual publication receipt. It displays total minted supply less actual burns, available/committed/paid rewards, locked principal, cumulative successful lock opens/closes and claims, and Community/founder fee receipts. It checks burn-only state, symbol/decimals, deleted metadata authority, unregulated currency status, exact object IDs and types, shared ownership, recipients, counter bounds and the reward accounting invariant before accepting a snapshot. The wallet uses the same checks and refreshes them before requesting a transaction signature. Free claims additionally require a fresh onchain eligibility check. These checks supplement independent review; they do not prove that package bytecode matches this document.
+Feast claimed, burned and inventory totals come from onchain state. Scheduled vesting requires a complete reconciled allocation-table read; it includes already claimed amounts and fully eligible locked allocations, rather than currently claimable inventory. Foundation receipts and clearing price come from a dated, hash-verified contribution report, not live source-chain balances.
 
-Charts refresh every 30 seconds and store up to 720 aggregate observations in the local browser. History starts when that browser observes the deployed project; it is not a complete historical index or a count of unique people. Total supply includes reserves and locked coins; it is not circulating supply. API failures preserve saved observations and mark them stale. Browser-cached observations are marked stale until a fresh RPC read succeeds; data older than 90 seconds is also marked stale. Object versions and last-change transaction links let readers inspect the provenance of each current read. The page refreshes on window focus and prevents overlapping refreshes. Reads are separate RPC observations rather than a single checkpoint snapshot.
-
-Trading volume uses DEX Screener only after a real mainnet pair is configured. The adapter checks chain, pair and the verified V1PR coin type. It charts the provider's rolling 24-hour USD volume for that single pair, not lifetime or all-exchange volume. Missing deployment/pair data is shown as unavailable; no activity is fabricated. [DEX Screener API](https://docs.dexscreener.com/api/reference).
+Explorer links expose token movements, custody and receipts. Public records and checks support accountability; they do not establish an audit or prove source-bytecode correspondence. Discretionary allocations, Foundation-controlled assets, contract failure and illiquid markets remain project risks. [Suiscan routes](https://docs.blockberry.one/docs/suiscan-routes), [Sui SDK queries](https://sdk.mystenlabs.com/sui/clients/querying).
 
 
-The custody directory publishes the founder/Operations, Community, initial liquidity and later liquidity addresses, with their current V1PR wallet balances. A wallet balance is not proof of a remaining budget or active DEX liquidity. All four Sui custody addresses must be pairwise distinct. Principal and reserved rewards are held in user position objects and tracked by the vault, outside these wallet holdings.
+## 10. Launch windows
 
-The recent activity feed decodes Move events for lock opens/closes, reward funding, deposit pause/resume, free claims and unclaimed-inventory burns. Each event is filtered to the configured vault or claim pool and links to its transaction and public participant address. The feed queries the latest 20 events per module and displays up to 20 matching entries; this is a bounded view, not a complete historical index. Equal-checkpoint entries do not imply a cross-transaction execution order. Ordinary transfers, holders and exchange transactions can be inspected through the coin explorer. Funding and pause events show a checkpoint instead of inventing a timestamp.
+Day 0 (T) is the published UTC opening shared by free claims and the Feast. Schedule only after review, rehearsal, historical-price coverage and custody checks pass. F is actual Feast finalization, no earlier than seven days after contributions close. If scoring or security checks are delayed, announce a later F; never extend free claims.
 
-The monitor links the exact coin type, Move package, Currency, vault, claim pool, admin capability objects, exchange pair and publication/allocation/immutability transactions on the appropriate Suiscan network. All four Sui custody addresses, three admin capability IDs, the original upgrade capability ID, and publication/allocation/immutability/metadata-deletion digests are required before website transactions are enabled. Exchange pair configuration remains optional until a funded pair exists. Unknown identifiers remain unavailable. Deployment transaction records are supplied by the operator and must be independently checked; a configuration flag is not an audit or a proof of source-bytecode correspondence. [Suiscan route documentation](https://docs.blockberry.one/docs/suiscan-routes), [Sui SDK object and event queries](https://sdk.mystenlabs.com/sui/clients/querying).
+| Window | Phase | Available to whom |
+|---|---|---|
+| Before scheduling | Preparation | Everyone: read, inspect and follow; no contributions or free claims |
+| T − 7 days to T | Applications | Community applicants: signed wallet proof and original entry for review |
+| T to T + 14 days | Opening | Approved addresses: one free claim; bound contributors: Feast; V1PR holders: funded locks when unpaused |
+| T + 14 to T + 21 days | Feast only | Free claims closed; contributors may still contribute; anyone may burn unused free inventory |
+| T + 21 to at least T + 28 days | Scoring and review | Everyone: inspect receipt, price and allocation archives; no Feast claims |
+| F to F + 90 days | Claims and pool opening | Contributors: frozen claims; trading only once paired funding, custody and LP lock are verified |
+| F + 90 days onward | Ongoing | Unclaimed Feast inventory may burn; existing locks retain exits; new locks require capacity |
 
-Custody addresses must be nonzero and pairwise distinct. Named allocation constants sum to the complete initial supply. Approval and expiry boundaries, multi-user funding/exits and permissionless burn flushing are covered by unit tests.
+Window ends are exclusive. Send contributions early enough for confirmation before T + 21 days. The seven-day Feast review and exchange opening are operating commitments, not cross-chain contract enforcement. Free-claim scheduling and its 14-day deadline are enforced onchain; the Feast's 90-day claim deadline starts at actual finalization.
 
-Feast claims use the shared 100-million pool. Only its AdminCap can set allocations before finalization; no edits afterward. Finalization burns unallocated tokens. Liquid claims vest 50% immediately and 50% over 60 days; locked claims create funded 12/24-month vault positions. Anyone may burn unclaimed tokens after 90 days. No minting or administrator sweep exists.
-
-
-The Feast monitor displays onchain claimed, burned and remaining inventory. Its complete-vesting read paginates the finalized allocation table, validates types, reconciles count and allocated sum, then computes each liquid allocation's exact rounding at fresh chain time; locked allocations are eligible in full at finalization. The scheduled vested total includes already claimed tokens and is not currently claimable inventory. Treasury explorers and a hash-verified contribution report expose received amounts by accepted coin and clearing price. Contribution reports are dated finalized-transfer exports, not live wallet balances; missing reports show unavailable. The report publishes its CSV hash and scoring commit. Wallet binding is gated by the proceeds disclosure checkbox, campaign configuration and an immutable-contract check. Signed receipts must be submitted through the published channel and accepted before transfers; the website does not automatically submit bindings or transfer source-chain coins. Bindings publicly associate source wallets with Sui destinations, reducing unlinkability.
+Liquid Feast allocations are 50% vested at F and fully vested at F + 60 days, with another 30 days to complete claims. Locked terms start at claim time and need full reward capacity. Expired claims have no refund path. At reward exhaustion, new locks stop; accepted escrow and owner exit rights continue. Community grants open through separately announced rounds.

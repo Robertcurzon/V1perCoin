@@ -1,6 +1,7 @@
 // Operator-only authenticated Pyth history acquisition; never imported by the website.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { validateConfig, hash } from './score.mjs';
+import { assetKey } from './networks.mjs';
 const [inputFile,outputFile]=process.argv.slice(2);
 if(!inputFile||!outputFile)throw new Error('Usage: node scripts/feast/fetch_prices.mjs INPUT.json PRICES.json');
 const input=JSON.parse(readFileSync(inputFile));validateConfig(input.config);
@@ -21,7 +22,7 @@ async function at(feed,time) {
 const prices={};
 for(const t of input.transfers) {
   if(t.confirmedAt<input.config.windowStart||t.confirmedAt>=input.config.windowStart+21*86400)continue;
-  const coin=input.config.coins.find(c=>c.chain===t.chain&&c.contract.toLowerCase()===t.contract.toLowerCase());if(!coin)throw new Error('Unknown coin');
+  const coin=input.config.coins.find(c=>assetKey(c.chain,c.contract)===assetKey(t.chain,t.contract));if(!coin)throw new Error('Unknown coin');
   const spot=await at(coin.pythFeed,t.confirmedAt),history=[];
   for(let i=1;i<=1440;i++)history.push(await at(coin.pythFeed,t.confirmedAt-i*60));
   prices[`${t.chain}:${t.txHash}:${t.index}`]={provider:'Pyth Benchmarks',confirmedAt:t.confirmedAt,spot,history};

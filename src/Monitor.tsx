@@ -1,4 +1,5 @@
 import { siteUrl } from './site';
+import LaunchTimeline from './LaunchTimeline';
 import { useEffect, useState } from 'react';
 import { useCurrentClient } from '@mysten/dapp-kit-react';
 import { readChainState, INITIAL_SUPPLY } from './chainState';
@@ -101,7 +102,7 @@ export default function Monitor() {
     <p className="token-intro">Supply, funded rewards, and community contract activity. {isLaunchConfigured ? `Sui ${launch.network}; refreshes every 30 seconds.` : 'No verified deployment is configured. No live figures or trading activity are implied.'}</p>
     <p className="fine-print coin-type">Coin type: {isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p>
     <div className="monitor-metrics">{[
-      ['Current total supply', value('supply')], ['Total actually burned', value('burned')], ['Pending exit burns', value('pendingBurn')], ['Available lock rewards', value('available')], ['Reserved lock rewards', value('committed')], ['Rewards paid', value('paid')], ['Total rewards funded', value('funded')], ['V1PR currently locked', value('locked')], ['Locks opened / closed', `${value('opened', false)} / ${value('closed', false)}`], ['Free claims paid', value('claims', false)], ['Community exit-fee receipts', value('community')], ['Founder exit-fee receipts', value('founder')],
+      ['Current total supply', value('supply')], ['Total actually burned', value('burned')], ['Pending exit burns', value('pendingBurn')], ['Available lock rewards', value('available')], ['Reserved lock rewards', value('committed')], ['Rewards paid', value('paid')], ['Total rewards funded', value('funded')], ['V1PR currently locked', value('locked')], ['Locks opened / closed', `${value('opened', false)} / ${value('closed', false)}`], ['Free claims paid', value('claims', false)], ['Community exit-fee receipts', value('community')], ['V1PR Foundation exit-fee receipts', value('founder')],
     ].map(([label, metric]) => <article key={label}><span>{label}</span><strong>{metric}</strong></article>)}</div>
     <div className="monitor-controls"><button className="button outline" disabled={!isLaunchConfigured || loading} onClick={() => setRevision((n) => n + 1)}>{loading ? 'REFRESHING…' : 'REFRESH DATA'}</button><span className="fine-print">{latest ? `Last snapshot: ${new Date(latest.time).toLocaleString()}${error || dataIsStale(receivedAt, now) ? ' · STALE / SAVED OBSERVATION' : ' · FRESH RPC READ'}` : 'Awaiting onchain data'}</span></div>
     {error && <p className="transaction-message" role="alert">Unable to refresh: {error}. Any existing chart shows the last saved observations.</p>}
@@ -110,6 +111,7 @@ export default function Monitor() {
     <Chart title="EXCHANGE VOLUME / ROLLING 24H USD" samples={samples.filter((sample) => sample.volume24h !== null && sample.volume24h !== undefined)} unit="USD" series={[{key:'volume24h',name:'Configured pair 24h volume',color:'#66c9f3'}]}/>
     <p className="fine-print">{launch.dexPairId ? `Source: DEX Screener, configured Sui pair ${launch.dexPairId}. Rolling 24-hour USD volume for this pair only; not all-exchange volume or cumulative lifetime trading. ${volumeError ? `Volume unavailable/stale: ${volumeError}` : ''}` : 'Trading volume is not available until a real, verified mainnet exchange pair is configured. No synthetic trades or zero-volume claim is displayed.'} <a href="https://docs.dexscreener.com/api/reference" target="_blank" rel="noreferrer">Provider documentation ↗</a></p>
     <p className="fine-print">Charts show observed onchain snapshots stored in this browser, starting when this page first loads after deployment. They are not a complete historical index. Counters are cumulative successful lock opens, closes and free claims; they do not count ordinary transfers, unique people, every transaction, or exchange trades. Total supply includes reserves and locked inventory; it is not circulating supply. Separate object reads can briefly span concurrent transactions. Network/API failures leave saved data marked stale.</p>
+    <LaunchTimeline />
     <FeastMonitor />
     <Transparency />
   </main></div>;
