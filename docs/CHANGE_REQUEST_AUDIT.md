@@ -37,7 +37,8 @@ Reviewed 3 October 2026 against the pasted five-phase request, current Move pack
 5. Publish application/binding intake channels and run original-entry review. The site generates signed downloads; it does not submit applications, approve users or transfer contributions automatically.
 6. Export/typeset the updated PDF with source/PDF provenance. Native editor compilation succeeded, but it does not export the website PDF. The release workflow does; the local reader hides its outdated PDF.
 
-The seven-day Feast review and pre-opening vault pause remain operator commitments. Feast finalization does not enforce a minimum review time, and a direct vault deposit is governed by its pause flag rather than an opening-date field. An AdminCap is therefore trusted to honor these operating rules. Locked Feast claims require vault capacity and unpaused deposits; no binding reserves capacity and unclaimed inventory expires without refunds. Unit abort tests verify rejection reasons; mainnet/testnet transaction rehearsal must verify failed-transaction rollback, gas and retry behavior.
+Iteration 2 closes the review/date/reservation gaps: feast::set_allocations commits the CSV hash and resets review; finalize enforces seven days and reserves all locked rewards atomically. launch::allocate fixes opens_at_ms; ordinary open/deposit enforce it. Reserved Feast claims bypass pause/date/capacity gates and expired reservations return before principal burns. Remaining trust assumptions are listed explicitly in white paper section 11.
+
 
 ## Verification
 

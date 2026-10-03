@@ -14,6 +14,7 @@ const ECapacity: u64 = 3;
 const EPosition: u64 = 4;
 const EAdmin: u64 = 5;
 const EFunding: u64 = 6;
+const EOpening: u64 = 7;
 const MONTH_MS: u64 = 2_592_000_000;
 
 public struct Vault has key {
@@ -32,6 +33,8 @@ public struct Vault has key {
     pending_burn: Balance<V1PR>,
     locks_opened: u64,
     locks_closed: u64,
+    opens_at_ms: u64,
+    feast_committed: u64,
 }
 public struct AdminCap has key, store { id: UID, vault: ID }
 /// No `store`: users cannot transfer a position through public_transfer.
@@ -51,12 +54,12 @@ public struct BurnsFlushed has copy, drop { vault: ID, amount: u64 }
 public struct Funded has copy, drop { vault: ID, amount: u64 }
 public struct PauseChanged has copy, drop { vault: ID, paused: bool }
 
-public(package) fun create(fund: Coin<V1PR>, community: address, founder: address, ctx: &mut TxContext): (Vault, AdminCap) {
+public(package) fun create(fund: Coin<V1PR>, community: address, founder: address, opens_at_ms: u64, ctx: &mut TxContext): (Vault, AdminCap) {
     assert!(fund.value() == viper::allocation::lock_rewards(), EFunding);
     assert!(community != @0x0 && founder != @0x0 && community != founder, EFunding);
     let vault = Vault {
         id: object::new(ctx), rewards: fund.into_balance(), community, founder, paused: false, total_locked: 0,
-        reward_committed: 0, reward_paid: 0, reward_funded: viper::allocation::lock_rewards(), community_paid: 0, founder_paid: 0, burned: 0, pending_burn: sui::balance::zero(), locks_opened: 0, locks_closed: 0,
+        reward_committed: 0, reward_paid: 0, reward_funded: viper::allocation::lock_rewards(), community_paid: 0, founder_paid: 0, burned: 0, pending_burn: sui::balance::zero(), locks_opened: 0, locks_closed: 0, opens_at_ms, feast_committed: 0,
     };
     let cap = AdminCap { id: object::new(ctx), vault: object::id(&vault) };
     (vault, cap)
@@ -89,20 +92,44 @@ public fun fee_split(fee: u64): (u64, u64, u64) {
 public fun open(vault: &mut Vault, principal: Coin<V1PR>, months: u64, clock: &Clock, ctx: &mut TxContext): Position {
     let reward = full_reward(principal.value(), months);
     let now = clock.timestamp_ms();
-    let duration_ms = months * MONTH_MS;
     assert!(!vault.paused, EClosed);
+    assert!(now >= vault.opens_at_ms, EOpening);
     assert!(principal.value() > 0 && net_reward(principal.value(), months) > 0, ECapacity);
     assert!(reward <= vault.rewards.value(), ECapacity);
-    vault.locks_opened = vault.locks_opened + 1;
     vault.reward_committed = vault.reward_committed + reward;
+    let escrow = vault.rewards.split(reward);
+    new_position(vault, principal, escrow, months, clock, ctx)
+}
+fun new_position(vault: &mut Vault, principal: Coin<V1PR>, escrow: Balance<V1PR>, months: u64, clock: &Clock, ctx: &mut TxContext): Position {
+    let reward = escrow.value(); let now = clock.timestamp_ms(); let duration_ms = months * MONTH_MS;
+    vault.locks_opened = vault.locks_opened + 1;
     vault.total_locked = vault.total_locked + principal.value();
     let position = Position {
         id: object::new(ctx), vault: object::id(vault), owner: ctx.sender(),
-        principal: principal.into_balance(), reward: vault.rewards.split(reward),
+        principal: principal.into_balance(), reward: escrow,
         start_ms: now, duration_ms,
     };
     event::emit(Opened { vault: object::id(vault), timestamp_ms: now, position: object::id(&position), owner: ctx.sender(), principal: position.principal.value(), months, reward, maturity_ms: now + duration_ms });
     position
+}
+/// Only Feast can reserve inventory; no public or AdminCap withdrawal path.
+public(package) fun reserve_feast(vault: &mut Vault, amount: u64): Balance<V1PR> {
+    assert!(amount <= vault.rewards.value(), ECapacity);
+    vault.reward_committed = vault.reward_committed + amount;
+    vault.feast_committed = vault.feast_committed + amount;
+    vault.rewards.split(amount)
+}
+/// Reserved obligations bypass date/pause and never compete for capacity again.
+public(package) fun deposit_reserved(vault: &mut Vault, principal: Coin<V1PR>, reward: Balance<V1PR>, months: u64, clock: &Clock, ctx: &mut TxContext) {
+    assert!(reward.value() == full_reward(principal.value(),months) && reward.value() > 0, ECapacity);
+    vault.feast_committed = vault.feast_committed - reward.value();
+    let position = new_position(vault,principal,reward,months,clock,ctx);
+    transfer::transfer(position,ctx.sender());
+}
+public(package) fun release_feast(vault: &mut Vault, reward: Balance<V1PR>) {
+    vault.feast_committed = vault.feast_committed - reward.value();
+    vault.reward_committed = vault.reward_committed - reward.value();
+    vault.rewards.join(reward);
 }
 public fun deposit(vault: &mut Vault, principal: Coin<V1PR>, months: u64, clock: &Clock, ctx: &mut TxContext) {
     let position = open(vault, principal, months, clock, ctx);
@@ -191,7 +218,7 @@ fun funded_exit_and_pause_preserve_principal() {
     let mut ctx = tx_context::dummy();
     let mut clock = sui::clock::create_for_testing(&mut ctx);
     let (mut currency, metadata) = viper::v1pr::test_currency(&mut ctx);
-    let (mut vault, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
+    let (mut vault, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
     let position = open(&mut vault, coin::mint_for_testing<V1PR>(1_000_000_000_000, &mut ctx), 6, &clock, &mut ctx);
     let committed = full_reward(1_000_000_000_000, 6);
     let (free, reserved, paid, locked) = accounting(&vault); assert!(free == viper::allocation::lock_rewards() - committed && reserved == committed && paid == 0 && locked == 1_000_000_000_000);
@@ -228,7 +255,7 @@ fun mature_term(m: u64) {
     let mut ctx = tx_context::dummy();
     let mut clock = sui::clock::create_for_testing(&mut ctx);
     let (mut currency, metadata) = viper::v1pr::test_currency(&mut ctx);
-    let (mut vault, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
+    let (mut vault, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
     let expected = full_reward(1_000_000_000, m);
     let position = open(&mut vault, coin::mint_for_testing<V1PR>(1_000_000_000, &mut ctx), m, &clock, &mut ctx);
     sui::clock::set_for_testing(&mut clock, m * MONTH_MS + 1);
@@ -247,7 +274,7 @@ fun mature_term(m: u64) {
 fun reward_capacity_cannot_be_overcommitted() {
     let mut ctx = tx_context::dummy();
     let clock = sui::clock::create_for_testing(&mut ctx);
-    let (mut vault, _cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
+    let (mut vault, _cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
     let _position = open(&mut vault, coin::mint_for_testing<V1PR>(3_000_000_000_000_000, &mut ctx), 24, &clock, &mut ctx);
     abort 999
 }
@@ -255,7 +282,7 @@ fun reward_capacity_cannot_be_overcommitted() {
 fun paused_deposits_fail() {
     let mut ctx = tx_context::dummy();
     let clock = sui::clock::create_for_testing(&mut ctx);
-    let (mut vault, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
+    let (mut vault, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
     set_paused(&mut vault, &cap, true);
     let _position = open(&mut vault, coin::mint_for_testing<V1PR>(1_000_000_000, &mut ctx), 24, &clock, &mut ctx);
     abort 999
@@ -265,8 +292,8 @@ fun wrong_vault_cannot_close_position() {
     let mut ctx = tx_context::dummy();
     let clock = sui::clock::create_for_testing(&mut ctx);
     let (_currency, _metadata) = viper::v1pr::test_currency(&mut ctx);
-    let (mut first, _first_cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
-    let (mut second, _second_cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
+    let (mut first, _first_cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
+    let (mut second, _second_cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
     let position = open(&mut first, coin::mint_for_testing<V1PR>(1_000_000_000, &mut ctx), 12, &clock, &mut ctx);
     let _payout = close(&mut second, position, &clock, &mut ctx);
     abort 999
@@ -285,7 +312,7 @@ fun recorded_owner_is_enforced() {
     let mut ctx = tx_context::dummy();
     let clock = sui::clock::create_for_testing(&mut ctx);
     let (_currency, _metadata) = viper::v1pr::test_currency(&mut ctx);
-    let (mut vault, _cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
+    let (mut vault, _cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
     let mut position = open(&mut vault, coin::mint_for_testing<V1PR>(1_000_000_000, &mut ctx), 12, &clock, &mut ctx);
     position.owner = @0xA;
     let _payout = close(&mut vault, position, &clock, &mut ctx); abort 999
@@ -293,8 +320,8 @@ fun recorded_owner_is_enforced() {
 #[test, expected_failure(abort_code = EAdmin)]
 fun another_vault_admin_cannot_pause() {
     let mut ctx = tx_context::dummy();
-    let (mut first, _first_cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
-    let (_second, second_cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
+    let (mut first, _first_cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
+    let (_second, second_cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
     set_paused(&mut first, &second_cap, true); abort 999
 }
 #[test]
@@ -302,7 +329,7 @@ fun replenishment_preserves_existing_commitments() {
     let mut ctx = tx_context::dummy();
     let mut clock = sui::clock::create_for_testing(&mut ctx);
     let (mut currency, metadata) = viper::v1pr::test_currency(&mut ctx);
-    let (mut vault, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
+    let (mut vault, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
     let position = open(&mut vault, coin::mint_for_testing<V1PR>(1_000_000_000_000, &mut ctx), 24, &clock, &mut ctx);
     let reserved = full_reward(1_000_000_000_000, 24);
     fund(&mut vault, coin::mint_for_testing<V1PR>(1_000_000_000, &mut ctx));
@@ -324,7 +351,7 @@ fun replenishment_preserves_existing_commitments() {
 fun dust_lock_cannot_open_with_zero_net_reward() {
     let mut ctx = tx_context::dummy();
     let clock = sui::clock::create_for_testing(&mut ctx);
-    let (mut vault, _cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, &mut ctx);
+    let (mut vault, _cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), &mut ctx), @0xB, @0xA, 0, &mut ctx);
     let _position = open(&mut vault, coin::mint_for_testing<V1PR>(1, &mut ctx), 1, &clock, &mut ctx); abort 999
 }
 
@@ -333,7 +360,7 @@ fun completed_months_never_exceed_finished_shorter_lock() {
     let p = 1_000_000_000_000;
     let mut ctx = tx_context::dummy();
     let mut clock = sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,&mut ctx);
+    let (mut vault,cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     let mut term = 1;
     while (term <= 24) {
         let start = clock.timestamp_ms();
@@ -364,7 +391,7 @@ fun multi_user_sequence_reconciles_every_step() {
     let mut scenario = sui::test_scenario::begin(@0xA);
     let mut clock = sui::clock::create_for_testing(scenario.ctx());
     let (mut currency, metadata) = viper::v1pr::test_currency(scenario.ctx());
-    let (mut vault, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), scenario.ctx()), @0xC,@0xF,scenario.ctx());
+    let (mut vault, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(), scenario.ctx()), @0xC,@0xF,0,scenario.ctx());
     assert_balanced(&vault);
     let a = open(&mut vault,coin::mint_for_testing<V1PR>(1_000_000_000_000,scenario.ctx()),24,&clock,scenario.ctx()); assert_balanced(&vault);
     scenario.next_tx(@0xB);
@@ -389,3 +416,10 @@ fun multi_user_sequence_reconciles_every_step() {
 
 #[test_only]
 public fun position_details(position: &Position): (address,u64,u64,u64) { (position.owner,position.duration_ms,position.principal.value(),position.reward.value()) }
+
+#[test, expected_failure(abort_code=EOpening)]
+fun ordinary_lock_before_opening_fails() {
+    let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx);
+    let (mut vault,_cap)=create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,1,&mut ctx);
+    let _position=open(&mut vault,coin::mint_for_testing<V1PR>(1_000_000_000,&mut ctx),12,&clock,&mut ctx); abort 999
+}

@@ -45,7 +45,7 @@ See [website deployment](docs/WEBSITE_DEPLOYMENT.md). Main-branch publication au
 
 Custody addresses must be nonzero and pairwise distinct. Named allocation constants sum to the complete initial supply. Approval and expiry boundaries, multi-user funding/exits and permissionless burn flushing are covered by unit tests.
 
-Feast claims use the shared 100-million pool. Only its AdminCap can set allocations before finalization; no edits afterward. Finalization burns unallocated tokens. Liquid claims vest 50% immediately and 50% over 60 days; locked claims create funded 12/24-month vault positions. Anyone may burn unclaimed tokens after 90 days. No minting or administrator sweep exists.
+Feast claims use the shared 100-million pool. Only its AdminCap can set allocations before finalization; no edits afterward. Finalization burns unallocated tokens. Liquid claims vest 50% immediately and 50% over 60 days; finalization reserves all 12/24-month rewards or aborts, and locked claims consume those reservations despite pauses, the ordinary opening date or later capacity exhaustion. Anyone may burn unclaimed tokens after 90 days. No minting or administrator sweep exists.
 
 
 ## Feed the Viper
@@ -62,3 +62,8 @@ The monitor publishes Foundation explorer links and hash-verified export totals/
 Free claims are limited to 100M V1PR: at most 10,000 reviewed addresses, exactly 10,000 each, one claim per address. Seven-day signed applications precede day 0; the onchain window is scheduled once with at least seven days' notice, approvals freeze at opening and claims end 14 days later. No extension or administrator sweep. See scripts/claims/README.md and the white paper's phase table.
 
 The Feast menu includes native DOGE and native MemeCore M; all four receiving networks must be configured and rehearsed. Network- and campaign-bound signatures, native receipt checks and pricing rules are in scripts/feast/. No contribution campaign is open.
+
+
+## Trust assumptions
+
+Cross-chain finality, complete exports and historical-price provenance; correct CSV publication and AdminCap allocation entries; original-work eligibility review and intake timestamps; receipt publication and multisig custody; 25% proceeds conversion/funding, exchange opening-price floor and LP locking; discretionary Foundation/Community budgets; and deployment/source correspondence are operator responsibilities, not restrictions imposed by Move. See the white paper section 11 for the full list. Contract rules are enforced by feast::set_allocations/finalize/claim_locked/burn_unclaimed (hash, review, reservations and expiry), lock_vault::open/deposit (opening and emergency pause), free_claims::schedule/approve/claim (one-time claim dates/caps) and launch::allocate (custody and once-only allocation).

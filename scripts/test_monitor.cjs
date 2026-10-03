@@ -34,7 +34,7 @@ const currency = CurrencyBcs.parse(CurrencyBcs.serialize({
 assert.equal(currency.supply.$kind, 'BurnOnly'); assert.equal(currency.supply.BurnOnly, '999999999999999');
 const position = PositionBcs.parse(PositionBcs.serialize({ id, vault: id, owner: other, principal: '1000000000000', reward: '53000000000', start_ms: '1', duration_ms: '62208000000' }).toBytes());
 assert.equal(position.reward, '53000000000'); assert.equal(position.owner, other);
-const vault = VaultBcs.parse(VaultBcs.serialize({ id, rewards: '100', community: id, founder: other, paused: false, total_locked: '1000', reward_committed: '30', reward_paid: '20', reward_funded: '150', community_paid: '7', founder_paid: '1', burned: '2', pending_burn: '3', locks_opened: '5', locks_closed: '2' }).toBytes());
+const vault = VaultBcs.parse(VaultBcs.serialize({ id, rewards: '100', community: id, founder: other, paused: false, total_locked: '1000', reward_committed: '30', reward_paid: '20', reward_funded: '150', community_paid: '7', founder_paid: '1', burned: '2', pending_burn: '3', locks_opened: '5', locks_closed: '2', opens_at_ms:'604800000', feast_committed:'0' }).toBytes());
 assert.equal(BigInt(vault.rewards) + BigInt(vault.reward_committed) + BigInt(vault.reward_paid), BigInt(vault.reward_funded));
 const pool = ClaimsBcs.parse(ClaimsBcs.serialize({ id, inventory: '99990000000000', eligibility: { id, size: '1' }, approved: '1', claimed: '1', start_ms: '604800000', end_ms: '1814400000' }).toBytes());
 assert.equal(pool.claimed, '1');
@@ -60,8 +60,8 @@ assert.throws(() => decodeActivity({ ...event, bcs: new Uint8Array([0]) }, id, i
 const claimEvent = { ...event, eventType: `${id}::free_claims::Claimed`, bcs: EventSchemas.Claimed.serialize({ pool: id, timestamp_ms: '1000', owner: other, amount: '10000000000' }).toBytes() };
 assert.equal(decodeActivity(claimEvent, id, id, id).label, 'Free claim paid');
 assert.equal(decodeActivity(claimEvent, id, id, other), null);
-const feast = FeastBcs.parse(FeastBcs.serialize({id, inventory:'0', allocations:{id,size:'2'}, allocated:'10000000000000',claimed:'10000000000000',burned:'90000000000000',finalized:true,start_ms:'1'}).toBytes());
-fixtures.set(path.resolve('src/launch.json'), { currencyId: id, vaultId: id, claimsId: id, feastId: id, founder: other, community: id, freeClaimsStartMs:604800000 });
+const feast = FeastBcs.parse(FeastBcs.serialize({id, inventory:'0', allocations:{id,size:'2'}, allocated:'10000000000000',claimed:'10000000000000',burned:'90000000000000',finalized:true,start_ms:'604800000',allocations_hash:new Array(32).fill(7),last_change_ms:'0',locked_reward_required:'0',reward_reserve:'0',reservation_vault:id}).toBytes());
+fixtures.set(path.resolve('src/launch.json'), { currencyId: id, vaultId: id, claimsId: id, feastId: id, founder: other, community: id, freeClaimsStartMs:604800000,vaultOpensAtMs:604800000 });
 const { validateState } = load('src/chainState.ts');
 validateState(currency, vault, pool, feast);
 for (const [c,v,p] of [
@@ -81,7 +81,7 @@ for (const [c,v,p] of [
 console.log('Verification checks passed: explorer routing, freshness, scoped event decoding and fail-closed currency/accounting checks.');
 
 const { isManifestConfigured } = load('src/manifest.ts');
-const manifest = { network: 'testnet', status: 'verified', packageId: id, currencyId: id, vaultId: id, claimsId: id, founder: other, community: id, feastId:id, feastAdminCapId:id, upgradeCapId:id, feastOpen:false, feastStartMs:0, feastSubmissionUrl:'', freeClaimsStartMs:604800000, freeClaimsApplicationUrl:'https://example.com/apply', feastTreasury:{ethereum:'',solana:'',dogecoin:'',memecore:''}, initialLiquidity: `0x${'c'.repeat(64)}`, laterLiquidity: `0x${'d'.repeat(64)}`, vaultAdminCapId: id, claimsAdminCapId: id, coinType: coin, publishDigest: txDigest, allocationDigest: txDigest, immutableDigest: txDigest, metadataDigest: txDigest, dexPairId: '' };
+const manifest = { network: 'testnet', status: 'verified', packageId: id, currencyId: id, vaultId: id, claimsId: id, founder: other, community: id, feastId:id, feastAdminCapId:id, upgradeCapId:id, feastOpen:false, feastStartMs:0, feastSubmissionUrl:'', freeClaimsStartMs:604800000,vaultOpensAtMs:604800000, freeClaimsApplicationUrl:'https://example.com/apply', feastTreasury:{ethereum:'',solana:'',dogecoin:'',memecore:''}, initialLiquidity: `0x${'c'.repeat(64)}`, laterLiquidity: `0x${'d'.repeat(64)}`, vaultAdminCapId: id, claimsAdminCapId: id, coinType: coin, publishDigest: txDigest, allocationDigest: txDigest, immutableDigest: txDigest, metadataDigest: txDigest, dexPairId: '' };
 assert.equal(isManifestConfigured(manifest), true);
 for (const patch of [{ network: 'devnet' },{ feastId: '' },{ upgradeCapId:'' },{ initialLiquidity:other },{ feastOpen:true },{ metadataDigest: '' },{ founder: id },{ vaultAdminCapId: `0x${'0'.repeat(64)}` },{ publishDigest: '<script>' },{ coinType: `${other}::v1pr::V1PR` }]) assert.equal(isManifestConfigured({ ...manifest, ...patch }), false);
 console.log('Manifest checks passed: required custody, authorities, network, coin type and receipts.');
@@ -123,7 +123,7 @@ void (async () => {
     [rpcManifest.currencyId,{objectId:id,type:`0x2::coin_registry::Currency<${coin}>`,owner:{$kind:'Shared'},content:content(CurrencyBcs,{id,decimals:6,name:'Viper Coin',symbol:'V1PR',description:'',icon_url:'',supply:{BurnOnly:'999999999999999'},regulated:{Unregulated:true},treasury_cap_id:id,metadata_cap_id:{Deleted:true},extra_fields:[]})}],
     [rpcManifest.vaultId,{objectId:rpcManifest.vaultId,type:`${id}::lock_vault::Vault`,owner:{$kind:'Shared'},content:content(VaultBcs,{...vault,id:rpcManifest.vaultId})}],
     [rpcManifest.claimsId,{objectId:rpcManifest.claimsId,type:`${id}::free_claims::Pool`,owner:{$kind:'Shared'},content:content(ClaimsBcs,{...pool,id:rpcManifest.claimsId})}],
-    [rpcManifest.feastId,{objectId:rpcManifest.feastId,type:`${id}::feast::Pool`,owner:{$kind:'Shared'},content:content(FeastBcs,{...feast,id:rpcManifest.feastId})}],
+    [rpcManifest.feastId,{objectId:rpcManifest.feastId,type:`${id}::feast::Pool`,owner:{$kind:'Shared'},content:content(FeastBcs,{...feast,id:rpcManifest.feastId,reservation_vault:rpcManifest.vaultId})}],
     ['0x6',{objectId:'0x6',type:'0x2::clock::Clock',owner:{$kind:'Shared'},content:content(ClockBcs,{id:'0x6',timestamp_ms:'1000'})}],
   ]);
   const mock = {core:{getObject:async ({objectId})=>{

@@ -11,6 +11,8 @@ export function isManifestConfigured(manifest: typeof launch): boolean {
   && new Set(custody.map(a => a.toLowerCase())).size === custody.length
   && manifest.coinType === `${manifest.packageId}::v1pr::V1PR`
   && [manifest.publishDigest, manifest.allocationDigest, manifest.immutableDigest, manifest.metadataDigest].every((digest) => /^[1-9A-HJ-NP-Za-km-z]{43,44}$/.test(digest))
+  && Number.isSafeInteger(manifest.vaultOpensAtMs) && manifest.vaultOpensAtMs >= 0
+  && (manifest.freeClaimsStartMs === 0 || manifest.vaultOpensAtMs === manifest.freeClaimsStartMs)
   && Number.isSafeInteger(manifest.freeClaimsStartMs) && manifest.freeClaimsStartMs >= 0
   && (manifest.freeClaimsStartMs === 0 || /^https:\/\//.test(manifest.freeClaimsApplicationUrl))
   && typeof manifest.feastOpen === 'boolean'

@@ -84,7 +84,7 @@ export default function LockPanel() {
         }
         if (claimed) throw new Error('This wallet already claimed its allocation.');
       }
-      if (action === 'deposit' && (launch.freeClaimsStartMs === 0 || state.time < BigInt(launch.freeClaimsStartMs))) throw new Error('New locks open at the published day-0 opening.');
+      if (action === 'deposit' && (state.time < BigInt(state.v.opens_at_ms))) throw new Error('New locks open at the published day-0 opening.');
       if (action === 'deposit' && state.v.paused) throw new Error('New locks are paused. Existing locks can still exit.');
       const tx = new Transaction();
       tx.setSender(account.address);
@@ -104,8 +104,8 @@ export default function LockPanel() {
     finally { setPending(false); }
   }
   const visiblePositions = loadedOwner === account?.address ? positions : [];
-  const lockOpen = configured && launch.freeClaimsStartMs > 0 && chainTime >= BigInt(launch.freeClaimsStartMs);
-  const freeOpen = lockOpen && chainTime < BigInt(launch.freeClaimsStartMs) + 14n * 86_400_000n;
+  const lockOpen = configured && vault !== null && chainTime >= BigInt(vault.opens_at_ms);
+  const freeOpen = configured && launch.freeClaimsStartMs > 0 && chainTime >= BigInt(launch.freeClaimsStartMs) && chainTime < BigInt(launch.freeClaimsStartMs) + 14n * 86_400_000n;
   const capacity = vault ? BigInt(vault.rewards) : null;
   return <section id="lock" className="section lock-section">
     <div className="kicker">LOCK & EARN / FUNDED REWARDS</div>

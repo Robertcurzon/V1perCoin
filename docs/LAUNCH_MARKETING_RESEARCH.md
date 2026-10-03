@@ -99,3 +99,8 @@ Lead with “Feed the Viper. Cute memes in. More venom out.” The baby Viper gr
 **Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PR founder (the "V1PR Foundation"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PR only, with no claim on Foundation assets or future income. Foundation receiving addresses and all received transfers are published for verification.
 
 The DEX pool opens at no less than the Feast clearing price, paired with 25% of Feast proceeds. Remaining proceeds are founder-controlled and discretionary.
+
+
+## Trust assumptions
+
+All venue selection, liquidity sizing, paired funding, opening-price targets, LP-lock execution, listings, social cadence, creator-program spending and disclosure/publication plans in this research document are explicit operating assumptions. They are not promises enforced by the token contract. Onchain dates, review commitments and reserved claims follow the functions cited in white paper sections 3–6; all remaining operator responsibilities are listed in section 11.

@@ -49,11 +49,11 @@ Each finalized contribution is valued at the lesser of Pyth confirmation-time sp
 
 Allocations follow each wallet's share of total points, limited to 10,000 V1PR per USD before bonuses. No wallet cap applies. Rounding and the price floor can leave inventory, burned at finalization. Publish inputs, finalized receipts, price archives, allocation CSV, SHA-256 hash and scoring commit. Clearing price is total eligible USD divided by V1PR allocated.
 
-The Feast administrator sets or edits allocations before one-time finalization, within the 100-million-token pool limit. Finalization freezes allocations. Liquid claims release 50% immediately and 50% linearly over 60 days. Locked claims open the recorded 12/24-month position, starting at claim time and reserving its full reward. A binding does not reserve vault capacity: insufficient rewards or paused deposits prevent the claim without consuming its allocation. Claims end 90 days after finalization; anyone may then burn remaining inventory. No administrator can sweep the pool.
+The Feast administrator sets or edits allocations and a 32-byte CSV hash through `feast::set_allocations`. Every edit records the chain clock and restarts review. `feast::finalize` requires the matching hash and at least seven days since the last edit; it freezes allocations and reserves every locked allocation's full reward in the vault, or aborts atomically if capacity is insufficient. Liquid claims release 50% immediately and 50% linearly over 60 days. `feast::claim_locked` consumes its reservation to open the recorded 12/24-month position, bypassing deposit pauses and the ordinary opening date. Terms start at claim time. Claims end after 90 days; `feast::burn_unclaimed` returns unused reward reservations to capacity before burning unclaimed principal. No administrator sweep exists.
 
-Feast proceeds are sent to the V1PR Foundation. Contributed coins are not burned, held in trust or governed by participants. Its founder controls the wallets and may hold, sell, reinvest or spend proceeds. Participants receive V1PR only, with no claim on Foundation assets or future income. Receiving addresses and transfers are published. There is no contribution refund path, including if a locked allocation cannot be claimed before expiry.
+Feast proceeds are sent to the V1PR Foundation. Contributed coins are not burned, held in trust or governed by participants. Its founder controls the wallets and may hold, sell, reinvest or spend proceeds. Participants receive V1PR only, with no claim on Foundation assets or future income. Receiving addresses and transfers are published. There is no contribution refund path, including expired claims or delayed finalization.
 
-The DEX pool opens at no less than the Feast clearing price, paired with 25% of Feast proceeds. Remaining proceeds are discretionary V1PR Foundation funds. This is an operating commitment requiring verified conversions and funding transactions; the Sui contract does not automatically enforce cross-chain spending.
+Exchange funding, the stated opening-price floor and the 25% proceeds commitment are explicit trust assumptions in section 11; no Sui function enforces cross-chain spending.
 
 ## 4. Free claims
 
@@ -67,7 +67,7 @@ Approval cannot overwrite or revoke an eligible address, include a zero address 
 
 The 150-million V1PR reward pool accepts locks first come, first served by successful transaction order. Each accepted position immediately escrows its complete term reward. If capacity is insufficient, the contract rejects the deposit. Accepted obligations remain funded.
 
-Choose 1–24 whole program months; each month is 30 days. Principal, term, owner and reward are set at opening. Positions cannot be transferred, extended or topped up; those actions require a new lock. No deposit fee or automatic compounding applies.
+`launch::allocate` fixes the vault's immutable opening timestamp. `lock_vault::open` and `deposit` reject ordinary deposits before that date; the emergency pause also rejects new deposits, while reserved Feast claims and exits remain available. Choose 1–24 whole program months; each month is 30 days. Principal, term, owner and reward are set at opening. Positions cannot be transferred, extended or topped up; those actions require a new lock. No deposit fee or automatic compounding applies.
 
 `annual rate = 1% × 10^((months − 1) / 23)`
 
@@ -146,6 +146,16 @@ Day 0 (T) is the published UTC opening shared by free claims and the Feast. Sche
 | F to F + 90 days | Claims and pool opening | Contributors: frozen claims; trading only once paired funding, custody and LP lock are verified |
 | F + 90 days onward | Ongoing | Unclaimed Feast inventory may burn; existing locks retain exits; new locks require capacity |
 
-Window ends are exclusive. Send contributions early enough for confirmation before T + 21 days. The seven-day Feast review and exchange opening are operating commitments, not cross-chain contract enforcement. Free-claim scheduling and its 14-day deadline are enforced onchain; the Feast's 90-day claim deadline starts at actual finalization.
+Window ends are exclusive. Send contributions early enough for confirmation before T + 21 days. `feast::finalize` enforces seven days after the latest hash/allocation edit. Setting the correct post-campaign allocations and funding/opening an exchange are trust assumptions (section 11). Free-claim scheduling and its 14-day deadline are enforced onchain; the Feast's 90-day claim deadline starts at actual finalization.
 
-Liquid Feast allocations are 50% vested at F and fully vested at F + 60 days, with another 30 days to complete claims. Locked terms start at claim time and need full reward capacity. Expired claims have no refund path. At reward exhaustion, new locks stop; accepted escrow and owner exit rights continue. Community grants open through separately announced rounds.
+Liquid Feast allocations are 50% vested at F and fully vested at F + 60 days, with another 30 days to complete claims. Locked terms start at claim time and consume rewards already reserved at finalization. Expired claims have no refund path. At reward exhaustion, new locks stop; accepted escrow and owner exit rights continue. Community grants open through separately announced rounds.
+
+
+## 11. Trust assumptions
+
+- Foundation-controlled proceeds, Operations and reserve-wallet spending remain discretionary. Community subbudgets, award review, spending receipts and publication commitments are not enforced by the token contract.
+- Operators must commit the correct complete CSV after the contribution cutoff, publish it and map its entries to the onchain table. The contract binds a 32-byte hash and review delay; it cannot reconstruct the CSV or prove its relation to source-chain receipts. The Feast AdminCap can edit before finalization, reset review repeatedly or delay finalization. Adequate reward capacity is required to finalize; participant contributions have no refund path.
+- Operators must establish canonical finalized source-chain receipts, complete independent exports and authenticated historical prices. The 21-day source-chain window and allocation fairness rely on those data and the published scorer, not a cross-chain proof verified by Move.
+- The plan commits 25% of all accepted Feast proceeds to paired liquidity and an opening DEX price no lower than the Feast clearing price. Conversions, losses, costs, actual paired funding, exchange range, LP custody and enforceable LP locking require operator execution and published receipts; neither commitment is enforced by this Sui package.
+- Multisig signers, accurate custody/deployment records, metadata deletion, package immutability, independent review and public reporting must be independently verified. The site's checks cannot prove that configured IDs came from authentic publication or that bytecode matches reviewed source.
+- Free-entry authorship, receipt timestamps, original-work review, eligibility fairness and intake availability rely on operators. Wallet and content deduplication cannot prove unique humans.
