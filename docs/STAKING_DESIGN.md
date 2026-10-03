@@ -7,3 +7,9 @@ Early reward is net_reward(P, whole elapsed months), zero before one month, capp
 Close does not take Currency. Burn shares accumulate in pending_burn. Permissionless flush_burns consumes that balance through Currency and increments actually burned. Pending inventory is separate from reward capacity and remains total supply until flushed.
 
 Accounting: rewards + reward_committed + reward_paid == reward_funded. Pausing only stops deposits. Anyone may fund with existing V1PR. There is no admin withdrawal path. Shared-object schemas and scoped events match the frontend. Network gas is separate.
+
+## Executable accounting evidence
+
+`invariant_sequence::fixed_seed_600_operations_five_users` exercises five senders and 1/3/6/12/24-month terms with a fixed `0xC0FFEE` seed. After each of 600 operations it checks funded reward conservation, actual Currency supply against independent Feast/exit burn counters, cumulative payouts against completed-month rewards, and pending plus flushed burns against the sum of exit burn shares. Coverage assertions require opens, early exits, mature exits, funding, flushing, Feast claims and pause toggles. Test inventory is split from one initial balance and recycled; the sequence creates no additional tokens.
+
+The 852 cases in `tests/fixtures/economics.json` cover small-unit rounding and all 24 terms at instant, partial, month-boundary, maturity and post-maturity times. `scripts/generate_economics_vectors.mjs` generates bounded Move tests from that same JSON shape; `--check` refuses stale artifacts. `test_economics.cjs` executes the TypeScript functions on every vector. Move tests exercise real `open`, `preview` and `close`. These are regression evidence, not a substitute for independent review.

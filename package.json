@@ -16,7 +16,7 @@
     "postbuild": "node scripts/finalize_site.cjs",
     "test:deployment": "node scripts/test_deployment.mjs",
     "whitepaper:source": "python3 scripts/generate_whitepaper.py",
-    "test:feast": "node scripts/feast/test.mjs",
+    "test:feast": "node scripts/feast/test.mjs && node scripts/feast/properties.mjs",
     "pretest:economics": "node scripts/sync_whitepaper.cjs",
     "test:claims": "node scripts/claims/test.mjs",
     "test:rehearsal": "node scripts/rehearse_localnet.mjs"
@@ -40,6 +40,7 @@
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
+    "fast-check": "^4.6.0",
     "globals": "^17.12.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.71.0",

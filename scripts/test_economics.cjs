@@ -65,3 +65,12 @@ for (let T = 1; T <= 24; T++) for (let m = 0; m < T; m++) {
   assert.ok(early.net <= finished);
   assert.equal(early.earned, m === 0 ? 0n : netReward(p,m));
 }
+
+const vectors = JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/economics.json')));
+for (const v of vectors) {
+  const p=BigInt(v.principal), reserved=fullReward(p,v.term);
+  assert.equal(reserved.toString(),v.reserved);
+  const result=exitPreview(p,reserved,BigInt(v.term)*MONTH_MS,BigInt(v.elapsedMs));
+  for (const field of ['earned','fee','community','burn','founder','net']) assert.equal(result[field].toString(),v[field]);
+}
+require('node:child_process').execFileSync(process.execPath,['scripts/generate_economics_vectors.mjs','--check'],{cwd:root,stdio:'inherit'});

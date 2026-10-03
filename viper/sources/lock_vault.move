@@ -423,3 +423,8 @@ fun ordinary_lock_before_opening_fails() {
     let (mut vault,_cap)=create(coin::mint_for_testing<V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,1,&mut ctx);
     let _position=open(&mut vault,coin::mint_for_testing<V1PR>(1_000_000_000,&mut ctx),12,&clock,&mut ctx); abort 999
 }
+
+#[test_only]
+public fun sequence_state(vault: &Vault): (bool,u64,u64) { (vault.paused,vault.pending_burn.value(),vault.burned) }
+#[test_only]
+public fun sequence_time(position: &Position): (u64,u64) { (position.start_ms,position.duration_ms) }
