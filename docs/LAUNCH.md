@@ -55,3 +55,5 @@ Visit `/monitor` after configuration. Confirm Currency supply and vault accounti
 - Confirm claim, open, close, top-up and pause/resume events appear with the correct vault/pool scope and receipt. The recent feed is bounded and may not contain all prior events. Check the explorer for complete receipts.
 - Disconnect the RPC connection and return to the page: saved readings must show stale; they must not turn into zero balances or simulated activity.
 - Verify package immutability and source independently. Website metadata/type/accounting checks do not prove absence of upgrade authority.
+
+Custody addresses must be nonzero and pairwise distinct. Named allocation constants sum to the complete initial supply. Approval and expiry boundaries, multi-user funding/exits and permissionless burn flushing are covered by unit tests.

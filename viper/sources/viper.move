@@ -1,11 +1,10 @@
 module viper::v1pr;
 
-use std::string;
 use sui::coin::Coin;
 use sui::coin_registry::{Self, Currency};
 
 /// One billion V1PR with six display decimals.
-const INITIAL_SUPPLY: u64 = 1_000_000_000_000_000;
+const ELaunchSupply: u64 = 100;
 
 /// One-time witness: package publication is the only creation path.
 public struct V1PR has drop {}
@@ -21,7 +20,7 @@ fun init(witness: V1PR, ctx: &mut TxContext) {
         ctx,
     );
 
-    let initial_coin = treasury_cap.mint(INITIAL_SUPPLY, ctx);
+    let initial_coin = treasury_cap.mint(viper::allocation::initial_supply(), ctx);
     currency.make_supply_burn_only(treasury_cap);
     let metadata_cap = currency.finalize(ctx);
 
@@ -43,7 +42,7 @@ fun initial_supply_is_sealed_in_launch_cap() {
     scenario.next_tx(@0xA);
 
     let cap = scenario.take_from_sender<LaunchCap>();
-    assert!(cap.supply.value() == INITIAL_SUPPLY, 0);
+    assert!(cap.supply.value() == viper::allocation::initial_supply(), 0);
     scenario.return_to_sender(cap);
     scenario.end();
 }
@@ -52,14 +51,14 @@ fun initial_supply_is_sealed_in_launch_cap() {
 public struct LaunchCap has key { id: UID, supply: sui::balance::Balance<V1PR> }
 public(package) fun consume_launch_cap(cap: LaunchCap, ctx: &mut TxContext): Coin<V1PR> {
     let LaunchCap { id, supply } = cap;
-    assert!(supply.value() == INITIAL_SUPPLY, 100);
+    assert!(supply.value() == viper::allocation::initial_supply(), ELaunchSupply);
     id.delete();
     sui::coin::from_balance(supply, ctx)
 }
 #[test_only]
 public fun test_currency(ctx: &mut TxContext): (Currency<V1PR>, sui::coin_registry::MetadataCap<V1PR>) {
     let (builder, mut cap) = coin_registry::new_currency_with_otw(V1PR {}, 6, b"V1PR".to_string(), b"Viper Coin".to_string(), b"".to_string(), b"".to_string(), ctx);
-    let minted = cap.mint(INITIAL_SUPPLY, ctx);
+    let minted = cap.mint(viper::allocation::initial_supply(), ctx);
     sui::coin::burn_for_testing(minted);
     let (mut currency, metadata) = builder.finalize_unwrap_for_testing(ctx);
     currency.make_supply_burn_only(cap);
@@ -68,5 +67,5 @@ public fun test_currency(ctx: &mut TxContext): (Currency<V1PR>, sui::coin_regist
 
 #[test_only]
 public fun test_launch_cap(ctx: &mut TxContext): LaunchCap {
-    LaunchCap { id: object::new(ctx), supply: sui::coin::mint_for_testing<V1PR>(INITIAL_SUPPLY, ctx).into_balance() }
+    LaunchCap { id: object::new(ctx), supply: sui::coin::mint_for_testing<V1PR>(viper::allocation::initial_supply(), ctx).into_balance() }
 }

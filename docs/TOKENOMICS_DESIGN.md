@@ -11,3 +11,5 @@ The authoritative economics are in [WHITEPAPER.md](WHITEPAPER.md). Implemented r
 Liquidity allocations are inventory held by disclosed custodians, not automatically created pools. The public distribution reserve is discretionary custody and does not accept contributions. Operations is founder-controlled without vesting; Community has a distinct wallet. Community subbudgets: 6% creator grants, 5% Hunt Board challenges, 3% education, 1% events/moderation, 5% reserve. These operating budgets total 20% and are not separately contract-enforced.
 
 Burns reduce supply without assuring price appreciation. Rewards redistribute existing inventory. At capacity exhaustion new locks stop; existing commitments remain backed. Voluntary replenishment with existing V1PR can restore capacity. No claim of perpetual yield is made.
+
+Custody addresses must be nonzero and pairwise distinct. Named allocation constants sum to the complete initial supply. Approval and expiry boundaries, multi-user funding/exits and permissionless burn flushing are covered by unit tests.

@@ -17,7 +17,7 @@ public struct Claimed has copy, drop { pool: ID, timestamp_ms: u64, owner: addre
 public struct ClaimsBurned has copy, drop { pool: ID, timestamp_ms: u64, amount: u64 }
 
 public(package) fun create(fund: Coin<V1PR>, clock: &Clock, ctx: &mut TxContext): (Pool, AdminCap) {
-    assert!(fund.value() == 100_000_000_000_000, EClaim);
+    assert!(fund.value() == viper::allocation::free_claims(), EClaim);
     let pool = Pool { id: object::new(ctx), inventory: fund.into_balance(), eligibility: table::new(ctx), approved: 0, claimed: 0, end_ms: clock.timestamp_ms() + WINDOW_MS };
     let cap = AdminCap { id: object::new(ctx), pool: object::id(&pool) };
     (pool, cap)
@@ -31,6 +31,7 @@ public fun approve(pool: &mut Pool, cap: &AdminCap, addresses: vector<address>, 
         pool.approved = pool.approved + 1;
     });
 }
+#[allow(lint(self_transfer))]
 public fun claim(pool: &mut Pool, clock: &Clock, ctx: &mut TxContext) {
     let sender = ctx.sender();
     assert!(clock.timestamp_ms() < pool.end_ms && pool.eligibility.contains(sender), EClaim);
@@ -56,7 +57,7 @@ public(package) fun share(pool: Pool) { transfer::share_object(pool); }
 fun approved_claim_receives_exact_amount() {
     let mut scenario = sui::test_scenario::begin(@0xA);
     let clock = sui::clock::create_for_testing(scenario.ctx());
-    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(100_000_000_000_000, scenario.ctx()), &clock, scenario.ctx());
+    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), scenario.ctx()), &clock, scenario.ctx());
     approve(&mut pool, &cap, vector[@0xA], &clock);
     claim(&mut pool, &clock, scenario.ctx());
     assert!(pool.claimed == 1 && remaining(&pool) == 99_990_000_000_000);
@@ -73,7 +74,7 @@ fun approved_claim_receives_exact_amount() {
 fun repeated_claim_fails() {
     let mut scenario = sui::test_scenario::begin(@0xA);
     let clock = sui::clock::create_for_testing(scenario.ctx());
-    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(100_000_000_000_000, scenario.ctx()), &clock, scenario.ctx());
+    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), scenario.ctx()), &clock, scenario.ctx());
     approve(&mut pool, &cap, vector[@0xA], &clock);
     claim(&mut pool, &clock, scenario.ctx());
     claim(&mut pool, &clock, scenario.ctx()); abort 999
@@ -82,7 +83,7 @@ fun repeated_claim_fails() {
 fun claim_window_expiry_is_enforced() {
     let mut scenario = sui::test_scenario::begin(@0xA);
     let mut clock = sui::clock::create_for_testing(scenario.ctx());
-    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(100_000_000_000_000, scenario.ctx()), &clock, scenario.ctx());
+    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), scenario.ctx()), &clock, scenario.ctx());
     approve(&mut pool, &cap, vector[@0xA], &clock);
     sui::clock::set_for_testing(&mut clock, WINDOW_MS);
     claim(&mut pool, &clock, scenario.ctx()); abort 999
@@ -91,7 +92,7 @@ fun claim_window_expiry_is_enforced() {
 fun unapproved_claim_fails() {
     let mut scenario = sui::test_scenario::begin(@0xA);
     let clock = sui::clock::create_for_testing(scenario.ctx());
-    let (mut pool, _cap) = create(coin::mint_for_testing<V1PR>(100_000_000_000_000, scenario.ctx()), &clock, scenario.ctx());
+    let (mut pool, _cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), scenario.ctx()), &clock, scenario.ctx());
     claim(&mut pool, &clock, scenario.ctx()); abort 999
 }
 #[test]
@@ -99,13 +100,52 @@ fun unclaimed_tokens_are_actually_burned() {
     let mut ctx = tx_context::dummy();
     let mut clock = sui::clock::create_for_testing(&mut ctx);
     let (mut currency, metadata) = viper::v1pr::test_currency(&mut ctx);
-    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(100_000_000_000_000, &mut ctx), &clock, &mut ctx);
+    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), &mut ctx), &clock, &mut ctx);
     sui::clock::set_for_testing(&mut clock, WINDOW_MS);
     burn_unclaimed(&mut pool, &mut currency, &clock);
     assert!(remaining(&pool) == 0 && currency.total_supply().destroy_some() == 900_000_000_000_000);
     let events = event::events_by_type<ClaimsBurned>();
-    assert!(events.length() == 1 && events[0].amount == 100_000_000_000_000 && events[0].timestamp_ms == WINDOW_MS);
+    assert!(events.length() == 1 && events[0].amount == viper::allocation::free_claims() && events[0].timestamp_ms == WINDOW_MS);
     std::unit_test::destroy(pool); std::unit_test::destroy(cap);
     std::unit_test::destroy(currency); std::unit_test::destroy(metadata);
     sui::clock::destroy_for_testing(clock);
+}
+
+#[test, expected_failure(abort_code = EAdmin)]
+fun wrong_admin_cannot_approve() {
+    let mut ctx = tx_context::dummy(); let clock = sui::clock::create_for_testing(&mut ctx);
+    let (mut first, _cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), &mut ctx), &clock, &mut ctx);
+    let (_second, wrong) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), &mut ctx), &clock, &mut ctx);
+    approve(&mut first, &wrong, vector[@0xA], &clock); abort 999
+}
+#[test, expected_failure(abort_code = EClaim)]
+fun approval_after_window_fails() {
+    let mut ctx = tx_context::dummy(); let mut clock = sui::clock::create_for_testing(&mut ctx);
+    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), &mut ctx), &clock, &mut ctx);
+    sui::clock::set_for_testing(&mut clock, WINDOW_MS); approve(&mut pool, &cap, vector[@0xA], &clock); abort 999
+}
+#[test, expected_failure(abort_code = EClaim)]
+fun duplicate_approval_fails() {
+    let mut ctx = tx_context::dummy(); let clock = sui::clock::create_for_testing(&mut ctx);
+    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), &mut ctx), &clock, &mut ctx);
+    approve(&mut pool, &cap, vector[@0xA,@0xA], &clock); abort 999
+}
+#[test, expected_failure(abort_code = EClaim)]
+fun over_capacity_approval_fails() {
+    let mut ctx = tx_context::dummy(); let clock = sui::clock::create_for_testing(&mut ctx);
+    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), &mut ctx), &clock, &mut ctx);
+    pool.approved = 10_000; approve(&mut pool, &cap, vector[@0xA], &clock); abort 999
+}
+#[test, expected_failure(abort_code = EClaim)]
+fun zero_approval_fails() {
+    let mut ctx = tx_context::dummy(); let clock = sui::clock::create_for_testing(&mut ctx);
+    let (mut pool, cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), &mut ctx), &clock, &mut ctx);
+    approve(&mut pool, &cap, vector[@0x0], &clock); abort 999
+}
+#[test, expected_failure(abort_code = EClaim)]
+fun premature_burn_fails() {
+    let mut ctx = tx_context::dummy(); let clock = sui::clock::create_for_testing(&mut ctx);
+    let (mut currency, _metadata) = viper::v1pr::test_currency(&mut ctx);
+    let (mut pool, _cap) = create(coin::mint_for_testing<V1PR>(viper::allocation::free_claims(), &mut ctx), &clock, &mut ctx);
+    burn_unclaimed(&mut pool, &mut currency, &clock); abort 999
 }
