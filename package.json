@@ -18,7 +18,8 @@
     "whitepaper:source": "python3 scripts/generate_whitepaper.py",
     "test:feast": "node scripts/feast/test.mjs",
     "pretest:economics": "node scripts/sync_whitepaper.cjs",
-    "test:claims": "node scripts/claims/test.mjs"
+    "test:claims": "node scripts/claims/test.mjs",
+    "test:rehearsal": "node scripts/rehearse_localnet.mjs"
   },
   "dependencies": {
     "@mysten/dapp-kit-react": "^2.1.37",

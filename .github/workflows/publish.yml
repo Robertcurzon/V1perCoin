@@ -26,6 +26,32 @@ jobs:
           sui_binary="/tmp/sui-cli/$sui_member"
           chmod +x "$sui_binary"
           "$sui_binary" move test --path viper --build-env testnet
+  localnet:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Install checksum-verified pinned Sui CLI
+        run: |
+          curl --fail --location --retry 3 https://github.com/MystenLabs/sui/releases/download/mainnet-v1.80.1/sui-mainnet-v1.80.1-ubuntu-x86_64.tgz -o /tmp/sui.tgz
+          echo '97f9aed10e0c2fe3204ce4639ac992e1449b17c14f22f30e9f903ead54ac7336  /tmp/sui.tgz' | sha256sum --check
+          mkdir -p /tmp/sui-cli
+          sui_member="$(tar -tzf /tmp/sui.tgz | awk -F / '$NF == "sui" { print; exit }')"
+          test -n "$sui_member"
+          tar -xzf /tmp/sui.tgz -C /tmp/sui-cli "$sui_member"
+          chmod +x "/tmp/sui-cli/$sui_member"
+          echo "SUI_BIN=/tmp/sui-cli/$sui_member" >> "$GITHUB_ENV"
+      - run: npm run test:rehearsal
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: localnet-rehearsal
+          path: tmp/localnet-rehearsal.json
+          if-no-files-found: error
   whitepaper:
     timeout-minutes: 15
     runs-on: ubuntu-24.04
@@ -59,7 +85,7 @@ jobs:
           if-no-files-found: error
   website:
     timeout-minutes: 15
-    needs: [whitepaper, contracts]
+    needs: [whitepaper, contracts, localnet]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
