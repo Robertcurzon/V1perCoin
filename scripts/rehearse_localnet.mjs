@@ -24,7 +24,7 @@ const url = `http://127.0.0.1:${rpcPort}`;
 const client = new SuiJsonRpcClient({ url, network: 'localnet' });
 const wallets = Array.from({length: 4}, () => Ed25519Keypair.generate());
 const addresses = wallets.map(k => k.toSuiAddress()), signer = wallets[0];
-let node, vite, logs = '', nodeError;
+let node, vite, nodeError;
 const receipts = [];
 async function execute(label, transaction, failure) {
   transaction.setGasBudget(1_000_000_000);
@@ -51,17 +51,18 @@ const txCall = (target, args, types = []) => {
 try {
   node = spawn(sui, ['start', '--with-faucet=127.0.0.1:'+faucetPort, '--force-regenesis', '--fullnode-rpc-port', String(rpcPort), '--committee-size', '1'], {cwd:directory, env:{...process.env,SUI_CONFIG_DIR:directory,TMPDIR:directory}, stdio:['ignore','pipe','pipe']});
   node.on('error', error => {nodeError = error;});
-  node.stdout.on('data', data => { logs += data; }); node.stderr.on('data', data => {logs += data;});
+  // Drain node logs without printing generated validator/faucet configuration.
+  node.stdout.resume(); node.stderr.resume();
   let ready = false;
   for (let i=0;i<120;i++) {
     if (nodeError) throw nodeError;
-    if (node.exitCode !== null || node.signalCode !== null) throw new Error(`Isolated node exited (${node.exitCode}): ${logs.slice(-2000)}`);
+    if (node.exitCode !== null || node.signalCode !== null) throw new Error(`Isolated node exited (${node.exitCode ?? node.signalCode})`);
     try { await time(); ready=true; break; } catch { await delay(500); }
   }
   assert(ready, 'Localnet startup timeout');
   let faucetReady=false;
   for(let i=0;i<120;i++) {try {await requestSuiFromFaucetV2({host:`http://127.0.0.1:${faucetPort}`,recipient:addresses[0]}); faucetReady=true; break;} catch {await delay(500);}}
-  assert(faucetReady,`Local faucet timeout: ${logs.slice(-2000)}`);
+  assert(faucetReady,'Local faucet timeout');
   const gasDeadline = Date.now()+30_000;
   while (!(await client.getCoins({owner:addresses[0]})).data.length) { assert(Date.now()<gasDeadline,'Faucet timeout'); await delay(250); }
   console.log('Isolated localnet ready; building pinned package.');
@@ -116,6 +117,6 @@ try {
   console.log(JSON.stringify({result:'PASS',transactions:receipts.length,chainState:'verified',skippedClockWarps},null,2));
 } finally {
   if(vite) await vite.close();
-  if(node && node.exitCode===null && node.signalCode===null) {const stopped=once(node,'exit'); node.kill('SIGTERM'); await Promise.race([stopped,delay(3000)]); if(node.exitCode===null && node.signalCode===null) {node.kill('SIGKILL'); await stopped;}}
+  if(node?.pid && node.exitCode===null && node.signalCode===null) {const stopped=once(node,'exit'); node.kill('SIGTERM'); await Promise.race([stopped,delay(3000)]); if(node.exitCode===null && node.signalCode===null) {node.kill('SIGKILL'); await stopped;}}
   await rm(directory,{recursive:true,force:true});
 }

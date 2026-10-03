@@ -69,3 +69,11 @@ public fun test_currency(ctx: &mut TxContext): (Currency<V1PR>, sui::coin_regist
 public fun test_launch_cap(ctx: &mut TxContext): LaunchCap {
     LaunchCap { id: object::new(ctx), supply: sui::coin::mint_for_testing<V1PR>(viper::allocation::initial_supply(), ctx).into_balance() }
 }
+
+#[test]
+fun voluntary_burn_reduces_total_supply() {
+    let mut ctx=tx_context::dummy(); let (mut currency,metadata)=test_currency(&mut ctx);
+    burn(&mut currency,sui::coin::mint_for_testing<V1PR>(123_456_789,&mut ctx));
+    assert!(currency.total_supply().destroy_some()==viper::allocation::initial_supply()-123_456_789);
+    std::unit_test::destroy(currency); std::unit_test::destroy(metadata);
+}

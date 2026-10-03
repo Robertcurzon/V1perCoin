@@ -43,3 +43,7 @@ Iteration 2 closes the review/date/reservation gaps: feast::set_allocations comm
 ## Verification
 
 All requested check commands passed after corrections: 52 Move tests; economics, Feast, free-application, monitor and PDF-freshness tests; TypeScript; lint; production build. The edited LaTeX source compiled successfully in the existing native editor. No deployment, private-key addition or invented production ID was performed.
+
+## Iteration 2 follow-up
+
+See ITERATION_2_REPORT.md and SECURITY_SPEC.md for current coverage. Review/date/reservation gaps and scorer consistency gates now have contract/code enforcement, with 80 passing Move tests, 852 shared vectors, 600 mixed operations and a successful isolated localnet rehearsal. The authenticated Pyth fixture remains blocked by missing env access; production source-chain acquisition/custody/liquidity remain launch gates. The historical verification counts above describe the original audit, not this iteration.

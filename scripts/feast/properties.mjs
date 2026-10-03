@@ -4,7 +4,8 @@ import {Wallet} from 'ethers';
 import {score,bindingMessage,lockMessage,POOL,UNIT,USD,DAY} from './score.mjs';
 const treasury='0x'+'bc'.repeat(20),feed='ab'.repeat(32),start=1_000_000;
 const config={snapshotDate:'2026-10-03',snapshotSha256:'cc'.repeat(32),finalityRules:{ethereum:'finalized-block'},windowStart:start,liquidityProceedsPercent:25,coins:Array.from({length:10},(_,i)=>({id:`fixture${i}`,chain:'ethereum',contract:'0x'+(i+1).toString(16).padStart(40,'0'),decimals:6,pythFeed:feed,treasury}))};
-const wallets=[1,2,3].map(i=>new Wallet('0x'+String(i).repeat(64))), destinations=[1,2,3].map(i=>'0x'+(i+10).toString(16).repeat(64));
+// Ephemeral test signing keys: never serialized or committed.
+const wallets=Array.from({length:3},()=>Wallet.createRandom()), destinations=[1,2,3].map(i=>'0x'+(i+10).toString(16).repeat(64));
 const signed=await Promise.all(wallets.map(async(w,i)=>Promise.all([0,12,24].map(async lockMonths=>{
  const message=bindingMessage(w.address,destinations[i],'ethereum',start);
  return {chain:'ethereum',windowStart:start,source:w.address,sui:destinations[i],lockMonths,message,signature:await w.signMessage(message),lockSignature:await w.signMessage(lockMessage(message,lockMonths))};

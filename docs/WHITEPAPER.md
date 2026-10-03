@@ -35,9 +35,9 @@ The full initial supply is minted once into a sealed LaunchCap. Allocation consu
 | Ecosystem Operations | 10% | 100,000,000 | V1PR Foundation |
 | Total | 100% | 1,000,000,000 | |
 
-V1PR Foundation is the project's operating name for its founder-controlled funds and receiving wallets. It does not imply independent governance or a separate legal entity. Operations funds development, hosting, design, administration and collaborators at its controller's discretion, without contractual vesting. The four Sui custody addresses must be nonzero and pairwise distinct.
+V1PR Foundation is the project's operating name for its founder-controlled funds and receiving wallets. It does not imply independent governance or a separate legal entity. Operations funds development, hosting, design, administration and collaborators at its controller's discretion, without contractual vesting. `launch::allocate` requires four nonzero, pairwise-distinct Sui custody addresses.
 
-Token reserves alone do not create exchange liquidity. The 200-million initial liquidity bucket is a reserve, not a requirement to deposit it all at opening. Size the deposit from verified paired funding and the promised opening price; leave unused inventory in custody. For Cetus, verify the initialized price, range and both token requirements together. Publish funding, pool balances, custody and LP-lock terms before announcing trading.
+Token reserves alone do not create exchange liquidity. The 200-million initial liquidity bucket is a reserve, not a requirement to deposit it all at opening. Deposit sizing, Cetus price/range simulation, unused inventory custody, paired funding, opening price and LP-lock publication are operating trust assumptions in section 11.
 
 ## 3. The Feast: Feed the Viper
 
@@ -47,11 +47,11 @@ Participants bind their source wallet to a Sui destination and confirm a liquid,
 
 Each finalized contribution is valued at the lesser of Pyth confirmation-time spot and the average of 1,440 preceding one-minute observations. Each observation must be no more than 60 seconds old at its sample time. Missing, stale or future prices stop scoring; the scorer requires Ethereum/MemeCore finalized-block anchors, Solana finalized commitment or at least 60 DOGE confirmations. It also reconciles every receiving wallet and asset against a second provider: inbound equals ending balance minus starting balance plus all outflows. Any mismatch stops CSV publication. Raw evidence, each input-file SHA-256 and the scorer commit accompany results. These checks rely on truthful complete exports; they do not prove chain history cryptographically. Points equal eligible USD value multiplied by participation and lock bonuses. Days 1–5 receive 1.50×; the bonus declines in daily steps to 1.00× on day 19 and remains there through day 21. Liquid, 12-month and 24-month choices receive 1.00×, 1.10× and 1.25× respectively.
 
-Allocations follow each wallet's share of total points, limited to 10,000 V1PR per USD before bonuses. No wallet cap applies. Rounding and the price floor can leave inventory, burned at finalization. Publish inputs, finalized receipts, price archives, allocation CSV, SHA-256 hash and scoring commit. Clearing price is total eligible USD divided by V1PR allocated.
+Allocations follow each wallet's share of total points, limited to 10,000 V1PR per USD before bonuses. No wallet cap applies. Rounding and the price floor can leave inventory, burned at finalization. Publication and independent reproduction of those inputs, receipts, archives, CSV/hash and scoring commit are trust assumptions in section 11. Clearing price is total eligible USD divided by V1PR allocated.
 
 The Feast administrator sets or edits allocations and a 32-byte CSV hash through `feast::set_allocations`. Every edit records the chain clock and restarts review. `feast::finalize` requires the matching hash and at least seven days since the last edit; it freezes allocations and reserves every locked allocation's full reward in the vault, or aborts atomically if capacity is insufficient. Liquid claims release 50% immediately and 50% linearly over 60 days. `feast::claim_locked` consumes its reservation to open the recorded 12/24-month position, bypassing deposit pauses and the ordinary opening date. Terms start at claim time. Claims end after 90 days; `feast::burn_unclaimed` returns unused reward reservations to capacity before burning unclaimed principal. No administrator sweep exists.
 
-Feast proceeds are sent to the V1PR Foundation. Contributed coins are not burned, held in trust or governed by participants. Its founder controls the wallets and may hold, sell, reinvest or spend proceeds. Participants receive V1PR only, with no claim on Foundation assets or future income. Receiving addresses and transfers are published. There is no contribution refund path, including expired claims or delayed finalization.
+Feast proceeds are sent to the V1PR Foundation. Contributed coins are not burned, held in trust or governed by participants. Its founder controls the wallets and may hold, sell, reinvest or spend proceeds. Participants receive V1PR only, with no claim on Foundation assets or future income. Publication of receiving addresses and transfers is a trust assumption in section 11. There is no contribution refund path, including expired claims or delayed finalization.
 
 Exchange funding, the stated opening-price floor and the 25% proceeds commitment are explicit trust assumptions in section 11; no Sui function enforces cross-chain spending.
 
@@ -59,9 +59,9 @@ Exchange funding, the stated opening-price floor and the 25% proceeds commitment
 
 The 100-million-token pool admits at most 10,000 distinct approved Sui addresses, each entitled to one 10,000 V1PR claim (0.001% of initial supply). Claimants pay network gas only. The free-claim window precedes the planned exchange opening; receiving tokens is not a promise of immediate trading liquidity. Applications run for the seven days before day 0; claims run for 14 days from day 0. There is no open-ended mint, extension or recurring free allocation.
 
-Applicants submit a wallet-signed application and one original meme, useful guide or valid testnet issue report through the published channel. Review checks authorship and duplicate work. Accepted applications are ordered by channel receipt time, with address and entry-link ordering breaking ties. The preparation tool verifies Sui signatures, rejects missing reviews and deduplicates wallet addresses, entry links and archived content hashes. Publish the reviewed manifest, reasons, exclusions, input hash and approval transaction receipts. Submissions do not guarantee approval; the channel, receipt timestamp and original-work review remain operator responsibilities.
+Applicants submit a wallet-signed application and one original meme, useful guide or valid testnet issue report through the published channel. Review checks authorship and duplicate work. Accepted applications are ordered by channel receipt time, with address and entry-link ordering breaking ties. The preparation tool verifies Sui signatures, rejects missing reviews and deduplicates wallet addresses, entry links and archived content hashes. The tool produces a reviewed manifest, reasons, exclusions and input hash; publication and approval receipts are trust assumptions in section 11. Submissions do not guarantee approval; the channel, receipt timestamp and original-work review remain operator responsibilities.
 
-Approval cannot overwrite or revoke an eligible address, include a zero address or exceed 10,000 recipients. The administrator schedules the opening once, at least seven days ahead. Approvals stop automatically at opening; claims are rejected before opening and at or after the 14-day deadline. Anyone may then burn unclaimed inventory; the administrator cannot withdraw it. One wallet or reviewed entry is not proof of one human: review reduces obvious farming but cannot eliminate multiple identities. No promotional purchase, paid referral or legal-name upload is required; submitted entries and wallet proofs are public.
+`free_claims::approve` cannot overwrite/revoke an eligible address, include zero or exceed 10,000 recipients; it freezes approvals at opening. `schedule` permits one opening with at least seven days of notice. `claim` rejects before opening and at/after the 14-day deadline. Permissionless `burn_unclaimed` destroys remaining inventory after expiry; no administrator withdrawal function exists. One wallet or reviewed entry is not proof of one human: review reduces obvious farming but cannot eliminate multiple identities. No promotional purchase, paid referral or legal-name upload is required; submitted entries and wallet proofs are public.
 
 ## 5. Lock rewards
 
@@ -105,7 +105,7 @@ Principal is separate. The administrator may pause new deposits but cannot withd
 
 The 20% Community allocation budgets 6% of supply for creator grants, 5% for Hunt Board challenges, 3% for onboarding and education, 1% for events and moderation, and 5% as reserve. Community's share of early-exit fees supplements these funds.
 
-These subbudgets are operating policy, not contract-enforced spending restrictions. Publish each award's recipient, purpose, amount and transaction digest. The release has no token-holder governance mechanism.
+These subbudgets and publication of each award's recipient, purpose, amount and transaction digest are operating trust assumptions in section 11. The release has no token-holder governance mechanism.
 
 ## 8. Privacy
 
@@ -119,7 +119,7 @@ Wallet software, hosting and RPC providers may receive connection metadata. Brow
 
 ## 9. Verification and monitor
 
-Before participant use, publish the authentic coin type, package and shared-object IDs, custody addresses, AdminCaps and transaction receipts. Delete metadata authority and make the package immutable. Use Sui multisigs for custody and AdminCaps, and chain-appropriate multisigs for Foundation receiving wallets. Complete independent review, testnet rehearsal, historical-price coverage and receipt-indexing checks before opening the Feast. The contribution campaign remains disabled until verified deployment records, receiving addresses, dates and a binding-submission channel are configured.
+Authentic deployment/custody publication, multisigs, independent review, rehearsal and source-data readiness are trust assumptions in section 11. Metadata deletion uses `coin_registry::delete_metadata_cap`; immutability uses `package::make_immutable`. The contribution campaign remains disabled until verified deployment records, receiving addresses, dates and a binding-submission channel are configured.
 
 The monitor verifies Currency metadata and burn-only state, object types and ownership, fee destinations and pool accounting. It requires explicit deleted/missing status for the published UpgradeCap ID; network errors are not evidence of immutability. Match that ID independently to the publication receipt. Wallet actions repeat state and eligibility checks before signatures.
 
@@ -134,7 +134,7 @@ Explorer links expose token movements, custody and receipts. Public records and 
 
 ## 10. Launch windows
 
-Day 0 (T) is the published UTC opening shared by free claims and the Feast. Schedule only after review, rehearsal, historical-price coverage and custody checks pass. F is actual Feast finalization, no earlier than seven days after contributions close. If scoring or security checks are delayed, announce a later F; never extend free claims.
+Day 0 (T) is the published UTC opening shared by free claims and the Feast. The operating timetable in section 11 schedules T only after review, rehearsal, historical-price coverage and custody checks. F is actual Feast finalization, intended to occur at least seven days after contributions close. The contract enforces seven days after the latest allocation edit, rather than the external contribution cutoff; free claims cannot be extended.
 
 | Window | Phase | Available to whom |
 |---|---|---|
@@ -153,8 +153,8 @@ Liquid Feast allocations are 50% vested at F and fully vested at F + 60 days, wi
 
 ## 11. Trust assumptions
 
-- Foundation-controlled proceeds, Operations and reserve-wallet spending remain discretionary. Community subbudgets, award review, spending receipts and publication commitments are not enforced by the token contract.
-- Operators must commit the correct complete CSV after the contribution cutoff, publish it and map its entries to the onchain table. The contract binds a 32-byte hash and review delay; it cannot reconstruct the CSV or prove its relation to source-chain receipts. The Feast AdminCap can edit before finalization, reset review repeatedly or delay finalization. Adequate reward capacity is required to finalize; participant contributions have no refund path.
+- Foundation-controlled proceeds, Operations and reserve-wallet spending remain discretionary. Community subbudgets, award review, spending receipts, receiving-address/transfer publication, launch/review/intake schedules and reporting commitments are not enforced by the token contract.
+- Operators must commit the correct complete CSV after the contribution cutoff, allow post-cutoff review, publish all inputs/price/receipt archives and scoring commit, and map its entries to the onchain table. The contract binds a 32-byte hash and review delay; it cannot reconstruct the CSV or prove its relation to source-chain receipts. The Feast AdminCap can edit before finalization, reset review repeatedly or delay finalization. Adequate reward capacity is required to finalize; participant contributions have no refund path.
 - Operators must establish canonical finalized source-chain receipts, complete exports reconciled to a second independent provider, raw-to-normalized correspondence, balance boundaries and authenticated historical prices. Provider labels, finality flags and hashes identify supplied evidence; they cannot prove honesty or actual independence. The 21-day source-chain window and allocation fairness rely on those data and the published scorer, not a cross-chain proof verified by Move.
 - The plan commits 25% of all accepted Feast proceeds to paired liquidity and an opening DEX price no lower than the Feast clearing price. Conversions, losses, costs, actual paired funding, exchange range, LP custody and enforceable LP locking require operator execution and published receipts; neither commitment is enforced by this Sui package.
 - Multisig signers, accurate custody/deployment records, metadata deletion, package immutability, independent review and public reporting must be independently verified. The site's checks cannot prove that configured IDs came from authentic publication or that bytecode matches reviewed source.

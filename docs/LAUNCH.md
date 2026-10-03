@@ -2,7 +2,7 @@
 
 Economics are fixed in [the white paper](WHITEPAPER.md); release code is implemented locally. No token has been deployed. Use testnet first.
 
-## Required public configuration
+## Trust assumptions: public configuration and release procedures
 
 Supply four nonzero, full-length Sui destination addresses: founder/Operations, Community, initial liquidity custodian, later liquidity custodian. Community must differ from founder. Publish who controls each wallet, the claim selection policy, and the admin capability owner. Publish all receiving addresses, including Dogecoin and MemeCore, and supply real paired-asset funds and select an exchange/LP custody policy before trading is enabled. The repository does not contain private keys and does not invent these addresses or funds.
 
@@ -31,7 +31,7 @@ sui move test --path viper
 6. Update `src/launch.json` with exact testnet IDs, coin type, all four custody destinations, all three admin capability IDs, publish/allocation/immutability/metadata-deletion digests and `status: "verified"`. Connect a test wallet to the site. Claim, deposit 1- and 24-month positions, inspect transaction targets and payout preview, early-exit, and verify Community/founder receipts plus pending burn, then permissionless flushing and actual supply decrease. Confirm wrong-network signing is rejected by the wallet. Pausing must stop deposits and leave exits available. Long-term maturity/time boundaries, including the zero-fee mature exit, are tested locally with Sui's test Clock.
 7. Reconcile available rewards + committed + paid = funded; locked principal is separate. Keep the site unpublished if any object or recipient verification fails. Record testnet results and independent review before mainnet publication.
 
-## Mainnet publication
+## Trust assumptions: future mainnet publication
 
 Repeat the reviewed flow against mainnet with mainnet funding and verified wallets. Do not reuse testnet object IDs or claim that testnet review is a mainnet audit. Before accepting participant funds, fix metadata and make the package immutable. Publish transaction records, coin type and all authorities. Configure `src/launch.json` for mainnet only after verification; the UI also checks object types and fee recipients before enabling transactions.
 
@@ -61,7 +61,7 @@ Custody addresses must be nonzero and pairwise distinct. Named allocation consta
 Rehearse Feast allocation, finalization, 0/30/60-day vesting and locked claims before mainnet. Record finalized allocations and supply burns. The 90-day Feast window starts at finalization, separately from free claims.
 
 
-## Feast opening requirements
+## Trust assumptions: Feast opening requirements
 
 - Use Sui multisig addresses for all four custody wallets and custody of all three AdminCaps. Use chain-appropriate multisigs for the Ethereum, Solana, native Dogecoin and MemeCore V1PR Foundation receiving wallets (founder-controlled); Sui addresses cannot receive those chain assets. Publish signer thresholds and custody policy.
 - Make the package immutable before opening locks or the Feast. Publish the original UpgradeCap ID and the immutability transaction; delete metadata authority and publish that receipt.
@@ -74,7 +74,7 @@ Rehearse Feast allocation, finalization, 0/30/60-day vesting and locked claims b
 - Lock the LP position and publish the lock transaction digest, custody and unlocking terms before announcing trading.
 - Rehearse missing/deleted UpgradeCap responses separately from RPC outages; both website and wallet actions must reject unresolved verification.
 
-**Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PR founder (the "V1PR Foundation"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PR only, with no claim on Foundation assets or future income. Foundation receiving addresses and all received transfers are published for verification.
+**Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PR founder (the "V1PR Foundation"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PR only, with no claim on Foundation assets or future income. Publication of Foundation receiving addresses and all received transfers is a trust assumption; verify actual archived evidence.
 
 
 ## Phases and cutoff checklist
@@ -96,7 +96,7 @@ Run `SUI_BIN=/path/to/pinned/sui npm run test:rehearsal` before approving a rele
 
 The gate publishes, registers Currency, sets a test icon, deletes metadata authority, allocates to distinct generated custody addresses, deletes UpgradeCap, approves and schedules free claims, commits a Feast CSV hash, checks early free-claim/finalization aborts, deposits, withdraws, burns and calls the actual website `readChainState`. Successful free claims, post-review Feast claims, mature exits and expiries require clock advances and are exercised by named Move unit tests. No production time gate is shortened for this rehearsal.
 
-CI makes `website` depend on `localnet`, preventing artifacts/deployment if rehearsal fails. Trust assumption: a repository administrator must mark the `localnet` check (and other release checks) as required in GitHub branch protection to block merges; workflow dependencies alone cannot enforce repository merge policy.
+CI makes `website` depend on `localnet`, preventing artifacts/deployment if rehearsal fails. GitHub main branch protection was configured on 3 October 2026: contracts, localnet, whitepaper and website are strict required checks, including admins. Trust assumption: repository administrators retain authority to alter that policy; workflow dependencies alone cannot enforce merge controls.
 
 ## Historical-price readiness gate
 

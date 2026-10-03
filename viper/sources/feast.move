@@ -210,3 +210,29 @@ fun unallocated_claim_fails() { let mut ctx=tx_context::dummy(); let mut clock=s
 fun repeated_locked_claim_fails() { let mut s=sui::test_scenario::begin(@0xA); let mut clock=sui::clock::create_for_testing(s.ctx()); let (mut p,c)=setup(s.ctx()); let (mut v,_vc)=test_vault(0,s.ctx()); let (mut currency,_m)=viper::v1pr::test_currency(s.ctx()); set_allocations(&mut p,&c,vector[@0xA],vector[1_000_000_000],vector[12],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); claim_locked(&mut p,&mut v,&clock,s.ctx()); claim_locked(&mut p,&mut v,&clock,s.ctx()); abort 999 }
 #[test,expected_failure(abort_code=EState)]
 fun claim_at_expiry_fails() { let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1pr::test_currency(&mut ctx); set_allocations(&mut p,&c,vector[@0xA],vector[1_000],vector[0],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); sui::clock::set_for_testing(&mut clock,p.start_ms+WINDOW_MS); claim(&mut p,&clock,&mut ctx); abort 999 }
+
+#[test,expected_failure(abort_code=EHash)]
+fun invalid_commitment_width_fails() {
+    let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx);
+    set_allocations(&mut p,&c,vector[],vector[],vector[],vector[7],&clock); abort 999
+}
+#[test,expected_failure(abort_code=EAllocation)]
+fun unsupported_locked_allocation_term_fails() {
+    let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx);
+    set_allocations(&mut p,&c,vector[@0xA],vector[1_000_000],vector[3],hash(),&clock); abort 999
+}
+#[test,expected_failure(abort_code=EClaim)]
+fun repeated_liquid_claim_without_new_vesting_fails() {
+    let mut s=sui::test_scenario::begin(@0xA); let mut clock=sui::clock::create_for_testing(s.ctx());
+    let (mut p,c)=setup(s.ctx()); let (mut v,_vc)=test_vault(0,s.ctx()); let (mut currency,_m)=viper::v1pr::test_currency(s.ctx());
+    set_allocations(&mut p,&c,vector[@0xA],vector[1_000],vector[0],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock);
+    claim(&mut p,&clock,s.ctx()); claim(&mut p,&clock,s.ctx()); abort 999
+}
+#[test,expected_failure(abort_code=EVault)]
+fun wrong_vault_cannot_consume_feast_reservation() {
+    let mut s=sui::test_scenario::begin(@0xA); let mut clock=sui::clock::create_for_testing(s.ctx());
+    let (mut p,c)=setup(s.ctx()); let (mut v,_vc)=test_vault(0,s.ctx()); let (mut wrong,_wc)=test_vault(0,s.ctx());
+    let (mut currency,_m)=viper::v1pr::test_currency(s.ctx());
+    set_allocations(&mut p,&c,vector[@0xA],vector[1_000_000],vector[12],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock);
+    claim_locked(&mut p,&mut wrong,&clock,s.ctx()); abort 999
+}

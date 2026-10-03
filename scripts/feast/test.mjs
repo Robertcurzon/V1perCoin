@@ -85,7 +85,7 @@ const {prepareReport}=await import('./score.mjs');
 const {mkdtempSync,writeFileSync,existsSync,rmSync}=await import('node:fs');
 const {tmpdir}=await import('node:os');
 const {join}=await import('node:path');
-const {spawnSync}=await import('node:child_process');
+const {spawnSync,execFileSync}=await import('node:child_process');
 function independent(cfg,transfers) {
  return {source:{provider:'second-provider',datasetId:'independent-balances-and-outflows',evidenceSha256:'22'.repeat(32),exportedAt:cfg.windowStart+22*DAY},records:cfg.coins.map(c=>{
   const total=transfers.filter(t=>t.chain===c.chain&&t.contract===c.contract).reduce((n,t)=>n+BigInt(t.amountBaseUnits),0n);
@@ -106,6 +106,7 @@ const compensating={...reconciled,records:reconciled.records.map((r,i)=>({...r,e
 assert.throws(()=>reconcile(config,[t,unbound],transferSource,compensating),/mismatch/);
 for(const candidate of [{...t,finalized:false},{...t,finalityRule:undefined},{...t,receiptStatus:'failure'},{...t,finalizedBlockNumber:9}])assert.throws(()=>score(config,[b],[candidate],prices(t)));
 assert.throws(()=>score({...config,finalityRules:{}},[b],[t],prices(t)),/rules/);
+assert.throws(()=>requireFinality({...t,chain:'unsupported',finalityRule:undefined}));
 requireFinality({chain:'solana',finalityRule:'finalized-slot',finalized:true,receiptStatus:'success',slot:10,finalizedSlot:20,commitment:'finalized'});
 assert.throws(()=>requireFinality({chain:'solana',finalityRule:'finalized-slot',finalized:true,receiptStatus:'success',slot:10,finalizedSlot:20,commitment:'confirmed'}));
 reconcile(dogeConfig,[dt],transferSource,independent(dogeConfig,[dt]));
@@ -121,6 +122,14 @@ try {
  const manifest=join(directory,'manifest.json');writeFileSync(manifest,JSON.stringify({files,evidenceFiles:['evidence0.json','evidence1.json']}));
  const prepared=prepareReport(manifest);assert.equal(prepared.inputFiles.length,8);
  for(const file of prepared.inputFiles)assert.equal(file.sha256,hash(readFileSync(file.path)));
+ const clean=!execFileSync('git',['status','--porcelain','--','scripts/feast'],{encoding:'utf8'}).trim();
+ if(clean) {
+  const validOut=join(directory,'valid-output'),success=spawnSync(process.execPath,['scripts/feast/score.mjs',manifest,validOut],{encoding:'utf8'});
+  assert.equal(success.status,0,success.stderr);
+  const report=JSON.parse(readFileSync(join(validOut,'results.json')));
+  assert.equal(report.scriptCommit,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  assert.equal(report.inputFiles.length,8);assert.equal(report.csvSha256,hash(readFileSync(join(validOut,'allocations.csv'))));
+ }
  // CLI mismatch must not even create the requested output directory.
  writeFileSync(join(directory,files.reconciliation),JSON.stringify({...inputs.reconciliation,records:[]}));
  const out=join(directory,'refused-output'),cli=spawnSync(process.execPath,['scripts/feast/score.mjs',manifest,out],{encoding:'utf8'});

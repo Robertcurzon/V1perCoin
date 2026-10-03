@@ -1,7 +1,7 @@
 import {normalizeAddress,assetKey} from './networks.mjs';
 export const FINALITY_RULES=Object.freeze({ethereum:'finalized-block',solana:'finalized-slot',dogecoin:'60-confirmations',memecore:'finalized-block'});
 export function requireFinality(t) {
-  if(t.finalityRule!==FINALITY_RULES[t.chain]) throw Error('Missing or incorrect source finality rule');
+  if(!FINALITY_RULES[t.chain] || t.finalityRule!==FINALITY_RULES[t.chain]) throw Error('Missing or incorrect source finality rule');
   if(t.chain==='dogecoin') {
     if(!Number.isSafeInteger(t.confirmations)||t.confirmations<60) throw Error('DOGE needs at least 60 confirmations');
   } else {
