@@ -12,4 +12,4 @@ The 10% public reserve is custodian-held. No paid campaign is launched, no recei
 
 ## Program funds
 
-Community receives 20% and 70% of exit fees. Operations receives 10% and the founder fee destination receives 10% of exit fees. They must be separate addresses. Reserve and operating wallet funds remain discretionary; no vesting or trustless spending policy is claimed. The 15% lock-reward balance has no admin withdrawal path. See [the vault specification](STAKING_DESIGN.md).
+Community receives 20% and 40% of early-exit fees. Operations receives 10% and the founder fee destination receives 10% of exit fees. They must be separate addresses. Reserve and operating wallet funds remain discretionary; no vesting or trustless spending policy is claimed. The 15% lock-reward balance has no admin withdrawal path. See [the vault specification](STAKING_DESIGN.md).

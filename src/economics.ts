@@ -18,17 +18,20 @@ export function formatAmount(amount: bigint): string {
   return `${(amount / UNIT).toLocaleString('en-US')}${fraction ? `.${fraction}` : ''}`;
 }
 export function netReward(principal: bigint, months: number): bigint {
-  return principal * ratePpm(months) / UNIT;
+  return principal * ratePpm(months) * BigInt(months) / (12n * UNIT);
 }
 export function exitPreview(principal: bigint, reserved: bigint, duration: bigint, elapsed: bigint) {
   const time = elapsed < 0n ? 0n : elapsed > duration ? duration : elapsed;
-  const earned = reserved * time / duration;
-  const fee = principal * (30n * duration + 170n * (duration - time)) / (10_000n * duration);
-  const burn = fee * 20n / 100n;
+  if (duration <= 0n || duration % MONTH_MS !== 0n) throw new Error("Invalid lock duration.");
+  const completed = Number(time / MONTH_MS);
+  const calculated = completed === 0 ? 0n : netReward(principal, completed);
+  const earned = calculated > reserved ? reserved : calculated;
+  const fee = principal * (500n * (duration - time)) / (10_000n * duration);
+  const burn = fee * 50n / 100n;
   const founder = fee / 10n;
   return { earned, fee, burn, founder, community: fee - burn - founder, net: principal - fee + earned };
 }
 
 export function fullReward(principal: bigint, months: number): bigint {
-  return principal * 30n / 10_000n + netReward(principal, months);
+  return netReward(principal, months);
 }

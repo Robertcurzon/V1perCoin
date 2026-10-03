@@ -34,7 +34,7 @@ const currency = CurrencyBcs.parse(CurrencyBcs.serialize({
 assert.equal(currency.supply.$kind, 'BurnOnly'); assert.equal(currency.supply.BurnOnly, '999999999999999');
 const position = PositionBcs.parse(PositionBcs.serialize({ id, vault: id, owner: other, principal: '1000000000000', reward: '53000000000', start_ms: '1', duration_ms: '62208000000' }).toBytes());
 assert.equal(position.reward, '53000000000'); assert.equal(position.owner, other);
-const vault = VaultBcs.parse(VaultBcs.serialize({ id, rewards: '100', community: id, founder: other, paused: false, total_locked: '1000', reward_committed: '30', reward_paid: '20', reward_funded: '150', community_paid: '7', founder_paid: '1', burned: '2', locks_opened: '5', locks_closed: '2' }).toBytes());
+const vault = VaultBcs.parse(VaultBcs.serialize({ id, rewards: '100', community: id, founder: other, paused: false, total_locked: '1000', reward_committed: '30', reward_paid: '20', reward_funded: '150', community_paid: '7', founder_paid: '1', burned: '2', pending_burn: '3', locks_opened: '5', locks_closed: '2' }).toBytes());
 assert.equal(BigInt(vault.rewards) + BigInt(vault.reward_committed) + BigInt(vault.reward_paid), BigInt(vault.reward_funded));
 const pool = ClaimsBcs.parse(ClaimsBcs.serialize({ id, inventory: '99990000000000', eligibility: { id, size: '1' }, approved: '1', claimed: '1', end_ms: '7776000000' }).toBytes());
 assert.equal(pool.claimed, '1');

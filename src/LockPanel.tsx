@@ -32,7 +32,7 @@ export default function LockPanel() {
   let inputError = '';
   try { principal = parseAmount(amount); } catch (e) { inputError = (e as Error).message; }
   const reward = fullReward(principal, months);
-  const matureFee = principal * 30n / 10_000n;
+  const matureFee = 0n;
 
   useEffect(() => {
     if (!configured) return;
@@ -90,7 +90,7 @@ export default function LockPanel() {
         if (netReward(value, months) === 0n || fullReward(value, months) > BigInt(state.v.rewards)) throw new Error('This lock exceeds available reward capacity or is too small.');
         tx.moveCall({ target: `${launch.packageId}::lock_vault::deposit`, arguments: [tx.object(launch.vaultId), coinWithBalance({ type: launch.coinType, balance: value }), tx.pure.u64(months), tx.object('0x6')] });
       }
-      if (action === 'withdraw' && position) tx.moveCall({ target: `${launch.packageId}::lock_vault::withdraw`, arguments: [tx.object(launch.vaultId), tx.object(position.id), tx.object(launch.currencyId), tx.object('0x6')] });
+      if (action === 'withdraw' && position) tx.moveCall({ target: `${launch.packageId}::lock_vault::withdraw`, arguments: [tx.object(launch.vaultId), tx.object(position.id), tx.object('0x6')] });
       const result = await kit.signAndExecuteTransaction({ transaction: tx });
       if (result.FailedTransaction) throw new Error(result.FailedTransaction.status.error?.message ?? 'Transaction failed.');
       await client.core.waitForTransaction({ digest: result.Transaction.digest });
@@ -109,15 +109,15 @@ export default function LockPanel() {
       <div className="lock-card">
         <label htmlFor="lock-amount">V1PR to lock</label><input id="lock-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <label htmlFor="lock-months">{months} program months · {months * 30} days</label><input id="lock-months" type="range" min="1" max="24" value={months} onChange={(e) => setMonths(Number(e.target.value))} />
-        <div className="facts"><div><span>NET TOTAL REWARD FOR THIS TERM</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>GROSS RESERVED V1PR REWARD</span><strong>{formatAmount(reward)}</strong></div><div><span>MATURE EXIT FEE (0.3%)</span><strong>{formatAmount(matureFee)}</strong></div><div><span>NET CHANGE AFTER MATURE EXIT FEE</span><strong>{formatAmount(reward - matureFee)} V1PR</strong></div><div><span>FULL-TERM NET PAYOUT</span><strong>{formatAmount(principal - matureFee + reward)} V1PR</strong></div><div><span>AVAILABLE REWARD CAPACITY</span><strong>{capacity === null ? 'NOT DEPLOYED / UNAVAILABLE' : `${formatAmount(capacity)} V1PR`}</strong></div></div>
-        {inputError && <p role="alert">{inputError}</p>}{principal > 0n && netReward(principal, months) === 0n && <p role="alert">Increase the amount to earn at least one V1PR base unit after the mature-exit fee.</p>}
-        <p className="fine-print">One month = 30 days. Simple rewards in V1PR; no compounding or dollar-return promise. No deposit fee. Mature exit costs 0.3% of initial principal. The pool also reserves a matching fee offset. Every completed lock earns a positive net V1PR reward before network gas. Early exits can return less than deposited.</p>
+        <div className="facts"><div><span>ANNUAL TOKEN REWARD RATE</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>RESERVED TERM REWARD</span><strong>{formatAmount(reward)}</strong></div><div><span>MATURE EXIT FEE (0%)</span><strong>{formatAmount(matureFee)}</strong></div><div><span>NET CHANGE AFTER MATURE EXIT FEE</span><strong>{formatAmount(reward - matureFee)} V1PR</strong></div><div><span>FULL-TERM NET PAYOUT</span><strong>{formatAmount(principal - matureFee + reward)} V1PR</strong></div><div><span>AVAILABLE REWARD CAPACITY</span><strong>{capacity === null ? 'NOT DEPLOYED / UNAVAILABLE' : `${formatAmount(capacity)} V1PR`}</strong></div></div>
+        {inputError && <p role="alert">{inputError}</p>}{principal > 0n && netReward(principal, months) === 0n && <p role="alert">Increase the amount to earn at least one V1PR base unit for the selected term.</p>}
+        <p className="fine-print">One month = 30 days. Simple rewards in V1PR; no compounding or dollar-return promise. No deposit fee. No fee at maturity. Early exit pays the reward for whole completed months and charges up to 5% of principal, tapering continuously to zero. Every completed lock earns a positive net V1PR reward before network gas. Early exits can return less than deposited.</p>
         <ConnectButton />
         <div className="buttons"><button className="button lime" disabled={!configured || !account || !vault || vault.paused || pending || Boolean(inputError) || netReward(principal, months) === 0n || (capacity !== null && reward > capacity)} onClick={() => void submit('deposit')}>{pending ? 'PROCESSING…' : 'OPEN LOCK'}</button><button className="button outline" disabled={!configured || !account || !vault || pending} onClick={() => void submit('claim')}>CLAIM 10,000 V1PR</button></div>
       </div>
       <div className="lock-card">
-        <h3>FIRST COME. FULLY FUNDED.</h3><p>Total term rewards grow exponentially from 0.5% of initial principal at 1 month to 5% at 24 months. The pool funds the exponential reward plus a 0.3% principal fee offset for a completed lock. There is no new minting.</p>
-        <p>Every exit costs 0.3% of initial principal, plus 1.7% × the fraction of the lock remaining if exiting early. The total starts at 2% and tapers to 0.3%. Of that fee, 70% funds Community programs, 20% is burned, and 10% goes to the founder.</p>
+        <h3>FIRST COME. FULLY FUNDED.</h3><p>Annual simple token rates grow exponentially from 1% for a 1-month lock to 10% for a 24-month lock. Total reward is annual rate × months / 12: 20% for 24 months. The full term reward is escrowed. There is no new minting.</p>
+        <p>Early-exit fee = 5% × the fraction of the term remaining. It reaches zero at maturity. Of the fee, 50% is queued for permissionless burning, 40% goes to Community programs and 10% to the founder. Only completed program months earn rewards, at the rate for that completed length.</p>
         <p>Free claims require an approved address: one 10,000 V1PR claim per approved wallet during the 90-day window. Unclaimed tokens can then be burned.</p>
         <p className="fine-print">{configured ? `Network: ${launch.network}. Wallet approval is required for every transaction.` : 'Contracts are implemented locally. Transactions remain disabled until deployment records and verified object IDs are published.'}</p>
         <a className="text-link" href={siteUrl('whitepaper/')}>READ THE WHITE PAPER ↗</a> · <a className="text-link" href={siteUrl('whitepaper.pdf')} target="_blank" rel="noreferrer">JOURNAL PDF ↗</a>
@@ -125,7 +125,7 @@ export default function LockPanel() {
     </div>
     {visiblePositions.length > 0 && <div className="positions"><h3>YOUR LOCKS</h3>{visiblePositions.map((position) => {
       const quote = exitPreview(BigInt(position.principal), BigInt(position.reward), BigInt(position.duration_ms), chainTime - BigInt(position.start_ms));
-      return <article className="lock-card" key={position.id}><p>{formatAmount(BigInt(position.principal))} V1PR · {Number(BigInt(position.duration_ms) / MONTH_MS)} months</p><p><ExplorerLink kind="object" value={position.id}>View position</ExplorerLink></p><p>Matures {new Date(Number(BigInt(position.start_ms) + BigInt(position.duration_ms))).toLocaleString()}</p><p>Earned {formatAmount(quote.earned)} · Fee {formatAmount(quote.fee)} V1PR</p><p>Community {formatAmount(quote.community)} · Burn {formatAmount(quote.burn)} · Founder {formatAmount(quote.founder)}</p><p>Net payout: {formatAmount(quote.net)} V1PR</p><p className="fine-print">Preview uses the last fetched onchain clock. The transaction uses the current onchain time.</p><button className="button outline" disabled={pending || !vault} onClick={() => void submit('withdraw', position)}>WITHDRAW</button></article>;
+      return <article className="lock-card" key={position.id}><p>{formatAmount(BigInt(position.principal))} V1PR · {Number(BigInt(position.duration_ms) / MONTH_MS)} months</p><p><ExplorerLink kind="object" value={position.id}>View position</ExplorerLink></p><p>Matures {new Date(Number(BigInt(position.start_ms) + BigInt(position.duration_ms))).toLocaleString()}</p><p>Earned {formatAmount(quote.earned)} · Fee {formatAmount(quote.fee)} V1PR</p><p>Community {formatAmount(quote.community)} · Pending burn {formatAmount(quote.burn)} · Founder {formatAmount(quote.founder)}</p><p>Net payout: {formatAmount(quote.net)} V1PR</p><p className="fine-print">Preview uses the last fetched onchain clock. The transaction uses the current onchain time.</p><button className="button outline" disabled={pending || !vault} onClick={() => void submit('withdraw', position)}>WITHDRAW</button></article>;
     })}<button className="button outline" disabled={pending} onClick={() => setRevision((value) => value + 1)}>REFRESH PREVIEW</button></div>}
     {error && <p role="alert" className="transaction-message">{error}</p>}{message && <p role="status" className="transaction-message">Confirmed: <ExplorerLink kind="tx" value={message}>{message}</ExplorerLink></p>}
   </section>;

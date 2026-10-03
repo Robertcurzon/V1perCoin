@@ -29,7 +29,7 @@
 {\large Protocol White Paper}\par\vspace{6pt}
 {\small Viper Coin / Release specification / 2 October 2026}\par\vspace{10pt}
 \end{center}
-\noindent\textbf{Abstract.} Viper Coin is a Sui meme token with a once-minted, burn-only supply of one billion V1PR. This paper specifies its seven allocation buckets, approved free claims, fully funded and non-transferable lock positions, exponential total-term rewards, time-tapered exit fees, supply-decreasing burns, public onchain monitoring, and the boundaries of optional privacy. Rewards distribute existing inventory and each accepted obligation is escrowed in full. Rates do not describe an annual yield or a guaranteed financial return. Website publication is separate from token deployment; no mainnet coin or funded exchange pool is live at the date of this specification.\par\vspace{6pt}
+\noindent\textbf{Abstract.} Viper Coin is a Sui meme token with a once-minted, burn-only supply of one billion V1PR. This paper specifies its seven allocation buckets, approved free claims, fully funded and non-transferable lock positions, exponential annual token rates and term rewards, time-tapered exit fees, supply-decreasing burns, public onchain monitoring, and the boundaries of optional privacy. Rewards distribute existing inventory and each accepted obligation is escrowed in full. Annual token rates do not guarantee a financial return. Website publication is separate from token deployment; no mainnet coin or funded exchange pool is live at the date of this specification.\par\vspace{6pt}
 \noindent\textbf{Keywords:} Sui; Move; burn-only currency; escrow; token rewards; public verification.\par\vspace{10pt}
 \hrule\vspace{14pt}
 Meme with a bite! No more cuddly baby-animal meme coins. Viper eats them for lunch.
@@ -92,48 +92,45 @@ The claim administrator registers eligible addresses before the window closes. R
 
 Users choose any whole number of program months from 1 through 24. One month is exactly 30 days. The principal, term, owner and reward are fixed at opening. A position is individually owned and cannot be transferred. A top-up or extension requires a new lock. There is no deposit fee. Each position holds its own principal and full reward in separate balances; payout does not depend on later participants depositing.
 
-The net total term token reward rate after the mature-exit fee grows exponentially:
+The annual simple token rate grows exponentially:
 
 \begin{equation}
-r(M)=0.005\,10^{(M-1)/23},\quad M\in\{1,\ldots,24\}.
+r(M)=0.01\,10^{(M-1)/23},\quad R(P,M)=\left\lfloor P\,r(M)\frac{M}{12}\right\rfloor.
 \end{equation}
 
-The contract uses a fixed 24-entry table rounded down to integer parts per million. There is no floating-point computation onchain. The site uses the same generated table.
+The generated annual rate table is rounded down to integer parts per million. Term reward in base units is \texttt{floor(principal  x  annual\_rate\_ppm(months)  x  months / 12,000,000)}. A year is twelve 30-day program months. No automatic compounding occurs.
 
 \begin{table}[H]\centering\small
-\caption{Total-term net rewards after the mature-exit fee; before network gas.}
+\caption{Annual token rates and complete-term rewards; before network gas.}
 \begin{tabularx}{\textwidth}{l r X X}
 \toprule
-\textbf{Term} & \textbf{Days} & \textbf{Total term V1PR reward} & \textbf{Full-term net reward on 1,000,000 V1PR} \\
+\textbf{Term} & \textbf{Days} & \textbf{Annual token rate} & \textbf{Total term reward on 1,000,000 V1PR} \\
 \midrule
-1 month & 30 & 0.5000\% & 5,000 V1PR \\
-6 months & 180 & 0.8248\% & 8,248 V1PR \\
-12 months & 360 & 1.5039\% & 15,039 V1PR \\
-18 months & 540 & 2.7422\% & 27,422 V1PR \\
-24 months & 720 & 5.0000\% & 50,000 V1PR \\
+1 month & 30 & 1.0000\% & 833.333333 V1PR \\
+6 months & 180 & 1.6496\% & 8,248 V1PR \\
+12 months & 360 & 3.0078\% & 30,078 V1PR \\
+18 months & 540 & 5.4844\% & 82,266 V1PR \\
+24 months & 720 & 10.0000\% & 200,000 V1PR \\
 \bottomrule\end{tabularx}
 \end{table}
 
-Rewards are simple, not compounded. \textbf{The pool reserves a mature-fee offset plus the exponential reward. Every accepted lock held to maturity earns a positive net V1PR reward before network gas.} For 1,000,000 V1PR locked for one month, the pool reserves 8,000 V1PR: a 3,000 V1PR fee offset plus 5,000 V1PR net reward. The exit still charges 3,000 V1PR and splits it 70/20/10; the final payout is 1,005,000 V1PR. The fee offset is funded from the same finite reward pool and consumes capacity; it is not minted or charged to later users.
-
-The 5\% figure is the \textbf{total net reward on initial principal for the entire 24-month lock}, before gas. A completed 10,000 V1PR 24-month lock pays 10,500 V1PR: the pool reserves 530 V1PR, the exit fee is 30 V1PR, and net reward is 500 V1PR. A completed one-month lock of the same principal pays 10,050 V1PR. Rates are neither annualized nor compounded. Net reward is \texttt{floor(initial principal  x  rate\_ppm(months) / 1,000,000)} in base units; add the mature-exit fee rounded down in base units to obtain gross escrowed reward. The table shows net reward after that fee, before gas. Deposits producing less than one base unit of net reward are rejected. At maturity the owner receives principal less the 0.3\% exit fee plus the reserved reward; accrual stops at maturity even if withdrawal occurs later.
+The reward pool reserves exactly the entire term reward; there is no mature fee or fee offset. A 24-month lock earns 20\% of its initial principal: 10,000 V1PR becomes 12,000 V1PR before network gas. Tiny deposits earning zero base units are rejected. Every shorter term compounded over 24 months earns less than one 24-month term. This comparison assumes repeated admission and sufficient future capacity, neither of which is promised.
 
 ``Staking'' is shorthand for this lock-reward vault. V1PR locks do not validate Sui or earn native SUI validator rewards. Rewards distribute existing V1PR and do not guarantee purchasing power, liquidity, growth, or a dollar return. Sui tokenomics~\cite{ref3}.
 
 \section{Exit fees and burn}
 
-The owner may close a position at any time. Every exit has a 0.3\% fee on initial principal. Early exit adds a time-tapered component, keeping the total at a maximum of 2\%:
+The owner may close a position at any time. Finished locks have no project exit fee. Early-exit fees taper continuously from 5\% to zero:
 
 \begin{equation}
-F(P,D,E)=\left\lfloor P\left(0.003+0.017\frac{D-E}{D}\right)\right\rfloor,
+F(P,D,E)=\left\lfloor 0.05P\frac{D-E}{D}\right\rfloor.
 \end{equation}
-\noindent where $P$ is principal in base units, $D$ is agreed duration, and $E$ is elapsed time clamped to $[0,D]$.
 
-At opening the fee is 2\%; after 10\% of the term, 1.83\%; after 90\%, 0.47\%; at and after maturity, 0.3\%. The component above 0.3\% reaches zero at maturity. The total cannot be avoided by exiting a moment before maturity. No blanket reward forfeiture applies: earned rewards are the reserved full reward multiplied by the fraction of the term elapsed, rounded down. The unearned remainder returns to available reward capacity.
+At opening the fee is 5\%; after 10\% of the term, 4.5\%; after 90\%, 0.5\%; at maturity, zero. Earned reward is recalculated using the annual rate for the whole completed program months, rather than the chosen longer term's rate. Before one complete month, earned reward is zero. Earned reward cannot exceed the original escrow. Unused escrow returns to available capacity.
 
-The fee goes \textbf{70\% to Community programs, 20\% to a real V1PR burn, and 10\% to the founder wallet}. The burn and founder portions round down; remaining base-unit dust goes to Community. For a 1,000,000 V1PR lock exited after 10\% of its term, the fee is 18,300 V1PR: 12,810 Community, 3,660 burned, 1,830 founder. The owner's payout is 981,700 V1PR plus earned rewards. At maturity, the same principal incurs a 3,000 V1PR fee: 2,100 Community, 600 burned, and 300 founder. Ordinary transfers and exchange trades are untaxed.
+Fees split 50\% pending burn, 40\% Community and 10\% founder. Burn and founder round down; rounding dust goes to Community. A 1,000,000 V1PR lock exited after 10\% of its term charges 45,000 V1PR: 22,500 pending burn, 18,000 Community and 4,500 founder. Ordinary transfers and DEX swaps remain untaxed.
 
-Burning uses the shared Currency's supply-decrease operation; sending to a dead address is not counted as a burn. Burns reduce token supply but do not mathematically guarantee price appreciation. Sui Coin Registry burn operations~\cite{ref4}.
+Closing queues the burn share in the vault without touching the shared Currency. Anyone may call \texttt{flush\_burns} to destroy this balance through Currency and emit a BurnsFlushed event. Pending tokens are not spendable rewards and are still part of total supply until flushed. The monitor distinguishes pending burns from actually destroyed supply. Burning does not guarantee price appreciation. Sui Coin Registry burn operations~\cite{ref4}.
 
 \section{Exhaustion and replenishment}
 
@@ -146,7 +143,7 @@ A+C+Y=T,
 \end{equation}
 \noindent where $A$ is available rewards, $C$ committed rewards, $Y$ rewards paid, and $T$ all rewards funded.
 
-User principal is accounted for separately. The administrator can pause or resume new deposits, but cannot withdraw principal or reward inventory, change fee recipients, change rates, or block exits through the pause flag. Exits still require a functioning Sui network, access to the user's wallet, and the shared vault and Currency objects.
+User principal is accounted for separately. The administrator can pause or resume new deposits, but cannot withdraw principal or reward inventory, change fee recipients, change rates, or block exits through the pause flag. Exits still require a functioning Sui network, access to the user's wallet, and the shared vault object.
 
 \section{Community programs and accountability}
 

@@ -6,7 +6,7 @@ export const PositionBcs = bcs.struct('Position', {
 export const VaultBcs = bcs.struct('Vault', {
   id: bcs.Address, rewards: bcs.u64(), community: bcs.Address, founder: bcs.Address,
   paused: bcs.bool(), total_locked: bcs.u64(), reward_committed: bcs.u64(),
-  reward_paid: bcs.u64(), reward_funded: bcs.u64(), community_paid: bcs.u64(), founder_paid: bcs.u64(), burned: bcs.u64(), locks_opened: bcs.u64(), locks_closed: bcs.u64(),
+  reward_paid: bcs.u64(), reward_funded: bcs.u64(), community_paid: bcs.u64(), founder_paid: bcs.u64(), burned: bcs.u64(), pending_burn: bcs.u64(), locks_opened: bcs.u64(), locks_closed: bcs.u64(),
 });
 export const ClockBcs = bcs.struct('Clock', { id: bcs.Address, timestamp_ms: bcs.u64() });
 

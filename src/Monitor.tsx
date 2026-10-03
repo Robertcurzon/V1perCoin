@@ -11,7 +11,7 @@ import { formatAmount } from './economics';
 
 type Snapshot = {
   time: number; volume24h: string | null; supply: string; available: string; committed: string; paid: string;
-  funded: string; locked: string; burned: string; opened: string; closed: string;
+  funded: string; locked: string; burned: string; pendingBurn: string; opened: string; closed: string;
   claims: string; community: string; founder: string;
 };
 const historyKey = `v1pr-monitor:${launch.network}:${launch.vaultId}`;
@@ -20,7 +20,7 @@ function readHistory(): Snapshot[] {
   try {
     const data: unknown = JSON.parse(localStorage.getItem(historyKey) ?? '[]');
     if (!Array.isArray(data)) return [];
-    return data.filter((entry): entry is Snapshot => Boolean(entry && typeof entry === 'object' && typeof entry.time === 'number' && Number.isSafeInteger(entry.time) && entry.time > 0 && ['supply','available','committed','paid','funded','locked','burned','opened','closed','claims','community','founder'].every((key) => typeof entry[key] === 'string' && /^\d+$/.test(entry[key])))).map((entry) => ({ ...entry, volume24h: typeof entry.volume24h === 'string' && /^\d+(\.\d+)?$/.test(entry.volume24h) ? entry.volume24h : null })).slice(-720);
+    return data.filter((entry): entry is Snapshot => Boolean(entry && typeof entry === 'object' && typeof entry.time === 'number' && Number.isSafeInteger(entry.time) && entry.time > 0 && ['supply','available','committed','paid','funded','locked','burned','pendingBurn','opened','closed','claims','community','founder'].every((key) => typeof entry[key] === 'string' && /^\d+$/.test(entry[key])))).map((entry) => ({ ...entry, volume24h: typeof entry.volume24h === 'string' && /^\d+(\.\d+)?$/.test(entry.volume24h) ? entry.volume24h : null })).slice(-720);
   } catch { return []; }
 }
 function Chart({ title, samples, series, tokens = true, unit = 'V1PR' }: {
@@ -67,7 +67,7 @@ export default function Monitor() {
         const sample: Snapshot = {
           time: Number(state.time), volume24h: null, supply: supply.toString(),
           available: v.rewards, committed: v.reward_committed, paid: v.reward_paid, funded: v.reward_funded,
-          locked: v.total_locked, burned: (INITIAL_SUPPLY - supply).toString(), opened: v.locks_opened, closed: v.locks_closed,
+          pendingBurn: v.pending_burn, locked: v.total_locked, burned: (INITIAL_SUPPLY - supply).toString(), opened: v.locks_opened, closed: v.locks_closed,
           claims: p.claimed, community: v.community_paid, founder: v.founder_paid,
         };
         if (launch.network === 'mainnet' && /^0x[0-9a-fA-F]{64}$/.test(launch.dexPairId)) {
@@ -100,12 +100,12 @@ export default function Monitor() {
     <p className="token-intro">Supply, funded rewards, and community contract activity. {isLaunchConfigured ? `Sui ${launch.network}; refreshes every 30 seconds.` : 'No verified deployment is configured. No live figures or trading activity are implied.'}</p>
     <p className="fine-print coin-type">Coin type: {isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p>
     <div className="monitor-metrics">{[
-      ['Current total supply', value('supply')], ['Total actually burned', value('burned')], ['Available lock rewards', value('available')], ['Reserved lock rewards', value('committed')], ['Rewards paid', value('paid')], ['Total rewards funded', value('funded')], ['V1PR currently locked', value('locked')], ['Locks opened / closed', `${value('opened', false)} / ${value('closed', false)}`], ['Free claims paid', value('claims', false)], ['Community exit-fee receipts', value('community')], ['Founder exit-fee receipts', value('founder')],
+      ['Current total supply', value('supply')], ['Total actually burned', value('burned')], ['Pending exit burns', value('pendingBurn')], ['Available lock rewards', value('available')], ['Reserved lock rewards', value('committed')], ['Rewards paid', value('paid')], ['Total rewards funded', value('funded')], ['V1PR currently locked', value('locked')], ['Locks opened / closed', `${value('opened', false)} / ${value('closed', false)}`], ['Free claims paid', value('claims', false)], ['Community exit-fee receipts', value('community')], ['Founder exit-fee receipts', value('founder')],
     ].map(([label, metric]) => <article key={label}><span>{label}</span><strong>{metric}</strong></article>)}</div>
     <div className="monitor-controls"><button className="button outline" disabled={!isLaunchConfigured || loading} onClick={() => setRevision((n) => n + 1)}>{loading ? 'REFRESHING…' : 'REFRESH DATA'}</button><span className="fine-print">{latest ? `Last snapshot: ${new Date(latest.time).toLocaleString()}${error || dataIsStale(receivedAt, now) ? ' · STALE / SAVED OBSERVATION' : ' · FRESH RPC READ'}` : 'Awaiting onchain data'}</span></div>
     {error && <p className="transaction-message" role="alert">Unable to refresh: {error}. Any existing chart shows the last saved observations.</p>}
     <div className="proof-links">{proof.map((p) => <div key={p.id}><ExplorerLink kind="object" value={p.id}>{p.label}</ExplorerLink> · version {p.version} · <ExplorerLink kind="tx" value={p.digest ?? ''}>Last change</ExplorerLink></div>)}</div>
-    <div className="monitor-grid"><Chart title="TOTAL TOKEN SUPPLY" samples={samples} series={[{key:'supply',name:'Supply',color:'#bdf332'},{key:'burned',name:'Burned',color:'#fa9a66'}]}/><Chart title="REWARD POOL" samples={samples} series={[{key:'available',name:'Available',color:'#bdf332'},{key:'committed',name:'Reserved',color:'#66c9f3'},{key:'paid',name:'Paid',color:'#fa9a66'}]}/><Chart title="LOCKED V1PR" samples={samples} series={[{key:'locked',name:'Locked principal',color:'#bdf332'}]}/><Chart title="CONTRACT INTERACTIONS" samples={samples} tokens={false} series={[{key:'opened',name:'Locks opened',color:'#bdf332'},{key:'closed',name:'Locks closed',color:'#66c9f3'},{key:'claims',name:'Claims paid',color:'#fa9a66'}]}/></div>
+    <div className="monitor-grid"><Chart title="TOTAL TOKEN SUPPLY" samples={samples} series={[{key:'supply',name:'Supply',color:'#bdf332'},{key:'burned',name:'Burned',color:'#fa9a66'},{key:'pendingBurn',name:'Pending burn',color:'#66c9f3'}]}/><Chart title="REWARD POOL" samples={samples} series={[{key:'available',name:'Available',color:'#bdf332'},{key:'committed',name:'Reserved',color:'#66c9f3'},{key:'paid',name:'Paid',color:'#fa9a66'}]}/><Chart title="LOCKED V1PR" samples={samples} series={[{key:'locked',name:'Locked principal',color:'#bdf332'}]}/><Chart title="CONTRACT INTERACTIONS" samples={samples} tokens={false} series={[{key:'opened',name:'Locks opened',color:'#bdf332'},{key:'closed',name:'Locks closed',color:'#66c9f3'},{key:'claims',name:'Claims paid',color:'#fa9a66'}]}/></div>
     <Chart title="EXCHANGE VOLUME / ROLLING 24H USD" samples={samples.filter((sample) => sample.volume24h !== null && sample.volume24h !== undefined)} unit="USD" series={[{key:'volume24h',name:'Configured pair 24h volume',color:'#66c9f3'}]}/>
     <p className="fine-print">{launch.dexPairId ? `Source: DEX Screener, configured Sui pair ${launch.dexPairId}. Rolling 24-hour USD volume for this pair only; not all-exchange volume or cumulative lifetime trading. ${volumeError ? `Volume unavailable/stale: ${volumeError}` : ''}` : 'Trading volume is not available until a real, verified mainnet exchange pair is configured. No synthetic trades or zero-volume claim is displayed.'} <a href="https://docs.dexscreener.com/api/reference" target="_blank" rel="noreferrer">Provider documentation ↗</a></p>
     <p className="fine-print">Charts show observed onchain snapshots stored in this browser, starting when this page first loads after deployment. They are not a complete historical index. Counters are cumulative successful lock opens, closes and free claims; they do not count ordinary transfers, unique people, every transaction, or exchange trades. Total supply includes reserves and locked inventory; it is not circulating supply. Separate object reads can briefly span concurrent transactions. Network/API failures leave saved data marked stale.</p>
