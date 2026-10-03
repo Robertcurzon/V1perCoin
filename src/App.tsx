@@ -9,7 +9,7 @@ import { ArrowDownRight, ArrowUpRight, Github, ShieldCheck } from 'lucide-react'
 
 const repoUrl = 'https://github.com/Robertcurzon/ViperCoin';
 const phases = [
-  ['01', 'Build', 'Fixed supply, allocation, approved claims, and funded lock rewards in Move.', 'IMPLEMENTED'],
+  ['01', 'Build', 'Deflationary supply, allocation, approved claims, and funded lock rewards in Move.', 'IMPLEMENTED'],
   ['02', 'Rehearse', 'Run the wallet and contract flows on Sui testnet and publish transaction records.', 'NEXT'],
   ['03', 'Verify', 'Review custody, contract security, metadata, and exchange liquidity funding.', 'REQUIRED'],
   ['04', 'Launch', 'Publish the verified mainnet coin type, open claims, and fund the exchange pool.', 'NOT LIVE'],
