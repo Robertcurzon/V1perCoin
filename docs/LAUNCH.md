@@ -48,14 +48,30 @@ Visit `/monitor` after configuration. Confirm Currency supply and vault accounti
 
 ### Website release checks
 
-- Open `/whitepaper`; verify all nine sections, economics tables, source links and the downloadable copy.
-- Populate `publicReserve`, `initialLiquidity`, `laterLiquidity`, `vaultAdminCapId`, `claimsAdminCapId`, and `metadataDigest` from the actual allocation and metadata-deletion receipts. The manifest refuses incomplete custody/authority records. A funded exchange pair is configured separately.
+- Open `/whitepaper`; verify all sections, economics tables, source links and the downloadable copy.
+- Populate `feastId`, `feastAdminCapId`, `upgradeCapId`, `initialLiquidity`, `laterLiquidity`, `vaultAdminCapId`, `claimsAdminCapId`, and `metadataDigest` from the actual allocation and metadata-deletion receipts. The manifest refuses incomplete custody/authority records. A funded exchange pair is configured separately.
 - Compare every custody address and initial allocation against the allocation transaction; public labels do not prove that a wallet's current balance equals its original budget.
 - Compare Currency, vault and claim pool IDs, versions and last-change receipts against Suiscan on the same network. Test that retaining metadata authority causes the website to reject the currency.
 - Confirm claim, open, close, top-up and pause/resume events appear with the correct vault/pool scope and receipt. The recent feed is bounded and may not contain all prior events. Check the explorer for complete receipts.
 - Disconnect the RPC connection and return to the page: saved readings must show stale; they must not turn into zero balances or simulated activity.
-- Verify package immutability and source independently. Website metadata/type/accounting checks do not prove absence of upgrade authority.
+- Verify package immutability and source independently. The site rejects an extant upgrade capability. Verify the original capability ID against publication receipts; unknown or transport errors must fail closed. Website checks do not prove source-bytecode correspondence.
 
 Custody addresses must be nonzero and pairwise distinct. Named allocation constants sum to the complete initial supply. Approval and expiry boundaries, multi-user funding/exits and permissionless burn flushing are covered by unit tests.
 
 Rehearse Feast allocation, finalization, 0/30/60-day vesting and locked claims before mainnet. Record finalized allocations and supply burns. The 90-day Feast window starts at finalization, separately from free claims.
+
+
+## Feast opening requirements
+
+- Use Sui multisig addresses for all four custody wallets and custody of all three AdminCaps. Use chain-appropriate multisigs for the Ethereum and Solana V1PR Treasury (founder-controlled); Sui addresses cannot receive those chain assets. Publish signer thresholds and custody policy.
+- Make the package immutable before opening locks or the Feast. Publish the original UpgradeCap ID and the immutability transaction; delete metadata authority and publish that receipt.
+- Publish the free-claim approval list with every approve transaction digest.
+- Freeze the accepted contracts, 21-day dates, Treasury addresses and submission channel. Verify authenticated Pyth historical coverage and finalized transfer indexing before accepting funds. Test both source-wallet binding signatures and each locked-claim path on testnet.
+- Keep feastOpen false until all opening requirements pass. Set real feastStartMs and HTTPS feastSubmissionUrl; never invent addresses or IDs. Participants download signed binding JSON and submit via the published channel. Confirm verified receipt acceptance before they transfer; source assets are not automatically transferred by the website.
+- Publish all Treasury receipt exports, signed bindings with consent to public linkage, Pyth archives, scorer input, Feast CSV, its exact-byte SHA-256 hash and the scoring script commit. Reproduce results independently, publish set_allocations digests and finalize once.
+- Publish results.json as public/feast-results.json without changing bytes and set feastResultsSha256. Match its windowStart to feastStartMs. The monitor distinguishes dated exports from live onchain counters.
+- The DEX pool opens at no less than the Feast clearing price, paired with 25% of Feast proceeds. Remaining proceeds are founder-controlled and discretionary. Record asset conversions and funding digests; liquidity is an operational commitment, not an automatic cross-chain restriction.
+- Lock the LP position and publish the lock transaction digest, custody and unlocking terms before announcing trading.
+- Rehearse missing/deleted UpgradeCap responses separately from RPC outages; both website and wallet actions must reject unresolved verification.
+
+**Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PR founder (the "V1PR Treasury"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PR only, with no claim on Treasury assets or future income. Treasury addresses and all received transfers are published for verification.

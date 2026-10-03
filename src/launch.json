@@ -12,10 +12,20 @@
   "allocationDigest": "",
   "immutableDigest": "",
   "dexPairId": "",
-  "publicReserve": "",
   "initialLiquidity": "",
   "laterLiquidity": "",
   "vaultAdminCapId": "",
   "claimsAdminCapId": "",
-  "metadataDigest": ""
+  "metadataDigest": "",
+  "feastId": "",
+  "feastAdminCapId": "",
+  "upgradeCapId": "",
+  "feastTreasury": {
+    "ethereum": "",
+    "solana": ""
+  },
+  "feastOpen": false,
+  "feastStartMs": 0,
+  "feastSubmissionUrl": "",
+  "feastResultsSha256": ""
 }

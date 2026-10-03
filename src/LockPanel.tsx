@@ -6,7 +6,7 @@ import type { SuiClientTypes } from '@mysten/sui/client';
 import { PositionBcs, VaultBcs } from './chainSchemas';
 import { Transaction, coinWithBalance } from '@mysten/sui/transactions';
 import { bcs } from '@mysten/sui/bcs';
-import { readChainState } from './chainState';
+import { readChainState, objectAbsent } from './chainState';
 import ExplorerLink from './ExplorerLink';
 import { launch, isLaunchConfigured as configured } from './manifest';
 import { exitPreview, formatAmount, fullReward, MONTH_MS, netReward, parseAmount, ratePpm } from './economics';
@@ -32,7 +32,6 @@ export default function LockPanel() {
   let inputError = '';
   try { principal = parseAmount(amount); } catch (e) { inputError = (e as Error).message; }
   const reward = fullReward(principal, months);
-  const matureFee = 0n;
 
   useEffect(() => {
     if (!configured) return;
@@ -78,7 +77,10 @@ export default function LockPanel() {
         try {
           const { dynamicField } = await client.core.getDynamicField({ parentId: state.p.eligibility.id, name: { type: 'address', bcs: bcs.Address.serialize(account.address).toBytes() }, signal: AbortSignal.timeout(20_000) });
           claimed = bcs.bool().parse(dynamicField.value.bcs);
-        } catch { throw new Error('Claim eligibility could not be verified. The wallet must be approved before claiming.'); }
+        } catch (error) {
+          if (objectAbsent(error)) throw new Error('This wallet is not approved for a free claim.');
+          throw new Error('Network or data error: claim eligibility could not be verified. Please retry.');
+        }
         if (claimed) throw new Error('This wallet already claimed its allocation.');
       }
       if (action === 'deposit' && state.v.paused) throw new Error('New locks are paused. Existing locks can still exit.');
@@ -109,7 +111,7 @@ export default function LockPanel() {
       <div className="lock-card">
         <label htmlFor="lock-amount">V1PR to lock</label><input id="lock-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <label htmlFor="lock-months">{months} program months · {months * 30} days</label><input id="lock-months" type="range" min="1" max="24" value={months} onChange={(e) => setMonths(Number(e.target.value))} />
-        <div className="facts"><div><span>ANNUAL TOKEN REWARD RATE</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>RESERVED TERM REWARD</span><strong>{formatAmount(reward)}</strong></div><div><span>MATURE EXIT FEE (0%)</span><strong>{formatAmount(matureFee)}</strong></div><div><span>NET CHANGE AFTER MATURE EXIT FEE</span><strong>{formatAmount(reward - matureFee)} V1PR</strong></div><div><span>FULL-TERM NET PAYOUT</span><strong>{formatAmount(principal - matureFee + reward)} V1PR</strong></div><div><span>AVAILABLE REWARD CAPACITY</span><strong>{capacity === null ? 'NOT DEPLOYED / UNAVAILABLE' : `${formatAmount(capacity)} V1PR`}</strong></div></div>
+        <div className="facts"><div><span>ANNUAL TOKEN REWARD RATE</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>RESERVED TERM REWARD</span><strong>{formatAmount(reward)}</strong></div><div><span>MATURE EXIT FEE (0%)</span><strong>0 V1PR</strong></div><div><span>TOTAL TERM REWARD</span><strong>{formatAmount(reward)} V1PR</strong></div><div><span>FULL-TERM NET PAYOUT</span><strong>{formatAmount(principal + reward)} V1PR</strong></div><div><span>AVAILABLE REWARD CAPACITY</span><strong>{capacity === null ? 'NOT DEPLOYED / UNAVAILABLE' : `${formatAmount(capacity)} V1PR`}</strong></div></div>
         {inputError && <p role="alert">{inputError}</p>}{principal > 0n && netReward(principal, months) === 0n && <p role="alert">Increase the amount to earn at least one V1PR base unit for the selected term.</p>}
         <p className="fine-print">One month = 30 days. Simple rewards in V1PR; no compounding or dollar-return promise. No deposit fee. No fee at maturity. Early exit pays the reward for whole completed months and charges up to 5% of principal, tapering continuously to zero. Every completed lock earns a positive net V1PR reward before network gas. Early exits can return less than deposited.</p>
         <ConnectButton />

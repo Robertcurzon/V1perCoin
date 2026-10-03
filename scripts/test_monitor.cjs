@@ -18,7 +18,7 @@ function load(file) {
   return exports;
 }
 const { readDexVolume } = load('src/volume.ts');
-const { CurrencyBcs, VaultBcs, ClaimsBcs, PositionBcs } = load('src/chainSchemas.ts');
+const { CurrencyBcs, VaultBcs, ClaimsBcs, PositionBcs, FeastBcs } = load('src/chainSchemas.ts');
 const id = `0x${'a'.repeat(64)}`, other = `0x${'b'.repeat(64)}`;
 const coin = `${id}::v1pr::V1PR`;
 const pair = { chainId: 'sui', pairAddress: id, baseToken: { address: coin }, quoteToken: { address: '0x2::sui::SUI' }, volume: { h24: 125.5 } };
@@ -60,9 +60,10 @@ assert.throws(() => decodeActivity({ ...event, bcs: new Uint8Array([0]) }, id, i
 const claimEvent = { ...event, eventType: `${id}::free_claims::Claimed`, bcs: EventSchemas.Claimed.serialize({ pool: id, timestamp_ms: '1000', owner: other, amount: '10000000000' }).toBytes() };
 assert.equal(decodeActivity(claimEvent, id, id, id).label, 'Free claim paid');
 assert.equal(decodeActivity(claimEvent, id, id, other), null);
-fixtures.set(path.resolve('src/launch.json'), { currencyId: id, vaultId: id, claimsId: id, founder: other, community: id });
+const feast = FeastBcs.parse(FeastBcs.serialize({id, inventory:'0', allocations:{id,size:'2'}, allocated:'10000000000000',claimed:'10000000000000',burned:'90000000000000',finalized:true,start_ms:'1'}).toBytes());
+fixtures.set(path.resolve('src/launch.json'), { currencyId: id, vaultId: id, claimsId: id, feastId: id, founder: other, community: id });
 const { validateState } = load('src/chainState.ts');
-validateState(currency, vault, pool);
+validateState(currency, vault, pool, feast);
 for (const [c,v,p] of [
   [{ ...currency, id: other },vault,pool],
   [{ ...currency, metadata_cap_id: { $kind: 'Claimed', Claimed: id } },vault,pool],
@@ -73,11 +74,60 @@ for (const [c,v,p] of [
   [currency,vault,{ ...pool, claimed: '2' }],
   [currency,vault,{ ...pool, approved: '10001' }],
   [currency,vault,{ ...pool, inventory: '100000000000000' }],
-]) assert.throws(() => validateState(c,v,p));
+]) assert.throws(() => validateState(c,v,p,feast));
 console.log('Verification checks passed: explorer routing, freshness, scoped event decoding and fail-closed currency/accounting checks.');
 
 const { isManifestConfigured } = load('src/manifest.ts');
-const manifest = { network: 'testnet', status: 'verified', packageId: id, currencyId: id, vaultId: id, claimsId: id, founder: other, community: id, publicReserve: id, initialLiquidity: id, laterLiquidity: id, vaultAdminCapId: id, claimsAdminCapId: id, coinType: coin, publishDigest: txDigest, allocationDigest: txDigest, immutableDigest: txDigest, metadataDigest: txDigest, dexPairId: '' };
+const manifest = { network: 'testnet', status: 'verified', packageId: id, currencyId: id, vaultId: id, claimsId: id, founder: other, community: id, feastId:id, feastAdminCapId:id, upgradeCapId:id, feastOpen:false, feastStartMs:0, feastSubmissionUrl:'', feastTreasury:{ethereum:'',solana:''}, initialLiquidity: `0x${'c'.repeat(64)}`, laterLiquidity: `0x${'d'.repeat(64)}`, vaultAdminCapId: id, claimsAdminCapId: id, coinType: coin, publishDigest: txDigest, allocationDigest: txDigest, immutableDigest: txDigest, metadataDigest: txDigest, dexPairId: '' };
 assert.equal(isManifestConfigured(manifest), true);
-for (const patch of [{ network: 'devnet' },{ publicReserve: '' },{ metadataDigest: '' },{ founder: id },{ vaultAdminCapId: `0x${'0'.repeat(64)}` },{ publishDigest: '<script>' },{ coinType: `${other}::v1pr::V1PR` }]) assert.equal(isManifestConfigured({ ...manifest, ...patch }), false);
+for (const patch of [{ network: 'devnet' },{ feastId: '' },{ upgradeCapId:'' },{ initialLiquidity:other },{ feastOpen:true },{ metadataDigest: '' },{ founder: id },{ vaultAdminCapId: `0x${'0'.repeat(64)}` },{ publishDigest: '<script>' },{ coinType: `${other}::v1pr::V1PR` }]) assert.equal(isManifestConfigured({ ...manifest, ...patch }), false);
 console.log('Manifest checks passed: required custody, authorities, network, coin type and receipts.');
+
+for (const patch of [{id:other},{inventory:'1'},{allocated:'1'},{claimed:'1000000000000001'},{finalized:false}]) assert.throws(() => validateState(currency,vault,pool,{...feast,...patch}));
+const { ObjectError } = require('@mysten/sui/client');
+const { objectAbsent, verifyUpgradeCap } = load('src/chainState.ts');
+assert.equal(objectAbsent(new ObjectError('notExists','missing',{reason:'notFound',objectId:id})),true);
+assert.equal(objectAbsent(new ObjectError('deleted','deleted',{reason:'deleted',objectId:id})),true);
+assert.equal(objectAbsent(new ObjectError('UNKNOWN','unknown',{reason:'unknown',objectId:id})),false);
+assert.equal(objectAbsent(new Error('not found')),false);
+const { vestedAllocation, treasuryExplorer } = load('src/feastData.ts');
+assert.equal(vestedAllocation({amount:'1001',claimed:'0',lock_months:'0'},0n),500n);
+assert.equal(vestedAllocation({amount:'1001',claimed:'0',lock_months:'0'},30n*86400000n),750n);
+assert.equal(vestedAllocation({amount:'1001',claimed:'0',lock_months:'0'},60n*86400000n),1001n);
+assert.equal(vestedAllocation({amount:'1001',claimed:'0',lock_months:'24'},0n),1001n);
+assert.equal(treasuryExplorer('ethereum','0x'+'1'.repeat(40)),'https://etherscan.io/address/0x'+'1'.repeat(40));
+assert.equal(treasuryExplorer('ethereum','https://bad.example'),null);
+void (async () => {
+  for (const reason of ['notFound','deleted']) await verifyUpgradeCap({core:{getObject:async()=>{throw new ObjectError('absent','absent',{reason,objectId:id});}}},id,AbortSignal.timeout(1000));
+  for (const error of [new Error('RPC timed out'),new ObjectError('UNKNOWN','unknown',{reason:'unknown',objectId:id}),new ObjectError('notFound','wrong lookup',{reason:'notFound',objectId:other})]) await assert.rejects(verifyUpgradeCap({core:{getObject:async()=>{throw error;}}},id,AbortSignal.timeout(1000)));
+  await assert.rejects(verifyUpgradeCap({core:{getObject:async()=>({object:{}})}},id,AbortSignal.timeout(1000)),/still exists/);
+  const panel=fs.readFileSync('src/FeastPanel.tsx','utf8');
+  assert(panel.includes('!campaignOpen || !consent || !account'));
+  assert(panel.includes('FEAST_DISCLOSURE'));
+  assert(panel.includes('SIGN WALLET BINDING'));
+  const rpcManifest = {...manifest, vaultId:`0x${'e'.repeat(64)}`, claimsId:`0x${'f'.repeat(64)}`, feastId:`0x${'1'.repeat(64)}`, upgradeCapId:`0x${'2'.repeat(64)}`};
+  fixtures.set(path.resolve('src/launch.json'),rpcManifest);
+  const rpcRead = load('src/chainState.ts').readChainState;
+  const ClockBcs = load('src/chainSchemas.ts').ClockBcs;
+  const content = (schema,value) => schema.serialize(value).toBytes();
+  const rows = new Map([
+    [rpcManifest.currencyId,{objectId:id,type:`0x2::coin_registry::Currency<${coin}>`,owner:{$kind:'Shared'},content:content(CurrencyBcs,{id,decimals:6,name:'Viper Coin',symbol:'V1PR',description:'',icon_url:'',supply:{BurnOnly:'999999999999999'},regulated:{Unregulated:true},treasury_cap_id:id,metadata_cap_id:{Deleted:true},extra_fields:[]})}],
+    [rpcManifest.vaultId,{objectId:rpcManifest.vaultId,type:`${id}::lock_vault::Vault`,owner:{$kind:'Shared'},content:content(VaultBcs,{...vault,id:rpcManifest.vaultId})}],
+    [rpcManifest.claimsId,{objectId:rpcManifest.claimsId,type:`${id}::free_claims::Pool`,owner:{$kind:'Shared'},content:content(ClaimsBcs,{...pool,id:rpcManifest.claimsId})}],
+    [rpcManifest.feastId,{objectId:rpcManifest.feastId,type:`${id}::feast::Pool`,owner:{$kind:'Shared'},content:content(FeastBcs,{...feast,id:rpcManifest.feastId})}],
+    ['0x6',{objectId:'0x6',type:'0x2::clock::Clock',owner:{$kind:'Shared'},content:content(ClockBcs,{id:'0x6',timestamp_ms:'1000'})}],
+  ]);
+  const mock = {core:{getObject:async ({objectId})=>{
+    if (objectId===rpcManifest.upgradeCapId) throw new ObjectError('deleted','deleted',{reason:'deleted',objectId});
+    return {object:rows.get(objectId)};
+  }}};
+  assert.equal((await rpcRead(mock)).f.claimed,feast.claimed);
+  const original = rows.get(rpcManifest.feastId);
+  for (const patch of [{type:`${other}::feast::Pool`},{owner:{$kind:'AddressOwner',AddressOwner:id}}]) {
+    rows.set(rpcManifest.feastId,{...original,...patch}); await assert.rejects(rpcRead(mock),/type or shared/);
+  }
+  rows.set(rpcManifest.feastId,original);
+  await assert.rejects(rpcRead({core:{getObject:async()=>{throw new Error('RPC disconnected');}}}));
+  console.log('RPC verification passed: shared Feast type, immutable capability and complete snapshot failure handling.');
+  console.log('Feast checks passed: BCS accounting, exact vesting, safe Treasury links, consent gating and explicit upgrade absence versus RPC failure.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

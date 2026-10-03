@@ -16,7 +16,8 @@
     "postbuild": "node scripts/finalize_site.cjs",
     "test:deployment": "node scripts/test_deployment.mjs",
     "whitepaper:source": "python3 scripts/generate_whitepaper.py",
-    "test:feast": "node scripts/feast/test.mjs"
+    "test:feast": "node scripts/feast/test.mjs",
+    "pretest:economics": "node scripts/sync_whitepaper.cjs"
   },
   "dependencies": {
     "@mysten/dapp-kit-react": "^2.1.37",

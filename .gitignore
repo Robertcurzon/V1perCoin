@@ -38,3 +38,7 @@ output/
 *.synctex.gz
 public/whitepaper.pdf
 docs/*.pdf
+
+# Generated from canonical docs sources during prebuild
+public/WHITEPAPER.md
+public/Viper_Coin_Whitepaper.tex

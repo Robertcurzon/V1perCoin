@@ -90,3 +90,12 @@ Review active liquidity and executable buy/sell quotes, ownership concentration 
 The current website monitor supplies object checks and a bounded activity feed, browser-local history and configured pair volume. It does not yet provide campaign attribution, comprehensive historical retention cohorts or independently measured organic trading. Record those limitations instead of displaying fabricated analytics.
 
 The release still needs actual public destination wallets, paired SUI, the pool configuration and custody policy, a successful venue/wallet rehearsal and security review. The next implementation task is the Cetus compatibility and liquidity rehearsal. Marketing preparation can proceed alongside it; a purchase announcement follows verified trading readiness.
+
+
+## Feed the Viper campaign
+
+Lead with “Feed the Viper. Cute memes in. More venom out.” The baby Viper grows through participation: reuse the approved jungle illustration of vipers eating dog and frog mascots. Creator challenges can show their meme coins becoming Viper food, daily Feast participation cards and receipts, and educational posts on verified coin types and funded lock rewards. Venom describes community momentum, not a financial metric. Never portray Treasury contributions as mechanically increasing price or promise that a baby coin appreciates faster. Publish the allocation, price floor, vesting, funding and founder-controlled proceeds alongside campaign posts. Community grants reward submitted creative work and disclosed receipts, rather than manufactured volume or undisclosed paid promotion.
+
+**Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PR founder (the "V1PR Treasury"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PR only, with no claim on Treasury assets or future income. Treasury addresses and all received transfers are published for verification.
+
+The DEX pool opens at no less than the Feast clearing price, paired with 25% of Feast proceeds. Remaining proceeds are founder-controlled and discretionary.

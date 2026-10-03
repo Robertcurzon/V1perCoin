@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useCurrentClient } from '@mysten/dapp-kit-react';
 import { readChainState, INITIAL_SUPPLY } from './chainState';
 import Transparency from './Transparency';
+import FeastMonitor from './FeastMonitor';
 import ExplorerLink from './ExplorerLink';
 import { dataIsStale } from './explorer';
 import { launch, isLaunchConfigured } from './manifest';
@@ -109,6 +110,7 @@ export default function Monitor() {
     <Chart title="EXCHANGE VOLUME / ROLLING 24H USD" samples={samples.filter((sample) => sample.volume24h !== null && sample.volume24h !== undefined)} unit="USD" series={[{key:'volume24h',name:'Configured pair 24h volume',color:'#66c9f3'}]}/>
     <p className="fine-print">{launch.dexPairId ? `Source: DEX Screener, configured Sui pair ${launch.dexPairId}. Rolling 24-hour USD volume for this pair only; not all-exchange volume or cumulative lifetime trading. ${volumeError ? `Volume unavailable/stale: ${volumeError}` : ''}` : 'Trading volume is not available until a real, verified mainnet exchange pair is configured. No synthetic trades or zero-volume claim is displayed.'} <a href="https://docs.dexscreener.com/api/reference" target="_blank" rel="noreferrer">Provider documentation ↗</a></p>
     <p className="fine-print">Charts show observed onchain snapshots stored in this browser, starting when this page first loads after deployment. They are not a complete historical index. Counters are cumulative successful lock opens, closes and free claims; they do not count ordinary transfers, unique people, every transaction, or exchange trades. Total supply includes reserves and locked inventory; it is not circulating supply. Separate object reads can briefly span concurrent transactions. Network/API failures leave saved data marked stale.</p>
+    <FeastMonitor />
     <Transparency />
   </main></div>;
 }
