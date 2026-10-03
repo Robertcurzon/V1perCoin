@@ -8,8 +8,9 @@
 
 ## Reserves and exchange liquidity
 
-The 10% public reserve is custodian-held. No paid campaign is launched, no receiving address solicits BTC/ETH/ZEC/SUI, and no conversion or cross-chain receipt mechanism is implemented. Initial liquidity has 20%; later liquidity has 15%. Each requires a disclosed custodian. Exchange pool creation is a separate transaction requiring real paired assets; token reserves alone are not executable liquidity. Publish the DEX, pool, pair, funding transaction, LP position ownership and withdrawal policy before linking trading.
 
 ## Program funds
 
 Community receives 20% and 40% of early-exit fees. Operations receives 10% and the founder fee destination receives 10% of exit fees. They must be separate addresses. Reserve and operating wallet funds remain discretionary; no vesting or trustless spending policy is claimed. The 15% lock-reward balance has no admin withdrawal path. See [the vault specification](STAKING_DESIGN.md).
+
+Feast claims use the shared 100-million pool. Only its AdminCap can set allocations before finalization; no edits afterward. Finalization burns unallocated tokens. Liquid claims vest 50% immediately and 50% over 60 days; locked claims create funded 12/24-month vault positions. Anyone may burn unclaimed tokens after 90 days. No minting or administrator sweep exists.

@@ -26,7 +26,7 @@ Publication mints the full initial supply into a sealed, one-use LaunchCap. The 
 | Bucket | Supply | V1PR | Control |
 |---|---:|---:|---|
 | Free claims | 10% | 100,000,000 | Shared claim pool; approved addresses |
-| Public distribution reserve | 10% | 100,000,000 | Published reserve custodian; no paid campaign open |
+| Feast claims | 10% | 100,000,000 | Shared Feast pool; finalized allocations |
 | Initial exchange liquidity | 20% | 200,000,000 | Published liquidity custodian |
 | Later liquidity reserve | 15% | 150,000,000 | Published reserve custodian |
 | Community programs | 20% | 200,000,000 | Separate published Community wallet |
@@ -36,7 +36,7 @@ Publication mints the full initial supply into a sealed, one-use LaunchCap. The 
 
 Operations pays for development, hosting, design, administration and collaborators at the founder's discretion. There is no separate Team allocation, promised vesting, or automated spending restriction on Operations. Community and Operations must have distinct addresses. Liquidity reserves require a paired asset and an actual pool-creation transaction; allocating V1PR alone does not create market liquidity, establish a price, or lock LP ownership. Pool, pair, paired-asset funding, LP custodian and withdrawal policy must be published before a buy link appears.
 
-The public distribution reserve accepts no ZEC, BTC, ETH or SUI payments in this release. It is retained as a disclosed reserve, not advertised as an active sale. Its custodian can move these tokens; no contract vesting is implied. The 0.5% specialty-action tax, affiliate commissions, games, private-transfer integration, and cross-chain campaign are outside this release.
+The 100-million Feast pool holds existing tokens onchain, not in a reserve custodian wallet. AdminCap controls allocations before finalization; finalization permanently freezes the list and burns unallocated inventory. Liquid allocations release 50% immediately and the remainder linearly over 60 days. Locked allocations create 12- or 24-month positions owned by claimants, using the ordinary vault and funded rewards. Locked terms start when claimed; insufficient rewards or a deposit pause prevents the entire claim transaction without consuming the allocation. After 90 days from finalization, anyone can burn remaining inventory. Claims stop at that deadline. No administrator may sweep the pool. The offchain contribution-scoring pipeline and website campaign configuration must be completed and published before opening the Feast.
 
 ## 3. Free claims
 
@@ -130,3 +130,5 @@ The recent activity feed decodes Move events for lock opens/closes, reward fundi
 The monitor links the exact coin type, Move package, Currency, vault, claim pool, admin capability objects, exchange pair and publication/allocation/immutability transactions on the appropriate Suiscan network. All five custody addresses, both admin capability IDs, and publication/allocation/immutability/metadata-deletion digests are required before website transactions are enabled. Exchange pair configuration remains optional until a funded pair exists. Unknown identifiers remain unavailable. Deployment transaction records are supplied by the operator and must be independently checked; a configuration flag is not an audit or proof that upgrade authority has been removed. [Suiscan route documentation](https://docs.blockberry.one/docs/suiscan-routes), [Sui SDK object and event queries](https://sdk.mystenlabs.com/sui/clients/querying).
 
 Custody addresses must be nonzero and pairwise distinct. Named allocation constants sum to the complete initial supply. Approval and expiry boundaries, multi-user funding/exits and permissionless burn flushing are covered by unit tests.
+
+Feast claims use the shared 100-million pool. Only its AdminCap can set allocations before finalization; no edits afterward. Finalization burns unallocated tokens. Liquid claims vest 50% immediately and 50% over 60 days; locked claims create funded 12/24-month vault positions. Anyone may burn unclaimed tokens after 90 days. No minting or administrator sweep exists.

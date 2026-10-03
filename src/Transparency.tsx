@@ -8,7 +8,6 @@ import { decodeActivity, type Activity } from './activity';
 const wallets = [
   { label: 'Ecosystem Operations / founder fees', address: launch.founder, note: '10% initial allocation; founder-controlled, no vesting.' },
   { label: 'Community programs', address: launch.community, note: '20% initial allocation plus 40% of early-exit fees; discretionary program budget.' },
-  { label: 'Public distribution reserve', address: launch.publicReserve, note: '10% initial allocation; custodian-controlled.' },
   { label: 'Initial liquidity reserve', address: launch.initialLiquidity, note: '20% initial allocation; wallet inventory does not prove active exchange liquidity.' },
   { label: 'Later liquidity reserve', address: launch.laterLiquidity, note: '15% initial allocation; custodian-controlled.' },
 ];

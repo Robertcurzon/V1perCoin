@@ -44,3 +44,5 @@ The Move events now include the vault/pool ID for scoping. Lock and claim events
 See [website deployment](docs/WEBSITE_DEPLOYMENT.md). Main-branch publication automatically typesets the journal-style white paper, runs website checks and deploys GitHub Pages. All routes and assets support the project subdirectory. The downloadable PDF and standalone LaTeX source are linked from the reader. The Markdown document remains the canonical text; `npm run whitepaper:source` regenerates LaTeX without changing the economic rules.
 
 Custody addresses must be nonzero and pairwise distinct. Named allocation constants sum to the complete initial supply. Approval and expiry boundaries, multi-user funding/exits and permissionless burn flushing are covered by unit tests.
+
+Feast claims use the shared 100-million pool. Only its AdminCap can set allocations before finalization; no edits afterward. Finalization burns unallocated tokens. Liquid claims vest 50% immediately and 50% over 60 days; locked claims create funded 12/24-month vault positions. Anyone may burn unclaimed tokens after 90 days. No minting or administrator sweep exists.

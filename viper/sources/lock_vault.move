@@ -375,3 +375,6 @@ fun multi_user_sequence_reconciles_every_step() {
     std::unit_test::destroy(vault); std::unit_test::destroy(cap); std::unit_test::destroy(currency); std::unit_test::destroy(metadata);
     sui::clock::destroy_for_testing(clock); scenario.end();
 }
+
+#[test_only]
+public fun position_details(position: &Position): (address,u64,u64,u64) { (position.owner,position.duration_ms,position.principal.value(),position.reward.value()) }

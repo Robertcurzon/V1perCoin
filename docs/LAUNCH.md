@@ -4,7 +4,7 @@ Economics are fixed in [the white paper](WHITEPAPER.md); release code is impleme
 
 ## Required public configuration
 
-Supply five nonzero, full-length Sui destination addresses: founder/Operations, Community, public distribution reserve, initial liquidity custodian, later liquidity custodian. Community must differ from founder. Publish who controls each wallet, the claim selection policy, and the admin capability owner. Supply real paired-asset funds and select an exchange/LP custody policy before trading is enabled. The repository does not contain private keys and does not invent these addresses or funds.
+Supply four nonzero, full-length Sui destination addresses: founder/Operations, Community, initial liquidity custodian, later liquidity custodian. Community must differ from founder. Publish who controls each wallet, the claim selection policy, and the admin capability owner. Supply real paired-asset funds and select an exchange/LP custody policy before trading is enabled. The repository does not contain private keys and does not invent these addresses or funds.
 
 ## Verification
 
@@ -26,9 +26,9 @@ sui move test --path viper
 1. Select a funded testnet signer. Confirm `sui client active-env` and its public address before any transaction. Publish `viper`; save the full JSON transaction result, package ID, LaunchCap, MetadataCap, UpgradeCap and Currency object sent to registry.
 2. Call `0x2::coin_registry::finalize_registration` with the V1PR type argument, registry 0xc and the received Currency object. Record the resulting **shared** Currency ID. Verify symbol V1PR, name Viper Coin, six decimals, initial one-billion supply and burn-only state.
 3. Set a publicly hosted icon URL using the MetadataCap, then permanently fix metadata by deleting the metadata cap through Currency. Record the transaction. Before participant use, consume UpgradeCap with `0x2::package::make_immutable`; record the immutability digest. This prevents upgrades from adding mint/sweep paths or changing accepted lock terms.
-4. Call `launch::allocate` with LaunchCap, founder, Community, public reserve, initial liquidity custodian, later liquidity custodian, and Clock 0x6. Record vault/claim pool IDs, both AdminCaps and allocation digest. The 90-day claim window starts here. Each lock later reserves its full term reward from the 150-million pool. Reconcile all seven buckets to the initial mint.
+4. Call `launch::allocate` with LaunchCap, founder, Community, initial liquidity custodian, later liquidity custodian, and Clock 0x6. Record vault/free-claim/Feast pool IDs, all three AdminCaps and allocation digest. The 90-day claim window starts here. Each lock later reserves its full term reward from the 150-million pool. Reconcile all seven buckets to the initial mint.
 5. Approve test addresses with `free_claims::approve`. Claim from an approved wallet; verify 10,000 V1PR arrives, a repeated claim fails, and an unapproved claim fails. Approval is administrative; publish the eligibility policy before opening real claims.
-6. Update `src/launch.json` with exact testnet IDs, coin type, all five custody destinations, both admin capability IDs, publish/allocation/immutability/metadata-deletion digests and `status: "verified"`. Connect a test wallet to the site. Claim, deposit 1- and 24-month positions, inspect transaction targets and payout preview, early-exit, and verify Community/founder receipts plus pending burn, then permissionless flushing and actual supply decrease. Confirm wrong-network signing is rejected by the wallet. Pausing must stop deposits and leave exits available. Long-term maturity/time boundaries, including the zero-fee mature exit, are tested locally with Sui's test Clock.
+6. Update `src/launch.json` with exact testnet IDs, coin type, all four custody destinations, all three admin capability IDs, publish/allocation/immutability/metadata-deletion digests and `status: "verified"`. Connect a test wallet to the site. Claim, deposit 1- and 24-month positions, inspect transaction targets and payout preview, early-exit, and verify Community/founder receipts plus pending burn, then permissionless flushing and actual supply decrease. Confirm wrong-network signing is rejected by the wallet. Pausing must stop deposits and leave exits available. Long-term maturity/time boundaries, including the zero-fee mature exit, are tested locally with Sui's test Clock.
 7. Reconcile available rewards + committed + paid = funded; locked principal is separate. Keep the site unpublished if any object or recipient verification fails. Record testnet results and independent review before mainnet publication.
 
 ## Mainnet publication
@@ -57,3 +57,5 @@ Visit `/monitor` after configuration. Confirm Currency supply and vault accounti
 - Verify package immutability and source independently. Website metadata/type/accounting checks do not prove absence of upgrade authority.
 
 Custody addresses must be nonzero and pairwise distinct. Named allocation constants sum to the complete initial supply. Approval and expiry boundaries, multi-user funding/exits and permissionless burn flushing are covered by unit tests.
+
+Rehearse Feast allocation, finalization, 0/30/60-day vesting and locked claims before mainnet. Record finalized allocations and supply burns. The 90-day Feast window starts at finalization, separately from free claims.

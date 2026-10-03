@@ -29,3 +29,9 @@ export const CurrencyBcs = bcs.struct('Currency', {
     key: bcs.string(), value: bcs.struct('ExtraField', { typeName: bcs.string(), bytes: bcs.vector(bcs.u8()) }),
   })),
 });
+
+export const FeastAllocationBcs = bcs.struct('Allocation', { amount: bcs.u64(), claimed: bcs.u64(), lock_months: bcs.u64() });
+export const FeastBcs = bcs.struct('Pool', {
+  id: bcs.Address, inventory: bcs.u64(), allocations: bcs.struct('Table', { id: bcs.Address, size: bcs.u64() }),
+  allocated: bcs.u64(), claimed: bcs.u64(), burned: bcs.u64(), finalized: bcs.bool(), start_ms: bcs.u64(),
+});
