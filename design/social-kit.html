@@ -20,7 +20,7 @@
     .card::before { content: ''; position: absolute; inset: 0; z-index: -2; background-position: center; background-size: cover; }
     .card::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(8,16,10,.54), rgba(8,16,10,.15) 37%, rgba(8,16,10,.88)); }
     .character::before { background-image: url('../public/viper-art.jpg'); }
-    .hunt::before { background-image: url('../public/viper-meme-feast.webp'); background-position: 63% center; }
+    .hunt::before { background-image: repeating-linear-gradient(135deg, transparent 0 36px, #bdf33218 36px 38px), repeating-linear-gradient(45deg, transparent 0 36px, #bdf33218 36px 38px); }
     .wordmark, .eyebrow, .foot { font-weight: 700; text-transform: uppercase; letter-spacing: .13em; }
     .wordmark { color: #bdf332; font-size: clamp(15px, 2vw, 24px); }
     .eyebrow { color: #bdf332; font-size: clamp(11px, 1.3vw, 15px); }
@@ -29,7 +29,7 @@
     .foot { display: flex; justify-content: space-between; gap: 12px; font-size: clamp(11px, 1.1vw, 15px); }
     .wide { grid-column: 1 / -1; }
     .wide .card { aspect-ratio: 16 / 9; }
-    .wide .card::before { background-image: url('../public/viper-meme-feast.webp'); background-position: center; }
+    .wide .card::before { background-image: repeating-linear-gradient(135deg, transparent 0 52px, #bdf33218 52px 54px), radial-gradient(ellipse at right, #314624, #101510 70%); }
     .wide .card::after { background: linear-gradient(90deg, rgba(8,16,10,.94), rgba(8,16,10,.52) 44%, transparent 75%); }
     .wide .main { max-width: 58%; }
     .note { max-width: 1180px; margin: 18px auto 0; color: #b9c4b4; font-size: 13px; line-height: 1.5; }
@@ -41,7 +41,7 @@
 <body>
   <header>
     <h1>Viper Coin (V1PR) social kit</h1>
-    <p>Click a headline to edit it. These are layout previews using existing project art. Check image and remix rights before publishing; no claim, reward program, or product shown here is live.</p>
+    <p>Click a headline to edit it. These are layout previews using a temporary hero crop and original CSS patterns. The hero and logo are to be replaced / rights to confirm; current red eyes must become yellow / venom-lime. Check image and remix rights before publishing; no claim, reward program, or product shown here is live.</p>
   </header>
   <main class="gallery">
     <section class="item">
