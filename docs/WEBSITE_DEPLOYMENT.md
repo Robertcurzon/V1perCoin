@@ -1,6 +1,6 @@
 # Website and white paper publication
 
-Public site: https://robertcurzon.github.io/ViperCoin/
+Public site: https://robertcurzon.github.io/V1perCoin/
 
 The website deploys from `main` through `.github/workflows/publish.yml`. Every publication builds the journal-style PDF from the standalone `docs/Viper_Coin_Whitepaper.tex`, checks the web code and economics, then deploys the static `dist` folder to GitHub Pages. The workflow performs no wallet transaction or Sui token deployment.
 
@@ -15,7 +15,7 @@ The PDF is available at `whitepaper.pdf`; the web reader is at `whitepaper/`, an
 
 ## Other static hosts
 
-Build with `npm ci` and `npm run build`, then serve `dist`. The default base is `/`; set `VITE_BASE_PATH=/ViperCoin/` for this GitHub project site or the appropriate subdirectory for another host. A production publication must also compile the supplied standalone `.tex` source and copy the resulting PDF to `public/whitepaper.pdf` before building. CI performs this automatically. The built-in LaTeX editor can preview and check the source without installing a local TeX distribution.
+Build with `npm ci` and `npm run build`, then serve `dist`. The default base is `/`; set `VITE_BASE_PATH=/V1perCoin/` for this GitHub project site or the appropriate subdirectory for another host. A production publication must also compile the supplied standalone `.tex` source and copy the resulting PDF to `public/whitepaper.pdf` before building. CI performs this automatically. The built-in LaTeX editor can preview and check the source without installing a local TeX distribution.
 
 ## Token activation is separate
 

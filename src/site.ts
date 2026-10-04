@@ -1,4 +1,4 @@
-// Vite supplies '/' locally and '/ViperCoin/' on GitHub Pages.
+// Vite supplies '/' locally and '/V1perCoin/' on GitHub Pages.
 export function siteUrl(path = '') { return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`; }
 export function currentPage() {
   const base = import.meta.env.BASE_URL;
@@ -8,7 +8,7 @@ export function currentPage() {
 
 export type Socials = { x: string; telegram: string; discord: string };
 export const site = {
-  repository: 'https://github.com/Robertcurzon/ViperCoin',
+  repository: 'https://github.com/Robertcurzon/V1perCoin',
   socials: {
     x: import.meta.env.VITE_SOCIAL_X || '',
     telegram: import.meta.env.VITE_SOCIAL_TELEGRAM || '',

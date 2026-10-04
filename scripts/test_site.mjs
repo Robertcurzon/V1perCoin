@@ -32,7 +32,7 @@ try {
   const { CommunityLinks } = await server.ssrLoadModule('/src/CommunityLinks.tsx');
   const fallback = renderToStaticMarkup(React.createElement(CommunityLinks,{socials:blankSocials}));
   assert(fallback.includes('Channels opening soon.'));
-  assert(fallback.includes('https://github.com/Robertcurzon/ViperCoin'));
+  assert(fallback.includes('https://github.com/Robertcurzon/V1perCoin'));
   assert(!fallback.includes('discord.gg'));
   const configured = renderToStaticMarkup(React.createElement(CommunityLinks,{socials:{x:'https://x.com/viper',telegram:'',discord:''}}));
   assert(configured.includes('https://x.com/viper'));

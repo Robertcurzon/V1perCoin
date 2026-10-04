@@ -6,13 +6,13 @@ import {readFileSync} from 'node:fs';
 const tickers=['SHIB','PEPE','SPX','FLOKI','PUMP','PENGU','BONK','WIF','DOGE','M'];
 const accepted=JSON.parse(readFileSync('scripts/feast/config.json','utf8')).coins.map(c=>c.symbol);
 assert.deepEqual([...tickers].sort(),[...accepted].sort());
-const server=await createServer({base:'/ViperCoin/',server:{middlewareMode:true,hmr:false,ws:false},appType:'custom'});
+const server=await createServer({base:'/V1perCoin/',server:{middlewareMode:true,hmr:false,ws:false},appType:'custom'});
 try{
  const {default:FeastMenu}=await server.ssrLoadModule('/src/FeastMenu.tsx');
  for(const compact of [false,true]){
   const html=renderToStaticMarkup(React.createElement(FeastMenu,{compact}));
   assert(html.includes('data-menu-state="board"'));
-  assert(html.includes('src="/ViperCoin/feast-menu.webp"'));
+  assert(html.includes('src="/V1perCoin/feast-menu.webp"'));
   assert(html.includes('hidden=""'));
   for(const ticker of tickers)assert(html.includes(`<li>${ticker}</li>`));
   assert(html.includes(`Feast menu: ${tickers.join(', ')}`));

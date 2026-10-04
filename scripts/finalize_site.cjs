@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const pages = require('../site-pages.json');
 const base = process.env.VITE_BASE_PATH || '/';
-const publicUrl = process.env.VITE_PUBLIC_SITE_URL || 'https://robertcurzon.github.io/ViperCoin/';
+const publicUrl = process.env.VITE_PUBLIC_SITE_URL || 'https://robertcurzon.github.io/V1perCoin/';
 const socialDomains = { X: ['x.com','twitter.com'], TELEGRAM: ['t.me','telegram.me'], DISCORD: ['discord.gg','discord.com'] };
 for (const [channel, domains] of Object.entries(socialDomains)) {
   const value = process.env[`VITE_SOCIAL_${channel}`] || '';

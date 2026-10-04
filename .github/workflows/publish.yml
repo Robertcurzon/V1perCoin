@@ -117,7 +117,7 @@ jobs:
       - run: npm run lint
       - run: npm run build
         env:
-          VITE_BASE_PATH: /ViperCoin/
+          VITE_BASE_PATH: /V1perCoin/
       - run: npm run test:deployment
       - name: Install pinned Chromium for contrast checks
         run: PLAYWRIGHT_BROWSERS_PATH=tmp/playwright-browsers npx playwright install --with-deps chromium

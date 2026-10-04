@@ -5,7 +5,7 @@ import {preview} from 'vite';
 import {PNG} from 'pngjs';
 // Rasterize backgrounds with text temporarily hidden. This includes gradients and
 // illustrations that a nearest-solid-ancestor calculation would miss.
-const server=await preview({base:'/ViperCoin/',preview:{host:'127.0.0.1',port:0}});
+const server=await preview({base:'/V1perCoin/',preview:{host:'127.0.0.1',port:0}});
 const origin=server.resolvedUrls.local[0];
 const browser=await chromium.launch({headless:true});
 const failures=[],results=[];

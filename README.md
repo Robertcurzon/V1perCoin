@@ -2,7 +2,7 @@
 
 Deflationary supply: minted once, burn-only.
 
-**[Public website](https://robertcurzon.github.io/ViperCoin/) · [Journal PDF](https://robertcurzon.github.io/ViperCoin/whitepaper.pdf) · [Onchain monitor](https://robertcurzon.github.io/ViperCoin/monitor/)**
+**[Public website](https://robertcurzon.github.io/V1perCoin/) · [Journal PDF](https://robertcurzon.github.io/V1perCoin/whitepaper.pdf) · [Onchain monitor](https://robertcurzon.github.io/V1perCoin/monitor/)**
 
 Sui meme coin with a once-minted, burn-only supply, approved free claims and fully funded lock rewards. Website publication is separate from token deployment: no mainnet token or funded exchange pool is configured yet.
 
@@ -75,6 +75,6 @@ Cross-chain finality, complete exports and historical-price provenance; correct 
 The homepage has seven sections, with the full participation and custody rules at `/rules/`.
 Set `VITE_SOCIAL_X`, `VITE_SOCIAL_TELEGRAM` and `VITE_SOCIAL_DISCORD` to official HTTPS channel URLs. They default to empty strings; absent channels stay hidden and Join the Den shows GitHub with “Channels opening soon.” Both rendering and the release build reject unexpected platform domains or URLs containing credentials.
 
-`VITE_PUBLIC_SITE_URL` sets the absolute HTTPS publication root for canonical and sharing URLs (default: `https://robertcurzon.github.io/ViperCoin/`). `VITE_BASE_PATH` still controls physical project-path deployment. Every route gets its own metadata from `site-pages.json` and the original `public/social-preview.png` card, whose editable source is `public/social-preview.svg`.
+`VITE_PUBLIC_SITE_URL` sets the absolute HTTPS publication root for canonical and sharing URLs (default: `https://robertcurzon.github.io/V1perCoin/`). `VITE_BASE_PATH` still controls physical project-path deployment. Every route gets its own metadata from `site-pages.json` and the original `public/social-preview.png` card, whose editable source is `public/social-preview.svg`.
 
 Upload batches are strictly address-sorted, capped at 500 and routinely sized at 250. Restart review and re-upload the complete table after any edit/removal. See scripts/feast/README.md and docs/SECURITY_SPEC.md for exact signing, reconciliation, pricing, commitment and gas rules. Rehearsal uses SUI_BIN or sui on PATH; it never reads personal wallet configuration.

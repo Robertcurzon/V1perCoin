@@ -2,7 +2,7 @@ import './test_supply.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createServer } from 'vite';
-const base = '/ViperCoin/';
+const base = '/V1perCoin/';
 const server = await createServer({ base, server: { middlewareMode: true, ws: false }, appType: 'custom' });
 try {
   const { siteUrl } = await server.ssrLoadModule('/src/site.ts');
@@ -21,9 +21,9 @@ try {
     assert(content.includes(`<title>${meta.title}</title>`));
     assert(content.includes(`property="og:title" content="${meta.title}"`));
     assert(content.includes(`property="og:description" content="${meta.description}"`));
-    assert(content.includes('property="og:image" content="https://robertcurzon.github.io/ViperCoin/social-preview.png"'));
+    assert(content.includes('property="og:image" content="https://robertcurzon.github.io/V1perCoin/social-preview.png"'));
     assert(content.includes('name="twitter:card" content="summary_large_image"'));
-    assert(content.includes(`rel="canonical" href="https://robertcurzon.github.io/ViperCoin/${route}"`));
+    assert(content.includes(`rel="canonical" href="https://robertcurzon.github.io/V1perCoin/${route}"`));
     assert.equal((content.match(/property="og:title"/g)||[]).length,1);
   }
   assert(fs.existsSync('dist/social-preview.png'));
