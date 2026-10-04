@@ -2,14 +2,14 @@
 module viper::invariant_sequence;
 use sui::coin::{Self,Coin};
 use sui::coin_registry::Currency;
-use viper::v1pr::V1PR;
+use viper::v1per::V1PER;
 use viper::lock_vault::{Vault,Position,create,accounting,funded,open,net_reward,preview,close,fund,flush_burns,set_paused};
 const MONTH_MS: u64=2_592_000_000;
 
 #[test_only]
 fun next_random(seed: &mut u64): u64 { *seed = (((*seed as u128)*1_664_525+1_013_904_223)%4_294_967_296) as u64; *seed }
 #[test_only]
-fun sequence_invariants(vault: &Vault, currency: &Currency<V1PR>, pool: &viper::feast::Pool, burn_shares: u64, payouts: &vector<u64>, allowed: &vector<u64>) {
+fun sequence_invariants(vault: &Vault, currency: &Currency<V1PER>, pool: &viper::feast::Pool, burn_shares: u64, payouts: &vector<u64>, allowed: &vector<u64>) {
     let (free,committed,paid,_)=accounting(vault); assert!(free+committed+paid==funded(vault));
     let (_,pending,burned)=viper::lock_vault::sequence_state(vault);
     let (_,_,_,feast_burned)=viper::feast::accounting(pool);
@@ -20,9 +20,9 @@ fun sequence_invariants(vault: &Vault, currency: &Currency<V1PR>, pool: &viper::
 #[test]
 fun fixed_seed_600_operations_five_users() {
     let mut s=sui::test_scenario::begin(@0xA); let mut clock=sui::clock::create_for_testing(s.ctx());
-    let (mut currency,metadata)=viper::v1pr::test_currency(s.ctx());
+    let (mut currency,metadata)=viper::v1per::test_currency(s.ctx());
     // One physical initial inventory, split and recycled: no extra mint during the sequence.
-    let mut stock=coin::mint_for_testing<V1PR>(viper::allocation::initial_supply(),s.ctx());
+    let mut stock=coin::mint_for_testing<V1PER>(viper::allocation::initial_supply(),s.ctx());
     let (mut vault,cap)=create(stock.split(viper::allocation::lock_rewards(),s.ctx()),@0xC,@0x99,0,s.ctx());
     let (mut pool,fcap)=viper::feast::create(stock.split(viper::allocation::public_reserve(),s.ctx()),s.ctx());
     let users=vector[@0xA,@0xB,@0xD,@0xE,@0xF]; let terms=vector[1,3,6,12,24];
@@ -41,7 +41,7 @@ fun fixed_seed_600_operations_five_users() {
         if(i < 5) {
             if(user==2 || user==3) {
                 viper::feast::claim(&mut pool,&clock,s.ctx()); s.next_tx(users[user]);
-                stock.join(s.take_from_sender<Coin<V1PR>>());
+                stock.join(s.take_from_sender<Coin<V1PER>>());
             } else {
                 viper::feast::claim_locked(&mut pool,&mut vault,&clock,s.ctx()); s.next_tx(users[user]);
                 positions.borrow_mut(user).fill(s.take_from_sender<Position>());

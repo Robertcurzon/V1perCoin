@@ -1,3 +1,4 @@
+import { V1per } from './V1per';
 import { useRef } from 'react';
 import { site, configuredSocials, type Socials } from './site';
 
@@ -8,5 +9,5 @@ export function CommunityLinks({ socials = site.socials, dark = false }: { socia
 
 export function JoinDenButton({ className = 'button lime' }: { className?: string }) {
   const dialog = useRef<HTMLDialogElement>(null);
-  return <><button type="button" className={className} aria-haspopup="dialog" onClick={() => dialog.current?.showModal()}>JOIN THE DEN ↗</button><dialog className="den-dialog" ref={dialog} aria-label="Join the Viper community"><div className="dialog-top"><h2>JOIN THE DEN.</h2><button type="button" className="dialog-close" aria-label="Close community links" onClick={() => dialog.current?.close()}>×</button></div><p>Viper Coin (V1PR). Good company. Sharp memes.</p><CommunityLinks /></dialog></>;
+  return <><button type="button" className={className} aria-haspopup="dialog" onClick={() => dialog.current?.showModal()}>JOIN THE DEN ↗</button><dialog className="den-dialog" ref={dialog} aria-label="Join the Viper community"><div className="dialog-top"><h2>JOIN THE DEN.</h2><button type="button" className="dialog-close" aria-label="Close community links" onClick={() => dialog.current?.close()}>×</button></div><p><V1per /> Coin (<V1per />). Good company. Sharp memes.</p><CommunityLinks /></dialog></>;
 }

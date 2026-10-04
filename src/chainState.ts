@@ -6,7 +6,7 @@ import { launch } from './manifest';
 export const INITIAL_SUPPLY = 1_000_000_000_000_000n;
 export function validateState(c: ReturnType<typeof CurrencyBcs.parse>, v: ReturnType<typeof VaultBcs.parse>, p: ReturnType<typeof ClaimsBcs.parse>, f: ReturnType<typeof FeastBcs.parse>, manifest = launch) {
   if (c.id !== manifest.currencyId.toLowerCase() || v.id !== manifest.vaultId.toLowerCase() || p.id !== manifest.claimsId.toLowerCase() || f.id !== manifest.feastId.toLowerCase()) throw new Error('Object contents do not match configured IDs.');
-  if (c.decimals !== 6 || c.symbol !== 'V1PR' || c.name !== 'Viper Coin' || c.supply?.$kind !== 'BurnOnly' || c.metadata_cap_id.$kind !== 'Deleted' || c.regulated.$kind !== 'Unregulated') throw new Error('Currency must be V1PR, unregulated, burn-only, with metadata authority deleted.');
+  if (c.decimals !== 6 || c.symbol !== 'V1PER' || c.name !== 'V1PER Coin' || c.supply?.$kind !== 'BurnOnly' || c.metadata_cap_id.$kind !== 'Deleted' || c.regulated.$kind !== 'Unregulated') throw new Error('Currency must be V1PER, unregulated, burn-only, with metadata authority deleted.');
   if (v.founder !== manifest.founder.toLowerCase() || v.community !== manifest.community.toLowerCase()) throw new Error('Fee destinations differ from the manifest.');
   if (BigInt(v.opens_at_ms) !== BigInt(manifest.vaultOpensAtMs) || BigInt(v.feast_committed) !== BigInt(f.reward_reserve) || BigInt(v.feast_committed) > BigInt(v.reward_committed)) throw new Error('Vault opening or Feast reservation differs from the release.');
   if (BigInt(v.rewards) + BigInt(v.reward_committed) + BigInt(v.reward_paid) !== BigInt(v.reward_funded)) throw new Error('Reward accounting does not reconcile.');

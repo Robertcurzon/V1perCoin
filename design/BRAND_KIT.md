@@ -1,4 +1,4 @@
-# Viper Coin (V1PR) community brand kit
+# V1PER Coin (V1PER) community brand kit
 
 **Working creative kit · 2 October 2026.** This gives the project reusable language and three editable social layouts. The coin, claims, rewards, products and burns are not live. Check rights to every image before publishing or permitting public remixes.
 
@@ -18,9 +18,9 @@ Short lines to test:
 - “No more cute critters. The jungle has a new appetite.”
 - “The meme coin food chain just changed.”
 - “Cute had its turn. Meet the bite.”
-- “Viper Coin (V1PR). Built on Sui. Memes with bite.”
+- “V1PER Coin (V1PER). Built on Sui. Memes with bite.”
 
-Use **Viper Coin (V1PR)** on the first mention of each page; use Viper or V1PR afterward. Put the verified Sui coin type next to any later claim or trading link; the ticker alone cannot identify the asset. Do not use “relaunch,” price targets, promised yield, or “private transfers” for the public base coin.
+Use **V1PER Coin (V1PER)** on the first mention of each page; use Viper or V1PER afterward. Put the verified Sui coin type next to any later claim or trading link; the ticker alone cannot identify the asset. Do not use “relaunch,” price targets, promised yield, or “private transfers” for the public base coin.
 
 ## Visual system
 
@@ -49,11 +49,11 @@ Four pilot prompts, suitable for running *after* rules and budget are approved:
 3. **Night shift:** draw Viper in the jungle after every other mascot has gone to sleep.
 4. **Proof of venom:** turn a verified on-chain fact, such as a real burn transaction, into a meme. Do not invent transaction numbers.
 
-For a first pilot, use a fixed prize pool from the Community Hunt Board budget, one submission per entrant, no purchase condition, and no referral points. Human moderation and an appeal path matter more than a gamified wallet count. If V1PR prizes are not yet available, use non-token recognition or wait; do not advertise imaginary rewards.
+For a first pilot, use a fixed prize pool from the Community Hunt Board budget, one submission per entrant, no purchase condition, and no referral points. Human moderation and an appeal path matter more than a gamified wallet count. If V1PER prizes are not yet available, use non-token recognition or wait; do not advertise imaginary rewards.
 
 ## Caption templates
 
-**Character reveal:** “The jungle has enough cute. Meet Viper Coin (V1PR): memes with bite, built on Sui. Follow the project from its first steps. [Project link]”
+**Character reveal:** “The jungle has enough cute. Meet V1PER Coin (V1PER): memes with bite, built on Sui. Follow the project from its first steps. [Project link]”
 
 **Hunt Board prompt:** “HUNT BOARD #[number] — [prompt]. Free to enter. Deadline: [UTC date/time]. Prize: [exact amount and asset, if funded]. Rules and art rights: [link]. No purchase required.”
 
@@ -63,3 +63,7 @@ For a first pilot, use a fixed prize pool from the Community Hunt Board budget, 
 
 State which logo and artwork the project owns or has a license to share, the allowed fan-art/remix uses, whether commercial merchandising is allowed, and whether attribution is required. Never imply third-party meme characters or trademarks are licensed by Viper. Until rights are verified, treat the existing images as project-internal references and invite original Viper submissions under explicit terms.
 
+
+## Digit styling
+
+Styled V1PER uses the shared wordmark: lime digit on dark with bone-white letters; bone-white digit within lime text; dark letters and deep-magenta digit on lime. Plain metadata, alt text, signatures and code identifiers use V1PER. On the white paper's white page, dark letters and the deep-magenta digit preserve contrast. The character remains The Viper.

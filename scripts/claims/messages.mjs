@@ -6,5 +6,5 @@ export function entryUrl(value) {
 }
 export function applicationMessage(address,startMs,entry) {
   if(!/^0x[a-f0-9]{64}$/.test(address)||BigInt(address)===0n||!Number.isSafeInteger(startMs)||startMs<7*DAY_MS)throw Error('Invalid application address or scheduled opening');
-  return `Apply ${address} for the V1PR free claim\nOpening: ${startMs}\nCommunity entry: ${entryUrl(entry)}`;
+  return `Apply ${address} for the V1PER free claim\nOpening: ${startMs}\nCommunity entry: ${entryUrl(entry)}`;
 }

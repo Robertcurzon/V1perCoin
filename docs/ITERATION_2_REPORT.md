@@ -1,6 +1,6 @@
 # Iteration 2 review report
 
-Review branch: `codex/v2-economics-feast`. Auditor target: `v1pr-v2-auditor-review-20261003`. The tag identifies the final Step 6 commit; resolve its full hash with `git rev-parse v1pr-v2-auditor-review-20261003^{commit}`. Every step is a separate commit. Main was not pushed and no testnet/mainnet token was deployed. Only isolated localnet transactions were executed.
+Review branch: `codex/v2-economics-feast`. Auditor target: `865b782e0b537ee06df79155d602a35df6ca04c3`. The tag identifies the final Step 6 commit; resolve its full hash with `git show 865b782e0b537ee06df79155d602a35df6ca04c3`. Every step is a separate commit. Main was not pushed and no testnet/mainnet token was deployed. Only isolated localnet transactions were executed.
 
 | Step | Change and evidence | Commit |
 |---|---|---|

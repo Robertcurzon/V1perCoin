@@ -20,14 +20,14 @@ function load(file) {
 const { readDexVolume } = load('src/volume.ts');
 const { CurrencyBcs, VaultBcs, ClaimsBcs, PositionBcs, FeastBcs } = load('src/chainSchemas.ts');
 const id = `0x${'a'.repeat(64)}`, other = `0x${'b'.repeat(64)}`;
-const coin = `${id}::v1pr::V1PR`;
+const coin = `${id}::v1per::V1PER`;
 const pair = { chainId: 'sui', pairAddress: id, baseToken: { address: coin }, quoteToken: { address: '0x2::sui::SUI' }, volume: { h24: 125.5 } };
 assert.equal(readDexVolume({ pairs: [pair] }, id, coin), 125.5);
 assert.equal(readDexVolume({ pairs: [{ ...pair, volume: { h24: 0 } }] }, id, coin), 0);
-for (const changed of [{ chainId: 'ethereum' }, { pairAddress: other }, { baseToken: { address: `${other}::v1pr::V1PR` } }, { volume: {} }, { volume: { h24: -1 } }, { volume: { h24: Infinity } }]) assert.throws(() => readDexVolume({ pairs: [{ ...pair, ...changed }] }, id, coin));
+for (const changed of [{ chainId: 'ethereum' }, { pairAddress: other }, { baseToken: { address: `${other}::v1per::V1PER` } }, { volume: {} }, { volume: { h24: -1 } }, { volume: { h24: Infinity } }]) assert.throws(() => readDexVolume({ pairs: [{ ...pair, ...changed }] }, id, coin));
 assert.throws(() => readDexVolume({ pairs: null }, id, coin));
 const currency = CurrencyBcs.parse(CurrencyBcs.serialize({
-  id, decimals: 6, name: 'Viper Coin', symbol: 'V1PR', description: '', icon_url: '',
+  id, decimals: 6, name: 'V1PER Coin', symbol: 'V1PER', description: '', icon_url: '',
   supply: { BurnOnly: '999999999999999' }, regulated: { Unregulated: true },
   treasury_cap_id: id, metadata_cap_id: { Deleted: true }, extra_fields: [],
 }).toBytes());
@@ -83,7 +83,7 @@ console.log('Verification checks passed: explorer routing, freshness, scoped eve
 const { isManifestConfigured } = load('src/manifest.ts');
 const manifest = { network: 'testnet', status: 'verified', packageId: id, currencyId: id, vaultId: id, claimsId: id, founder: other, community: id, feastId:id, feastAdminCapId:id, upgradeCapId:id, feastOpen:false, feastStartMs:0, feastSubmissionUrl:'', freeClaimsStartMs:604800000,vaultOpensAtMs:604800000, freeClaimsApplicationUrl:'https://example.com/apply', feastTreasury:{ethereum:'',solana:'',dogecoin:'',memecore:''}, initialLiquidity: `0x${'c'.repeat(64)}`, laterLiquidity: `0x${'d'.repeat(64)}`, vaultAdminCapId: id, claimsAdminCapId: id, coinType: coin, publishDigest: txDigest, allocationDigest: txDigest, immutableDigest: txDigest, metadataDigest: txDigest, dexPairId: '' };
 assert.equal(isManifestConfigured(manifest), true);
-for (const patch of [{ network: 'devnet' },{ feastId: '' },{ upgradeCapId:'' },{ initialLiquidity:other },{ feastOpen:true },{ metadataDigest: '' },{ founder: id },{ vaultAdminCapId: `0x${'0'.repeat(64)}` },{ publishDigest: '<script>' },{ coinType: `${other}::v1pr::V1PR` }]) assert.equal(isManifestConfigured({ ...manifest, ...patch }), false);
+for (const patch of [{ network: 'devnet' },{ feastId: '' },{ upgradeCapId:'' },{ initialLiquidity:other },{ feastOpen:true },{ metadataDigest: '' },{ founder: id },{ vaultAdminCapId: `0x${'0'.repeat(64)}` },{ publishDigest: '<script>' },{ coinType: `${other}::v1per::V1PER` }]) assert.equal(isManifestConfigured({ ...manifest, ...patch }), false);
 console.log('Manifest checks passed: required custody, authorities, network, coin type and receipts.');
 
 for (const patch of [{id:other},{inventory:'1'},{allocated:'1'},{claimed:'1000000000000001'},{finalized:false}]) assert.throws(() => validateState(currency,vault,pool,{...feast,...patch}));
@@ -120,7 +120,7 @@ void (async () => {
   const ClockBcs = load('src/chainSchemas.ts').ClockBcs;
   const content = (schema,value) => schema.serialize(value).toBytes();
   const rows = new Map([
-    [rpcManifest.currencyId,{objectId:id,type:`0x2::coin_registry::Currency<${coin}>`,owner:{$kind:'Shared'},content:content(CurrencyBcs,{id,decimals:6,name:'Viper Coin',symbol:'V1PR',description:'',icon_url:'',supply:{BurnOnly:'999999999999999'},regulated:{Unregulated:true},treasury_cap_id:id,metadata_cap_id:{Deleted:true},extra_fields:[]})}],
+    [rpcManifest.currencyId,{objectId:id,type:`0x2::coin_registry::Currency<${coin}>`,owner:{$kind:'Shared'},content:content(CurrencyBcs,{id,decimals:6,name:'V1PER Coin',symbol:'V1PER',description:'',icon_url:'',supply:{BurnOnly:'999999999999999'},regulated:{Unregulated:true},treasury_cap_id:id,metadata_cap_id:{Deleted:true},extra_fields:[]})}],
     [rpcManifest.vaultId,{objectId:rpcManifest.vaultId,type:`${id}::lock_vault::Vault`,owner:{$kind:'Shared'},content:content(VaultBcs,{...vault,id:rpcManifest.vaultId})}],
     [rpcManifest.claimsId,{objectId:rpcManifest.claimsId,type:`${id}::free_claims::Pool`,owner:{$kind:'Shared'},content:content(ClaimsBcs,{...pool,id:rpcManifest.claimsId})}],
     [rpcManifest.feastId,{objectId:rpcManifest.feastId,type:`${id}::feast::Pool`,owner:{$kind:'Shared'},content:content(FeastBcs,{...feast,id:rpcManifest.feastId,reservation_vault:rpcManifest.vaultId})}],

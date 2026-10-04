@@ -7,6 +7,8 @@ references = []
 def escape(text):
     text = text.replace('−', '-').replace('×', ' x ').replace('·', ' / ').replace('’', "'").replace('“', '``').replace('”', "''").replace('–', '--').replace('—', '---')
     return ''.join({'\\': r'\textbackslash{}', '&': r'\&', '%': r'\%', '$': r'\$', '#': r'\#', '_': r'\_', '{': r'\{', '}': r'\}', '~': r'\textasciitilde{}', '^': r'\textasciicircum{}'}.get(ch,ch) for ch in text)
+def styled(text):
+    return escape(text).replace('V1PER', r'\VOnePER{}')
 def inline(text):
     parts = re.split(r'(\[[^\]]+\]\(https://[^)]+\)|\*\*[^*]+\*\*|`[^`]+`)',text)
     output = []
@@ -15,10 +17,10 @@ def inline(text):
         if link:
             ref=(link[1],link[2])
             if ref not in references: references.append(ref)
-            output.append(escape(link[1])+r'~\cite{ref'+str(references.index(ref)+1)+'}')
+            output.append(styled(link[1])+r'~\cite{ref'+str(references.index(ref)+1)+'}')
         elif part.startswith('**') and part.endswith('**'): output.append(r'\textbf{'+inline(part[2:-2])+'}')
         elif part.startswith('`') and part.endswith('`'): output.append(r'\texttt{'+escape(part[1:-1])+'}')
-        else: output.append(escape(part))
+        else: output.append(styled(part))
     return ''.join(output)
 PREAMBLE=r'''% Generated from docs/WHITEPAPER.md by scripts/generate_whitepaper.py.
 % Standalone source: no external images, bibliography files or project inputs.
@@ -30,14 +32,16 @@ PREAMBLE=r'''% Generated from docs/WHITEPAPER.md by scripts/generate_whitepaper.
 \usepackage{amsmath,amssymb,booktabs,tabularx,array,microtype,xcolor,fancyhdr,float}
 \usepackage{xurl}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
-\definecolor{viper}{RGB}{37,75,37}
-\hypersetup{pdftitle={Viper Coin (V1PR): Protocol White Paper},pdfauthor={Viper Coin},pdfsubject={Sui token, deflationary supply, funded lock rewards and public verification}}
+\definecolor{viper}{HTML}{101510}
+\definecolor{brandone}{HTML}{A3155E}
+\newcommand{\VOnePER}{\texorpdfstring{V\textcolor{brandone}{1}PER}{V1PER}}
+\hypersetup{pdftitle={V1PER Coin (V1PER): Protocol White Paper},pdfauthor={V1PER Coin},pdfsubject={Sui token, deflationary supply, funded lock rewards and public verification}}
 \setlength{\parindent}{1em}
 \setlength{\parskip}{2pt}
 \setlength{\headheight}{14pt}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\footnotesize\sffamily Viper Coin (V1PR)}
+\fancyhead[L]{\footnotesize\sffamily \VOnePER{} Coin (\VOnePER{})}
 \fancyhead[R]{\footnotesize\sffamily Protocol White Paper}
 \fancyfoot[C]{\footnotesize\thepage}
 \renewcommand{\headrulewidth}{0.3pt}
@@ -47,11 +51,11 @@ PREAMBLE=r'''% Generated from docs/WHITEPAPER.md by scripts/generate_whitepaper.
 \begin{document}
 \begin{center}
 {\small\sffamily\color{viper} SUI / DEFLATIONARY SUPPLY / FUNDED LOCK REWARDS}\par\vspace{8pt}
-{\LARGE\bfseries Viper Coin (V1PR)}\par\vspace{4pt}
+{\LARGE\bfseries \VOnePER{} Coin (\VOnePER{})}\par\vspace{4pt}
 {\large Protocol White Paper}\par\vspace{6pt}
-{\small Viper Coin / Release specification / 3 October 2026}\par\vspace{10pt}
+{\small \VOnePER{} Coin / Release specification / 3 October 2026}\par\vspace{10pt}
 \end{center}
-\noindent Abstract. Viper Coin combines a deflationary, once-minted supply of one billion V1PR with community claims, the Feast contribution program and fully escrowed lock rewards. This paper defines allocation, vesting, annual token rates, early-exit fees, burns, V1PR Foundation custody, public verification and privacy boundaries. Rewards use existing inventory. No mainnet coin or funded exchange pool is live at this specification's date.\par\vspace{6pt}
+\noindent Abstract. \VOnePER{} Coin combines a deflationary, once-minted supply of one billion \VOnePER{} with community claims, the Feast contribution program and fully escrowed lock rewards. This paper defines allocation, vesting, annual token rates, early-exit fees, burns, \VOnePER{} Foundation custody, public verification and privacy boundaries. Rewards use existing inventory. No mainnet coin or funded exchange pool is live at this specification's date.\par\vspace{6pt}
 \noindent Keywords: Sui; Move; burn-only currency; escrow; token rewards; public verification.\par\vspace{10pt}
 \hrule\vspace{14pt}
 '''
@@ -73,7 +77,7 @@ for block in blocks:
     if block.startswith('# ') or block.startswith('**Release specification') or block.startswith('Release specification'): continue
     if block.startswith('## '):
         title=re.sub(r'^## \d+\. ','',block)
-        body.append(r'\section{'+escape(title)+'}')
+        body.append(r'\section{'+styled(title)+'}')
     elif block in FORMULAS: body.append(FORMULAS[block])
     elif block.startswith('|'):
         table_number+=1
@@ -82,9 +86,9 @@ for block in blocks:
         env='table'
         width=r'\textwidth'
         specs={1:'lX',2:'X r r X',3:'l r X X',4:'l X X'}[table_number]
-        captions={1:'Coin identity and supply rules.',2:'Initial allocation of the complete one-billion V1PR supply.',3:'Annual token rates and complete-term rewards; before network gas.',4:'Launch phases; T is the published opening and F the actual Feast finalization.'}
+        captions={1:'Coin identity and supply rules.',2:'Initial allocation of the complete one-billion V1PER supply.',3:'Annual token rates and complete-term rewards; before network gas.',4:'Launch phases; T is the published opening and F the actual Feast finalization.'}
         head=rows[0]
-        body.append(r'\begin{'+env+r'}[H]\centering\small'+'\n'+r'\caption{'+captions[table_number]+'}\n'+r'\begin{tabularx}{'+width+'}{'+specs+'}\n'+r'\toprule'+'\n'+' & '.join(r'\textbf{'+escape(c)+'}' for c in head)+r' \\'+ '\n'+r'\midrule'+'\n'+'\n'.join(' & '.join(inline(c) for c in row)+r' \\' for row in rows[1:])+'\n'+r'\bottomrule\end{tabularx}'+'\n'+r'\end{'+env+'}')
+        body.append(r'\begin{'+env+r'}[H]\centering\small'+'\n'+r'\caption{'+styled(captions[table_number])+'}\n'+r'\begin{tabularx}{'+width+'}{'+specs+'}\n'+r'\toprule'+'\n'+' & '.join(r'\textbf{'+styled(c)+'}' for c in head)+r' \\'+ '\n'+r'\midrule'+'\n'+'\n'.join(' & '.join(inline(c) for c in row)+r' \\' for row in rows[1:])+'\n'+r'\bottomrule\end{tabularx}'+'\n'+r'\end{'+env+'}')
     else: body.append(inline(block.replace('\n',' ')))
 refs=r'\begin{thebibliography}{9}'+'\n'+r'\footnotesize'+'\n'+'\n'.join(r'\bibitem{ref'+str(i)+'} '+escape(title)+'. '+r'\url{'+url+'}.' for i,(title,url) in enumerate(references,1))+'\n'+r'\end{thebibliography}'
 DEST.write_text(PREAMBLE+'\n\n'.join(body)+'\n\n'+refs+'\n'+r'\end{document}'+'\n')

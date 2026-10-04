@@ -233,3 +233,16 @@ footer nav { display: flex; flex-wrap: wrap; gap: 22px; }
 
 /* Original CSS scale pattern until the illustrator's generic-critter Feast art is ready. */
 .home-page .feast-section{background-image:linear-gradient(90deg,#101510e8,#101510f7),repeating-linear-gradient(135deg,transparent 0 50px,#bdf33226 50px 52px),repeating-linear-gradient(45deg,transparent 0 50px,#bdf33226 50px 52px)}
+
+/* One shared wordmark; inherited variables select the background-safe digit. */
+:root { --brand-one: #bdf332; }
+.v1per { white-space: nowrap; }
+.v1per .one { color: var(--brand-one); }
+.accent, em, .eyebrow, .kicker, .text-link, .facts strong, .allocation-grid strong, .custody-grid strong { --brand-one: #e9ecdf; }
+.lime, .closing { --brand-one: #a3155e; }
+.lime .v1per, .closing .v1per { color: #101510; }
+.dark { --brand-one: #e9ecdf; }
+
+.monitor-metrics strong, .proof-links a, .transparency a, .coin-type, .rules-index a { --brand-one: #e9ecdf; }
+a:hover { --brand-one: #e9ecdf; }
+.lime:hover { --brand-one: #a3155e; }

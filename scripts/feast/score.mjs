@@ -110,7 +110,7 @@ export function score(config,bindings,transfers,prices) {
     return {sui,amountBaseUnits:amount.toString(),lockMonths:choice.get(sui)};
   }).filter(a=>BigInt(a.amountBaseUnits)>0n);
   const allocated=allocations.reduce((n,a)=>n+BigInt(a.amountBaseUnits),0n);if(allocated>POOL)fail('Allocation exceeds pool');
-  const csv='sui_address,v1pr_amount_base_units,lock_months\n'+allocations.map(a=>`${a.sui},${a.amountBaseUnits},${a.lockMonths}\n`).join('');
+  const csv='sui_address,v1per_amount_base_units,lock_months\n'+allocations.map(a=>`${a.sui},${a.amountBaseUnits},${a.lockMonths}\n`).join('');
   audit.sort((a,b)=>a.key<b.key?-1:a.key>b.key?1:0);
   return {csv,summary:{windowStart:config.windowStart,treasuryReceivedBaseUnits:Object.fromEntries([...treasuryTotals].map(([k,v])=>[k,v.toString()])),csvSha256:hash(csv),totalUsdScaled:totalUsd.toString(),usdScale:USD.toString(),allocatedBaseUnits:allocated.toString(),burnAtFinalizeBaseUnits:(POOL-allocated).toString(),clearingPrice:allocated===0n?null:{usdNumerator:(totalUsd*UNIT).toString(),tokenDenominator:(allocated*USD).toString()},liquidityProceedsPercent:25,receivedBaseUnits:Object.fromEntries([...totals].map(([k,v])=>[k,v.toString()]))},audit,allocations};
 }

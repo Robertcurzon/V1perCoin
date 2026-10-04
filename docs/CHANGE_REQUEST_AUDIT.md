@@ -22,11 +22,11 @@ Reviewed 3 October 2026 against the pasted five-phase request, current Move pack
 
 ## Intentional changes authorized afterward
 
-- Use V1PR Foundation as the operating name; retain clear founder-control and no trust, asset rights, governance or refund promises. This replaces the pasted Treasury naming and exact disclosure wording.
+- Use V1PER Foundation as the operating name; retain clear founder-control and no trust, asset rights, governance or refund promises. This replaces the pasted Treasury naming and exact disclosure wording.
 - Liquidity commitment is 25%. The 200M initial liquidity bucket is a reserve; opening inventory follows actual paired capital, price and range. For a constant-product example, 25% of eligible proceeds at clearing price pairs with 25% of allocated Feast tokens, assuming no valuation/conversion difference. Cetus requires its own price/range/amount simulation, not that generic reserve ratio.
 - Native DOGE and MemeCore M replace two assets. The dated market archive is provenance rather than an automatic ranking rule.
 - Source signatures include the network and opening timestamp to prevent cross-network/campaign replay; term consent is separately signed.
-- Free claims use seven-day applications and a one-time 14-day claim window, capped at 10,000 wallets × 10,000 V1PR. Eligibility freezes at opening. This is reviewed wallet/entry eligibility, not proof of unique humans.
+- Free claims use seven-day applications and a one-time 14-day claim window, capped at 10,000 wallets × 10,000 V1PER. Eligibility freezes at opening. This is reviewed wallet/entry eligibility, not proof of unique humans.
 
 ## Actual unfinished launch work
 

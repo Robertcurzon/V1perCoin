@@ -1,4 +1,4 @@
-# Viper Coin (V1PR): art brief
+# V1PER Coin (V1PER): art brief
 
 The Viper is an apex predator: calm, confident, at the top of the food chain from day one. Humor comes through understatement. No juvenile framing, financial promises, gore or threats.
 

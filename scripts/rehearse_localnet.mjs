@@ -13,7 +13,8 @@ import { createServer } from 'vite';
 
 // Never reads a personal client config or keystore. Signing keys live only in memory.
 const sui = process.env.SUI_BIN || '/private/tmp/viper-sui-toolchain/sui';
-const directory = await mkdtemp('/tmp/viper-localnet-');
+await mkdir('tmp',{recursive:true});
+const directory = await mkdtemp(resolve('tmp/viper-localnet-'));
 const delay = ms => new Promise(r => setTimeout(r, ms));
 async function port() {
   const server = netServer(); server.listen(0, '127.0.0.1'); await once(server, 'listening');
@@ -71,15 +72,15 @@ try {
   const publish = new Transaction(); const [upgrade] = publish.publish({modules,dependencies}); publish.transferObjects([upgrade],publish.pure.address(addresses[0]));
   const published = await execute('Publish', publish);
   const packageId = published.objectChanges.find(o=>o.type==='published').packageId;
-  const coinType = `${packageId}::v1pr::V1PR`;
-  const upgradeCapId=created(published,'::package::UpgradeCap'), launchCap=created(published,'::v1pr::LaunchCap');
+  const coinType = `${packageId}::v1per::V1PER`;
+  const upgradeCapId=created(published,'::package::UpgradeCap'), launchCap=created(published,'::v1per::LaunchCap');
   const metadata=created(published,`::coin_registry::MetadataCap<${coinType}>`);
   const pendingCurrency=created(published,`::coin_registry::Currency<${coinType}>`);
   const {data: receiving} = await client.getObject({id:pendingCurrency});
   const registered = await execute('Register Currency',txCall('0x2::coin_registry::finalize_registration',tx=>[tx.object('0xc'),tx.receivingRef({objectId:pendingCurrency,version:receiving.version,digest:receiving.digest})],[coinType]));
   const currencyId=created(registered,`::coin_registry::Currency<${coinType}>`);
   const metadataTx=new Transaction();
-  metadataTx.moveCall({target:'0x2::coin_registry::set_icon_url',typeArguments:[coinType],arguments:[metadataTx.object(currencyId),metadataTx.object(metadata),metadataTx.pure.string('https://example.invalid/localnet-v1pr.png')]});
+  metadataTx.moveCall({target:'0x2::coin_registry::set_icon_url',typeArguments:[coinType],arguments:[metadataTx.object(currencyId),metadataTx.object(metadata),metadataTx.pure.string('https://example.invalid/localnet-v1per.png')]});
   metadataTx.moveCall({target:'0x2::coin_registry::delete_metadata_cap',typeArguments:[coinType],arguments:[metadataTx.object(currencyId),metadataTx.object(metadata)]});
   const metadataReceipt=await execute('Set test icon and delete metadata authority',metadataTx);
   const vaultOpensAtMs=(await time())+5000;
@@ -92,7 +93,7 @@ try {
   const freeClaimsStartMs=(await time())+7*86400000+10_000;
   await execute('Schedule free window with seven-day notice',txCall(`${packageId}::free_claims::schedule`,tx=>[tx.object(claimsId),tx.object(claimsAdminCapId),tx.pure.u64(freeClaimsStartMs),tx.object('0x6')]));
   await execute('Reject premature free claim',txCall(`${packageId}::free_claims::claim`,tx=>[tx.object(claimsId),tx.object('0x6')]), /free_claims.*(?:, 1\)|code: 1)/);
-  const csv=`sui_address,v1pr_amount_base_units,lock_months\n${addresses[0]},10000000000,12\n`;
+  const csv=`sui_address,v1per_amount_base_units,lock_months\n${addresses[0]},10000000000,12\n`;
   const commitment=[...createHash('sha256').update(csv).digest()];
   await execute('Commit Feast allocation CSV',txCall(`${packageId}::feast::set_allocations`,tx=>[tx.object(feastId),tx.object(feastAdminCapId),tx.pure.vector('address',[addresses[0]]),tx.pure.vector('u64',[10_000_000_000]),tx.pure.vector('u64',[12]),tx.pure.vector('u8',commitment),tx.object('0x6')]));
   await execute('Reject premature Feast finalization',txCall(`${packageId}::feast::finalize`,tx=>[tx.object(feastId),tx.object(feastAdminCapId),tx.object(vaultId),tx.object(currencyId),tx.pure.vector('u8',commitment),tx.object('0x6')]), /feast.*(?:, 5\)|code: 5)/);
@@ -109,11 +110,14 @@ try {
   vite=await createServer({server:{middlewareMode:true,ws:false},appType:'custom'});
   const {readChainState}=await vite.ssrLoadModule('/src/chainState.ts');
   const state=await readChainState(client,AbortSignal.timeout(20_000),localManifest);
+  assert(coinType.endsWith('::v1per::V1PER'));
+  assert.equal(state.c.symbol,'V1PER');
+  assert.equal(state.c.name,'V1PER Coin');
   assert.equal(BigInt(state.c.supply.BurnOnly),1_000_000_000_000_000n-burn);
   assert.equal(BigInt(state.v.pending_burn),0n); assert.equal(BigInt(state.v.reward_committed),0n);
   assert.equal(BigInt(state.f.reward_reserve),0n);
   const skippedClockWarps=['Successful free claim after seven-day notice; approved_claim_receives_exact_amount unit test','Feast finalize after review and locked/liquid claims; Feast unit tests','Mature exit, vesting and both expiry burns; Move clock-warp tests'];
-  await mkdir('tmp',{recursive:true}); await writeFile('tmp/localnet-rehearsal.json',JSON.stringify({localManifest,receipts,burnBaseUnits:burn.toString(),readChainState:'passed, including deleted UpgradeCap',skippedClockWarps},null,2)+'\n');
+  await mkdir('tmp',{recursive:true}); await writeFile('tmp/localnet-rehearsal.json',JSON.stringify({localManifest,currencyIdentity:{coinType,symbol:state.c.symbol,name:state.c.name},receipts,burnBaseUnits:burn.toString(),readChainState:'passed, including deleted UpgradeCap',skippedClockWarps},null,2)+'\n');
   console.log(JSON.stringify({result:'PASS',transactions:receipts.length,chainState:'verified',skippedClockWarps},null,2));
 } finally {
   if(vite) await vite.close();

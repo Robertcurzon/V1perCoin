@@ -105,6 +105,7 @@ jobs:
       - run: npm run test:economics
       - run: npm run test:monitor
       - run: npm run test:site
+      - run: npm run test:brand
       - run: npm run test:whitepaper
       - run: npm run typecheck
       - run: npm run lint

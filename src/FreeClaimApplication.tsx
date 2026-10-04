@@ -1,3 +1,4 @@
+import { BrandText } from './V1per';
 import { useState } from 'react';
 import { useCurrentAccount,useCurrentClient,useDAppKit } from '@mysten/dapp-kit-react';
 import { ConnectButton } from '@mysten/dapp-kit-react/ui';
@@ -18,7 +19,7 @@ export default function FreeClaimApplication() {
       const signed=await kit.signPersonalMessage({message:new TextEncoder().encode(text)});
       const application={address:account.address.toLowerCase(),startMs:launch.freeClaimsStartMs,entryUrl:url,signature:signed.signature};
       const downloadUrl=URL.createObjectURL(new Blob([JSON.stringify(application,null,2)+'\n'],{type:'application/json'}));
-      const a=document.createElement('a');a.href=downloadUrl;a.download='v1pr-free-claim-application.json';a.click();URL.revokeObjectURL(downloadUrl);
+      const a=document.createElement('a');a.href=downloadUrl;a.download='v1per-free-claim-application.json';a.click();URL.revokeObjectURL(downloadUrl);
     } catch(e){setError((e as Error).message);}finally{setBusy(false);}
   }
   return <details className="info-detail"><summary>Apply: eligibility, review and wallet proof</summary><div>
@@ -26,6 +27,6 @@ export default function FreeClaimApplication() {
     <p>The published eligibility manifest records wallet proofs, reviewed-entry hashes, reasons and exclusions. The preparation tool deduplicates addresses, entry links and content hashes. Onchain approval rejects duplicate or zero addresses and more than 10,000 recipients. Approval freezes at day 0, and each address can claim only once before day 14. The window cannot be extended or reopened.</p>
     <p>One entry and one wallet are not proof of one human. Manual review reduces obvious farming but cannot eliminate multiple identities. No purchase, legal-name upload or paid referral is required. Submitted community entries and wallet proofs will be public.</p>
     {configured ? <><ConnectButton/><label htmlFor="claim-entry">Public HTTPS link to your original community entry</label><input id="claim-entry" value={entry} onChange={e=>setEntry(e.target.value)} /><button className="button outline" disabled={!account||busy||!entry} onClick={()=>void sign()}>{busy?'SIGNING…':'SIGN & DOWNLOAD APPLICATION'}</button><p>Submit the downloaded file through the <a href={launch.freeClaimsApplicationUrl} target="_blank" rel="noreferrer">official application channel ↗</a>. The channel records receipt time. This site does not submit the file or approve you automatically. This signature requests no token transfer.</p></> : <p className="fine-print">Applications are closed. The official submission channel and UTC dates will be published after verification; no application signature is requested yet.</p>}
-    {error&&<p role="alert">{error}</p>}
+    {error&&<p role="alert"><BrandText text={error} /></p>}
   </div></details>;
 }

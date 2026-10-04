@@ -1,4 +1,4 @@
-# Viper Coin (V1PR)
+# V1PER Coin (V1PER)
 
 **[Public website](https://robertcurzon.github.io/ViperCoin/) · [Journal PDF](https://robertcurzon.github.io/ViperCoin/whitepaper.pdf) · [Onchain monitor](https://robertcurzon.github.io/ViperCoin/monitor/)**
 
@@ -21,7 +21,7 @@ sui move test --path viper
 
 [White paper](docs/WHITEPAPER.md) · [Vault](docs/STAKING_DESIGN.md) · [Distribution](docs/DISTRIBUTION_DESIGN.md) · [Launch runbook](docs/LAUNCH.md)
 
-The 150 million V1PR reward pool is first come, first served. Each accepted lock escrows its full reward. Annual simple token rates grow exponentially from 1% for one month to 10% for 24 months. Term reward = annual rate × months / 12, reaching 20% at 24 months. A month is 30 days. Early exits earn the completed-month reward and pay 5% × remaining fraction, split 50% pending burn / 40% Community / 10% founder. Mature exits have no fee. Permissionless flushing burns the pending balance. Ordinary transfers and swaps are untaxed. No inflation, confidential transfers or specialty-action tax is included. The Feast scorer and claim contracts are implemented; contributions stay closed until real launch inputs and historical pricing access are verified.
+The 150 million V1PER reward pool is first come, first served. Each accepted lock escrows its full reward. Annual simple token rates grow exponentially from 1% for one month to 10% for 24 months. Term reward = annual rate × months / 12, reaching 20% at 24 months. A month is 30 days. Early exits earn the completed-month reward and pay 5% × remaining fraction, split 50% pending burn / 40% Community / 10% founder. Mature exits have no fee. Permissionless flushing burns the pending balance. Ordinary transfers and swaps are untaxed. No inflation, confidential transfers or specialty-action tax is included. The Feast scorer and claim contracts are implemented; contributions stay closed until real launch inputs and historical pricing access are verified.
 
 The wallet interface uses official Sui dApp Kit with gRPC and remains disabled until `src/launch.json` contains verified deployment records. Wallet destinations, independent review, testnet rehearsal, hosted metadata, package immutability and funded exchange liquidity remain launch work. No private keys belong in this repository.
 
@@ -52,14 +52,14 @@ Feast claims use the shared 100-million pool. Only its AdminCap can set allocati
 
 Memes with bite. Viper is the calm, confident apex predator in the Sui meme jungle. Venom means participation and community momentum; nothing promises gains. The 21-day Feast uses the fixed accepted list and reproducible scorer in [scripts/feast](scripts/feast/README.md). Signatures bind source wallets and selected terms to Sui destinations. Publish canonical receipts, price archives, CSV/hash and the scoring commit before finalization.
 
-**Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PR founder (the "V1PR Foundation"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PR only, with no claim on Foundation assets or future income. Foundation receiving addresses and all received transfers are published for verification.
+**Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PER founder (the "V1PER Foundation"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PER only, with no claim on Foundation assets or future income. Foundation receiving addresses and all received transfers are published for verification.
 
 The DEX pool opens at no less than the Feast clearing price, paired with 25% of Feast proceeds. Remaining proceeds are founder-controlled and discretionary.
 
 The monitor publishes Foundation explorer links and hash-verified export totals/clearing price; onchain claims and burns refresh independently. For public/feast-results.json use the scorer's exact results.json bytes, set feastResultsSha256 to their SHA-256 hash, and match feastStartMs to the frozen scoring config. Scheduled vesting requires a complete, reconciled table read. Never label export totals as live Foundation balances.
 
 
-Free claims are limited to 100M V1PR: at most 10,000 reviewed addresses, exactly 10,000 each, one claim per address. Seven-day signed applications precede day 0; the onchain window is scheduled once with at least seven days' notice, approvals freeze at opening and claims end 14 days later. No extension or administrator sweep. See scripts/claims/README.md and the white paper's phase table.
+Free claims are limited to 100M V1PER: at most 10,000 reviewed addresses, exactly 10,000 each, one claim per address. Seven-day signed applications precede day 0; the onchain window is scheduled once with at least seven days' notice, approvals freeze at opening and claims end 14 days later. No extension or administrator sweep. See scripts/claims/README.md and the white paper's phase table.
 
 The Feast menu includes native DOGE and native MemeCore M; all four receiving networks must be configured and rehearsed. Network- and campaign-bound signatures, native receipt checks and pricing rules are in scripts/feast/. No contribution campaign is open.
 

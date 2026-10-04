@@ -1,5 +1,5 @@
 module viper::launch;
-use viper::v1pr::LaunchCap;
+use viper::v1per::LaunchCap;
 const ECustody: u64 = 101;
 fun validate_custody(addresses: vector<address>) {
     let mut i = 0;
@@ -15,7 +15,7 @@ public fun allocate(
     liquidity: address, later_liquidity: address,
     opens_at_ms: u64, clock: &sui::clock::Clock, ctx: &mut TxContext,
 ) {
-    let mut supply = viper::v1pr::consume_launch_cap(cap, ctx);
+    let mut supply = viper::v1per::consume_launch_cap(cap, ctx);
     validate_custody(vector[founder, community, liquidity, later_liquidity]);
     assert!(opens_at_ms >= clock.timestamp_ms(), ECustody);
     let (vault, vault_admin) = viper::lock_vault::create(supply.split(viper::allocation::lock_rewards(), ctx), community, founder, opens_at_ms, ctx);
@@ -38,7 +38,7 @@ public fun allocate(
 fun allocation_matches_entire_initial_supply() {
     let mut scenario = sui::test_scenario::begin(@0xF);
     let clock = sui::clock::create_for_testing(scenario.ctx());
-    let cap = viper::v1pr::test_launch_cap(scenario.ctx());
+    let cap = viper::v1per::test_launch_cap(scenario.ctx());
     allocate(cap, @0xA, @0xB, @0xD, @0xE, 0, &clock, scenario.ctx());
     scenario.next_tx(@0xF);
     let vault = scenario.take_shared<viper::lock_vault::Vault>();
@@ -57,7 +57,7 @@ fun allocation_matches_entire_initial_supply() {
     let mut i = 0;
     while (i < 4) {
         scenario.next_tx(recipients[i]);
-        let coin = scenario.take_from_sender<sui::coin::Coin<viper::v1pr::V1PR>>();
+        let coin = scenario.take_from_sender<sui::coin::Coin<viper::v1per::V1PER>>();
         assert!(coin.value() == amounts[i]);
         sui::coin::burn_for_testing(coin);
         i = i + 1;
@@ -68,10 +68,10 @@ fun allocation_matches_entire_initial_supply() {
 #[test, expected_failure(abort_code = ECustody)]
 fun allocate_zero_custody_fails() {
     let mut ctx = tx_context::dummy(); let clock = sui::clock::create_for_testing(&mut ctx);
-    allocate(viper::v1pr::test_launch_cap(&mut ctx), @0xA,@0xB,@0x0,@0xE,0,&clock,&mut ctx); abort 999
+    allocate(viper::v1per::test_launch_cap(&mut ctx), @0xA,@0xB,@0x0,@0xE,0,&clock,&mut ctx); abort 999
 }
 #[test, expected_failure(abort_code = ECustody)]
 fun allocate_duplicate_custody_fails() {
     let mut ctx = tx_context::dummy(); let clock = sui::clock::create_for_testing(&mut ctx);
-    allocate(viper::v1pr::test_launch_cap(&mut ctx), @0xA,@0xB,@0xC,@0xC,0,&clock,&mut ctx); abort 999
+    allocate(viper::v1per::test_launch_cap(&mut ctx), @0xA,@0xB,@0xC,@0xC,0,&clock,&mut ctx); abort 999
 }

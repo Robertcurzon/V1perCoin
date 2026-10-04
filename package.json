@@ -22,7 +22,8 @@
     "test:rehearsal": "node scripts/rehearse_localnet.mjs",
     "test:pyth": "node scripts/feast/test_pyth.mjs",
     "check:pyth": "node scripts/feast/check_pyth.mjs",
-    "test:site": "node scripts/test_site.mjs"
+    "test:site": "node scripts/test_site.mjs",
+    "test:brand": "node scripts/test_brand.mjs"
   },
   "dependencies": {
     "@mysten/dapp-kit-react": "^2.1.37",
@@ -40,6 +41,7 @@
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@vitejs/plugin-react": "^6.1.1",
+    "bitcoinjs-message": "2.2.0",
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",

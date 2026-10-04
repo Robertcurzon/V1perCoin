@@ -1,10 +1,10 @@
-# V1PR security specification
+# V1PER security specification
 
-Review target: tag `v1pr-v2-auditor-review-20261003` on `codex/v2-economics-feast`. This is a package for an independent auditor, not an assertion that an independent audit has occurred. No mainnet/testnet release is deployed. Localnet uses ephemeral generated custody and no production keys. Authenticated Pyth readiness is blocked by missing environment access; no real historical fixture is present.
+Review target: immutable security commit `865b782e0b537ee06df79155d602a35df6ca04c3` on `codex/v2-economics-feast`. This is a package for an independent auditor, not an assertion that an independent audit has occurred. No mainnet/testnet release is deployed. Localnet uses ephemeral generated custody and no production keys. Authenticated Pyth readiness is blocked by missing environment access; no real historical fixture is present.
 
 ## State and trust boundaries
 
-The initial mint is 1,000,000,000 V1PR, six decimals, then burn-only. Launch allocation is 100M free claims, 100M Feast, 200M initial liquidity, 150M later liquidity, 200M Community, 150M funded rewards and 100M Operations. Four external custody destinations are nonzero and distinct, but different addresses do not prove independent control. Shared Vault, free Pool, Feast Pool and Currency contain funded inventory; owned Positions contain principal and complete reward escrow. Claim tables are dynamic fields. No contract takes ownership of contributed source-chain assets or creates a refund entitlement.
+The initial mint is 1,000,000,000 V1PER, six decimals, then burn-only. Launch allocation is 100M free claims, 100M Feast, 200M initial liquidity, 150M later liquidity, 200M Community, 150M funded rewards and 100M Operations. Four external custody destinations are nonzero and distinct, but different addresses do not prove independent control. Shared Vault, free Pool, Feast Pool and Currency contain funded inventory; owned Positions contain principal and complete reward escrow. Claim tables are dynamic fields. No contract takes ownership of contributed source-chain assets or creates a refund entitlement.
 
 Annual reward rates are immutable 1–10% ppm over 1–24 30-day months, producing 20% total at 24 months. Early reward uses completed-month rate, capped by escrow. Early exit charges 5% × remaining fraction; burn receives floor(50%), Foundation floor(10%) and Community the remainder. Maturity has no fee. Pending burns remain in supply until permissionless flush. Ordinary transfers and DEX swaps have no contract tax.
 
@@ -16,9 +16,9 @@ Annual reward rates are immutable 1–10% ppm over 1–24 30-day months, produci
 |---|---|---|
 | `allocation` | `initial_supply`, `free_claims`, `public_reserve`, `initial_liquidity`, `later_liquidity`, `community`, `lock_rewards`, `operations` | Read immutable bucket constants; no authority or mutation. |
 | `reward_schedule` | `rate_ppm` | Read 24-entry immutable ppm table; rejects terms outside 1–24. |
-| `v1pr` | publication-only `init` | One-time witness creates Currency/TreasuryCap, mints initial supply, seals it in LaunchCap, converts supply to burn-only, sends Currency for registry registration and MetadataCap to publisher. |
-| `v1pr` | `burn` | Anyone supplying an owned V1PR coin and shared Currency can destroy that coin, reducing registered supply. |
-| `v1pr` | package `consume_launch_cap` | Consumes/deletes LaunchCap and returns exactly initial inventory; called by allocate. No reusable mint authority. |
+| `v1per` | publication-only `init` | One-time witness creates Currency/TreasuryCap, mints initial supply, seals it in LaunchCap, converts supply to burn-only, sends Currency for registry registration and MetadataCap to publisher. |
+| `v1per` | `burn` | Anyone supplying an owned V1PER coin and shared Currency can destroy that coin, reducing registered supply. |
+| `v1per` | package `consume_launch_cap` | Consumes/deletes LaunchCap and returns exactly initial inventory; called by allocate. No reusable mint authority. |
 | `launch` | `allocate` | Owner consumes LaunchCap; validates nonzero distinct destinations and future-or-current `opens_at_ms`; creates all three funded shared objects and AdminCaps, sends external allocations and AdminCaps. Opening date cannot later be edited. |
 | `lock_vault` | package `create`, `share` | Require exactly 150M funding and distinct Community/Foundation; construct/share Vault and bound AdminCap. |
 | `lock_vault` | `rate_ppm`, `net_reward`, `full_reward`, `exit_fee`, `fee_split` | Pure integer economics helpers. Onchain Position duration is bounded to 24 months; arbitrary unsupported helper inputs may abort rather than return a value. |
@@ -48,10 +48,10 @@ Tests are regression evidence for the listed properties, not mathematical proof 
 
 | Invariant | Test evidence |
 |---|---|
-| Initial bucket sum and one-use sealed supply | `allocation::buckets_sum_to_supply`, `v1pr::initial_supply_is_sealed_in_launch_cap`, `launch::allocation_matches_entire_initial_supply`; localnet actual publication/allocation. |
+| Initial bucket sum and one-use sealed supply | `allocation::buckets_sum_to_supply`, `v1per::initial_supply_is_sealed_in_launch_cap`, `launch::allocation_matches_entire_initial_supply`; localnet actual publication/allocation. |
 | Correct distinct nonzero custody | `launch::allocate_zero_custody_fails`, `allocate_duplicate_custody_fails`. |
 | Reward available + committed + paid = funded; principal separate | `lock_vault::funded_exit_and_pause_preserve_principal`, `replenishment_preserves_existing_commitments`, `multi_user_sequence_reconciles_every_step`, `invariant_sequence::fixed_seed_600_operations_five_users` after each operation. |
-| Actual Currency supply = initial − Feast burns − flushed exit burns | Same 600-operation test, `free_claims::unclaimed_tokens_are_actually_burned`, `feast::expiry_releases_unclaimed_reward_reservations`, `v1pr::voluntary_burn_reduces_total_supply`, localnet supply assertion. Pending burns are deliberately excluded until flush. |
+| Actual Currency supply = initial − Feast burns − flushed exit burns | Same 600-operation test, `free_claims::unclaimed_tokens_are_actually_burned`, `feast::expiry_releases_unclaimed_reward_reservations`, `v1per::voluntary_burn_reduces_total_supply`, localnet supply assertion. Pending burns are deliberately excluded until flush. |
 | Pending exit burns + actually flushed exit burns = sum of exit burn shares | 600-operation sequence with separate accumulated shares; actual localnet withdraw/flush. Feast/direct burns are separate categories. |
 | User lock payout <= principal + completed-month reward; reward <= escrow; zero extra maturity accrual | `lock_vault::completed_months_never_exceed_finished_shorter_lock`, `all_terms_mature_with_exact_fee_and_no_extra_accrual`; all 852 shared JSON vectors through actual Move open/preview/close and TypeScript; cumulative per-user bound in 600-operation sequence. |
 | Exact integer rates/fees/splits, 1–24 terms, nonzero funded reward | `exponential_curve_and_fee_boundaries`, `invalid_term`, `dust_lock_cannot_open_with_zero_net_reward`, `reward_capacity_cannot_be_overcommitted`, shared golden vectors and `scripts/test_economics.cjs`. |

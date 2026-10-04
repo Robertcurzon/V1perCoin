@@ -28,6 +28,6 @@ export function assetKey(chain, contract) {
 }
 export function bindingMessage(source, sui, chain, windowStart) {
   if (!networks[chain] || !Number.isSafeInteger(windowStart) || windowStart <= 0) throw new Error('Invalid binding network or campaign start');
-  return `Bind ${source} to Sui ${sui} for the V1PR Feast\nSource network: ${chain}\nCampaign start: ${windowStart}`;
+  return `Bind ${source} to Sui ${sui} for the V1PER Feast\nSource network: ${chain}\nCampaign start: ${windowStart}`;
 }
 export function lockMessage(message, months) { return `${message}\nLock choice: ${months} months`; }

@@ -1,3 +1,4 @@
+import { V1per, BrandText } from './V1per';
 import { useEffect, useState } from 'react';
 import { useCurrentAccount, useCurrentClient, useDAppKit } from '@mysten/dapp-kit-react';
 import { ConnectButton } from '@mysten/dapp-kit-react/ui';
@@ -55,5 +56,5 @@ export default function FreeClaimAction() {
     finally { setPending(false); }
   }
   const open = isLaunchConfigured && ready && launch.freeClaimsStartMs > 0 && chainTime >= BigInt(launch.freeClaimsStartMs) && chainTime < BigInt(launch.freeClaimsStartMs) + 14n * 86_400_000n;
-  return <div id="claim-action" className="lock-card claim-action"><h3>FREE CLAIM STATUS</h3><p>{launch.freeClaimsStartMs > 0 ? `UTC window: ${new Date(launch.freeClaimsStartMs).toISOString()} → ${new Date(launch.freeClaimsStartMs + 14 * 86400000).toISOString()} · ${open ? 'OPEN' : 'NOT OPEN'}` : 'Opening date not announced. Free claims are closed.'}</p><p>One 10,000 V1PR claim per approved wallet during the 14-day scheduled window; network gas only.</p><ConnectButton /><div className="buttons"><button className="button outline" disabled={!open || !account || pending} onClick={() => void claim()}>{pending ? 'PROCESSING…' : 'CLAIM 10,000 V1PR'}</button></div>{error && <p role="alert">{error}</p>}{message && <p role="status">Confirmed: <ExplorerLink kind="tx" value={message}>{message}</ExplorerLink></p>}</div>;
+  return <div id="claim-action" className="lock-card claim-action"><h3>FREE CLAIM STATUS</h3><p>{launch.freeClaimsStartMs > 0 ? `UTC window: ${new Date(launch.freeClaimsStartMs).toISOString()} → ${new Date(launch.freeClaimsStartMs + 14 * 86400000).toISOString()} · ${open ? 'OPEN' : 'NOT OPEN'}` : 'Opening date not announced. Free claims are closed.'}</p><p>One 10,000 <V1per /> claim per approved wallet during the 14-day scheduled window; network gas only.</p><ConnectButton /><div className="buttons"><button className="button outline" disabled={!open || !account || pending} onClick={() => void claim()}><BrandText text={pending ? 'PROCESSING…' : 'CLAIM 10,000 V1PER'} /></button></div>{error && <p role="alert"><BrandText text={error} /></p>}{message && <p role="status">Confirmed: <ExplorerLink kind="tx" value={message}><BrandText text={message} /></ExplorerLink></p>}</div>;
 }

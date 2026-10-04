@@ -6,7 +6,7 @@ Early reward is net_reward(P, whole elapsed months), zero before one month, capp
 
 Close does not take Currency. Burn shares accumulate in pending_burn. Permissionless flush_burns consumes that balance through Currency and increments actually burned. Pending inventory is separate from reward capacity and remains total supply until flushed.
 
-Accounting: rewards + reward_committed + reward_paid == reward_funded. `set_paused` stops ordinary deposits only; reserved Feast admissions and exits continue. `launch::allocate` fixes opens_at_ms, enforced by ordinary `open`/`deposit`. `feast::finalize` reserves all locked Feast rewards through `reserve_feast`; claims consume them via `deposit_reserved`, and expiry returns unused reservations via `release_feast`. Anyone may fund with existing V1PR. There is no admin withdrawal path. Shared-object schemas and scoped events match the frontend. Network gas is separate.
+Accounting: rewards + reward_committed + reward_paid == reward_funded. `set_paused` stops ordinary deposits only; reserved Feast admissions and exits continue. `launch::allocate` fixes opens_at_ms, enforced by ordinary `open`/`deposit`. `feast::finalize` reserves all locked Feast rewards through `reserve_feast`; claims consume them via `deposit_reserved`, and expiry returns unused reservations via `release_feast`. Anyone may fund with existing V1PER. There is no admin withdrawal path. Shared-object schemas and scoped events match the frontend. Network gas is separate.
 
 ## Executable accounting evidence
 

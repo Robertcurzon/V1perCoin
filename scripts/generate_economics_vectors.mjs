@@ -18,14 +18,14 @@ let move='/// Generated from tests/fixtures/economics.json; do not edit.\n#[test
 for(let i=0;i<cases.length;i+=50) {
  move+=`#[test]\nfun shared_json_golden_vectors_${i/50}() {\n`;
  move+='    let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);\n';
- move+='    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);\n';
+ move+='    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);\n';
  for(const c of cases.slice(i,i+50))move+=`    check(&mut vault,&mut clock,&mut ctx,${c.principal},${c.term},${c.elapsedMs},${c.reserved},${c.earned},${c.fee},${c.community},${c.burn},${c.founder},${c.net});\n`;
  move+='    std::unit_test::destroy(vault); std::unit_test::destroy(cap); sui::clock::destroy_for_testing(clock);\n}\n';
 }
 move+=`fun check(vault: &mut lock_vault::Vault, clock: &mut sui::clock::Clock, ctx: &mut TxContext, p: u64, term: u64, elapsed: u64, reserved: u64, earned: u64, fee: u64, community: u64, burn: u64, founder: u64, net: u64) {
     assert!(lock_vault::full_reward(p,term)==reserved);
     let start=clock.timestamp_ms();
-    let position=lock_vault::open(vault,sui::coin::mint_for_testing<viper::v1pr::V1PR>(p,ctx),term,clock,ctx);
+    let position=lock_vault::open(vault,sui::coin::mint_for_testing<viper::v1per::V1PER>(p,ctx),term,clock,ctx);
     sui::clock::set_for_testing(clock,start+elapsed);
     let (actual_p,e,f,c,b,o)=lock_vault::preview(&position,clock);
     assert!(actual_p==p && e==earned && f==fee && c==community && b==burn && o==founder);

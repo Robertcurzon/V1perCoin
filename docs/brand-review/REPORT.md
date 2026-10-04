@@ -1,4 +1,4 @@
-# Viper Coin (V1PR): website and brand review
+# V1PER Coin (V1PER): website and brand review
 
 Branch: `codex/website-brand`, based on `codex/v2-economics-feast`. The five brief steps are committed separately. Main has not been changed or deployed.
 
@@ -23,8 +23,8 @@ Captured with browser viewports of 1440 × 900 and 390 × 900, after web fonts l
 
 All three are rendered on the homepage, outside accordions and dialogs:
 
-- Hero: “Pre-launch: V1PR is not deployed, and nothing on this site promises gains.” This covers the deployment and gains disclosures in one short sentence.
-- Feast: “Contributed coins go to wallets controlled by the founder-run V1PR Foundation, to use at its discretion, with no refunds.”
+- Hero: “Pre-launch: V1PER is not deployed, and nothing on this site promises gains.” This covers the deployment and gains disclosures in one short sentence.
+- Feast: “Contributed coins go to wallets controlled by the founder-run V1PER Foundation, to use at its discretion, with no refunds.”
 
 ## Artwork
 
@@ -42,7 +42,7 @@ Coverage includes 80 Move tests, 852 Move/TypeScript economics vectors, randomiz
 
 Each localnet rehearsal had 13 transactions: 11 successes and two expected timing rejections. Successful free claims after the seven-day notice, finalization after review, mature exits, vesting and expiry burns remain covered by Move clock-warp tests rather than wall-clock waits. No mainnet deployment, real contribution, transaction signing or live Pyth acceptance was performed for this brand task.
 
-Browser checks: the community dialog and GitHub fallback; all six mobile navigation links; Rules anchors and expanded Feast details; no horizontal overflow; a 12,000 V1PR calculator input showing 10 V1PR reward at one month and 2,400 V1PR at 24 months. The 1–24-month economics and fees are unchanged.
+Browser checks: the community dialog and GitHub fallback; all six mobile navigation links; Rules anchors and expanded Feast details; no horizontal overflow; a 12,000 V1PER calculator input showing 10 V1PER reward at one month and 2,400 V1PER at 24 months. The 1–24-month economics and fees are unchanged.
 
 `git diff` against the base confirms no changes to `viper/`, `src/economics.ts`, `scripts/feast/`, `scripts/claims/` or `src/launch.json`. No contract, economic rule or scorer changes were made.
 

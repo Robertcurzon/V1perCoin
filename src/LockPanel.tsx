@@ -1,3 +1,4 @@
+import { V1per, BrandText } from './V1per';
 import { siteUrl } from './site';
 import { useEffect, useState } from 'react';
 import { useCurrentAccount, useCurrentClient, useDAppKit } from '@mysten/dapp-kit-react';
@@ -94,16 +95,16 @@ export default function LockPanel({ detailed = false }: { detailed?: boolean }) 
   return <section id="lock" className="section lock-section">
     <div className="kicker">LOCK & EARN / FUNDED REWARDS</div>
     <h2>LONGER LOCK.<br/><em>BIGGER BITE.</em></h2>
-    <p className="token-intro">1–10% annual V1PR rates for 1–24 months; first come, first fully funded.</p>
+    <p className="token-intro">1–10% annual <V1per /> rates for 1–24 months; first come, first fully funded.</p>
     <p className="lock-summary">Early exit: up to 5% of principal × time remaining; no fee at maturity.</p>
     <a className="text-link" href={siteUrl('rules/#lock')}>Full rules →</a>
     <div className="lock-grid">
       <div className="lock-card">
-        <label htmlFor="lock-amount">V1PR to lock</label><input id="lock-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        <label htmlFor="lock-amount"><V1per /> to lock</label><input id="lock-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <label htmlFor="lock-months">{months} program months · {months * 30} days</label><input id="lock-months" type="range" min="1" max="24" value={months} onChange={(e) => setMonths(Number(e.target.value))} />
-        <div className="facts"><div><span>ANNUAL TOKEN REWARD RATE</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>TOTAL TERM RATE</span><strong>{(Number(ratePpm(months)) / 10000 * months / 12).toFixed(4)}%</strong></div><div><span>MATURE EXIT FEE (0%)</span><strong>0 V1PR</strong></div><div><span>TOTAL TERM REWARD</span><strong>{formatAmount(reward)} V1PR</strong></div><div><span>FULL-TERM NET PAYOUT</span><strong>{formatAmount(principal + reward)} V1PR</strong></div><div><span>AVAILABLE REWARD CAPACITY</span><strong>{capacity === null ? 'NOT DEPLOYED / UNAVAILABLE' : `${formatAmount(capacity)} V1PR`}</strong></div></div>
-        {inputError && <p role="alert">{inputError}</p>}{principal > 0n && netReward(principal, months) === 0n && <p role="alert">Increase the amount to earn at least one V1PR base unit for the selected term.</p>}
-        {detailed && <p className="fine-print">One month = 30 days. Simple rewards in V1PR; no compounding or dollar-return promise. No deposit fee. No fee at maturity. Early exit pays the reward for whole completed months and charges up to 5% of principal, tapering continuously to zero. Every completed lock earns a positive net V1PR reward before network gas. Early exits can return less than deposited.</p>}
+        <div className="facts"><div><span>ANNUAL TOKEN REWARD RATE</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>TOTAL TERM RATE</span><strong>{(Number(ratePpm(months)) / 10000 * months / 12).toFixed(4)}%</strong></div><div><span>MATURE EXIT FEE (0%)</span><strong>0 <V1per /></strong></div><div><span>TOTAL TERM REWARD</span><strong>{formatAmount(reward)} <V1per /></strong></div><div><span>FULL-TERM NET PAYOUT</span><strong>{formatAmount(principal + reward)} <V1per /></strong></div><div><span>AVAILABLE REWARD CAPACITY</span><strong><BrandText text={capacity === null ? 'NOT DEPLOYED / UNAVAILABLE' : `${formatAmount(capacity)} V1PER`} /></strong></div></div>
+        {inputError && <p role="alert">{inputError}</p>}{principal > 0n && netReward(principal, months) === 0n && <p role="alert">Increase the amount to earn at least one <V1per /> base unit for the selected term.</p>}
+        {detailed && <p className="fine-print">One month = 30 days. Simple rewards in <V1per />; no compounding or dollar-return promise. No deposit fee. No fee at maturity. Early exit pays the reward for whole completed months and charges up to 5% of principal, tapering continuously to zero. Every completed lock earns a positive net <V1per /> reward before network gas. Early exits can return less than deposited.</p>}
         <ConnectButton />
         <div className="buttons"><button className="button lime" disabled={!lockOpen || !account || !vault || vault.paused || pending || Boolean(inputError) || netReward(principal, months) === 0n || (capacity !== null && reward > capacity)} onClick={() => void submit('deposit')}>{pending ? 'PROCESSING…' : 'OPEN LOCK'}</button></div>
       </div>
@@ -111,8 +112,8 @@ export default function LockPanel({ detailed = false }: { detailed?: boolean }) 
     </div>
     {visiblePositions.length > 0 && <div className="positions"><h3>YOUR LOCKS</h3>{visiblePositions.map((position) => {
       const quote = exitPreview(BigInt(position.principal), BigInt(position.reward), BigInt(position.duration_ms), chainTime - BigInt(position.start_ms));
-      return <article className="lock-card" key={position.id}><p>{formatAmount(BigInt(position.principal))} V1PR · {Number(BigInt(position.duration_ms) / MONTH_MS)} months</p><p><ExplorerLink kind="object" value={position.id}>View position</ExplorerLink></p><p>Matures {new Date(Number(BigInt(position.start_ms) + BigInt(position.duration_ms))).toLocaleString()}</p><p>Earned {formatAmount(quote.earned)} · Fee {formatAmount(quote.fee)} V1PR</p><p>Community {formatAmount(quote.community)} · Pending burn {formatAmount(quote.burn)} · Foundation {formatAmount(quote.founder)}</p><p>Net payout: {formatAmount(quote.net)} V1PR</p><p className="fine-print">Preview uses the last fetched onchain clock. The transaction uses the current onchain time.</p><button className="button outline" disabled={pending || !vault} onClick={() => void submit('withdraw', position)}>WITHDRAW</button></article>;
+      return <article className="lock-card" key={position.id}><p>{formatAmount(BigInt(position.principal))} <V1per /> · {Number(BigInt(position.duration_ms) / MONTH_MS)} months</p><p><ExplorerLink kind="object" value={position.id}>View position</ExplorerLink></p><p>Matures {new Date(Number(BigInt(position.start_ms) + BigInt(position.duration_ms))).toLocaleString()}</p><p>Earned {formatAmount(quote.earned)} · Fee {formatAmount(quote.fee)} <V1per /></p><p>Community {formatAmount(quote.community)} · Pending burn {formatAmount(quote.burn)} · Foundation {formatAmount(quote.founder)}</p><p>Net payout: {formatAmount(quote.net)} <V1per /></p><p className="fine-print">Preview uses the last fetched onchain clock. The transaction uses the current onchain time.</p><button className="button outline" disabled={pending || !vault} onClick={() => void submit('withdraw', position)}>WITHDRAW</button></article>;
     })}<button className="button outline" disabled={pending} onClick={() => setRevision((value) => value + 1)}>REFRESH PREVIEW</button></div>}
-    {error && <p role="alert" className="transaction-message">{error}</p>}{message && <p role="status" className="transaction-message">Confirmed: <ExplorerLink kind="tx" value={message}>{message}</ExplorerLink></p>}
+    {error && <p role="alert" className="transaction-message"><BrandText text={error} /></p>}{message && <p role="status" className="transaction-message">Confirmed: <ExplorerLink kind="tx" value={message}><BrandText text={message} /></ExplorerLink></p>}
   </section>;
 }

@@ -6,7 +6,7 @@ export function ratePpm(months: number): bigint {
   return BigInt(rates[months - 1]);
 }
 export function parseAmount(text: string): bigint {
-  if (!/^\d+(\.\d{1,6})?$/.test(text)) throw new Error('Enter V1PR with at most six decimal places.');
+  if (!/^\d+(\.\d{1,6})?$/.test(text)) throw new Error('Enter V1PER with at most six decimal places.');
   const [whole, fraction = ''] = text.split('.');
   const value = BigInt(whole) * UNIT + BigInt(fraction.padEnd(6, '0'));
   if (value <= 0n || value > 18_446_744_073_709_551_615n) throw new Error('Amount must be positive and fit the coin balance.');

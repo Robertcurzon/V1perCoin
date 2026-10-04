@@ -1,6 +1,6 @@
-# V1PR free-claim eligibility
+# V1PER free-claim eligibility
 
-Budget: 100M existing V1PR. Maximum 10,000 distinct addresses, 10,000 V1PR per address once (0.001% of initial supply each). No payment, referral purchase or legal identity upload is required. This enforces a wallet/entry limit, not one human per allocation.
+Budget: 100M existing V1PER. Maximum 10,000 distinct addresses, 10,000 V1PER per address once (0.001% of initial supply each). No payment, referral purchase or legal identity upload is required. This enforces a wallet/entry limit, not one human per allocation.
 
 1. Publish the reviewed release, day-0 UTC opening T and official HTTPS submission channel. Call free_claims::schedule once, at least seven days ahead. The contract sets the 14-day exclusive deadline and cannot reschedule, extend or reopen it. The shared opening is also the Feast's T.
 2. Receive signed applications during [T-7 days,T). The website downloads an application file; it does not submit it. The official channel adds receivedAtMs from its own receipt log, never a claimant-selected timestamp. Publish receipt provenance. Applications contain address, entryUrl, signature. startMs in the submission must match the campaign. Sign the exact text from messages.mjs; wallet signatures authorize no transfer.

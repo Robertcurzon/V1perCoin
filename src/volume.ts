@@ -11,7 +11,7 @@ export function readDexVolume(data: unknown, pairId: string, coinType: string): 
       if (!record(token) || typeof token.address !== 'string') return false;
       try { return normalizeStructTag(token.address) === normalizeStructTag(coinType); } catch { return false; }
     });
-    if (!matchesToken) throw new Error('Volume pair does not contain the verified V1PR coin type.');
+    if (!matchesToken) throw new Error('Volume pair does not contain the verified V1PER coin type.');
     if (!record(pair.volume) || typeof pair.volume.h24 !== 'number' || !Number.isFinite(pair.volume.h24) || pair.volume.h24 < 0) throw new Error('24-hour USD volume is unavailable.');
     return pair.volume.h24;
   }

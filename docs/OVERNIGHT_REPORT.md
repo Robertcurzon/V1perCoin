@@ -23,3 +23,11 @@ The baseline is the unchanged website branch head `cd374893c32ec6657e1feb7bf68eb
 ![Before, 390px](overnight-review/before-home-390.jpg)
 
 Task 2 validation: Move tests; all npm test scripts (economics, monitor, whitepaper, Feast, claims, rehearsal, Pyth, site); typecheck; lint; Pages build; deployment checks passed. The localnet rehearsal completed its 13 transactions with the two expected time-gated rejections. No deployment was performed.
+
+## Task 3: V1PER identity
+
+Renamed the coin, currency symbol, one-time witness and module to V1PER / `viper::v1per`, with the source file `v1per.move`. Updated the frontend validation, BCS references, signatures, tools, metadata and prose. Regenerated 852 economic vectors and the independently verified DOGE signed-message fixture using a transient test key kept only in memory. Added a shared React wordmark and LaTeX macro; the social PNG is regenerated from its SVG. CI rejects superseded names outside the single changelog record.
+
+The white paper remains in its existing editor and compiled successfully with the native compiler. White pages use dark letters and the magenta digit to preserve readability. The localnet scratch directory now stays inside the project; no existing deployment IDs or protocol amounts were changed.
+
+Task 3 validation: the full suite passed, including 80 Move tests and the localnet rehearsal with the explicit currency-identity assertions. Auditor references retain the actual immutable security commit, rather than implying the old tag was renamed. All frontend checks and the Pages build were repeated after the final presentation edits.

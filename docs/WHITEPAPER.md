@@ -1,30 +1,30 @@
-# Viper Coin (V1PR)
+# V1PER Coin (V1PER)
 
 Release specification · 3 October 2026
 
 Feed the Viper. Cute memes in. More venom out.
 
-Viper Coin (V1PR) is the apex predator in the Sui meme jungle. “Venom” means participation, creativity and community momentum. Nothing on the site promises gains.
+V1PER Coin (V1PER) is the apex predator in the Sui meme jungle. “Venom” means participation, creativity and community momentum. Nothing on the site promises gains.
 
-Viper Coin (V1PR) combines Deflationary Supply, free community claims and fully funded lock rewards on Sui. No mainnet coin or funded exchange pool is live. Verify the complete Sui coin type and publication records before using the token.
+V1PER Coin (V1PER) combines Deflationary Supply, free community claims and fully funded lock rewards on Sui. No mainnet coin or funded exchange pool is live. Verify the complete Sui coin type and publication records before using the token.
 
 ## 1. Deflationary Supply
 
 | Property | Release rule |
 |---|---|
-| Name / ticker | Viper Coin / V1PR |
+| Name / ticker | V1PER Coin / V1PER |
 | Chain / decimals | Sui / 6 |
 | Supply model | Deflationary Supply |
-| Initial supply | 1,000,000,000 V1PR |
+| Initial supply | 1,000,000,000 V1PER |
 | Subsequent minting | None |
 | Supply reductions | Onchain Currency burns |
 | Ordinary transfer or DEX swap tax | None |
 
 The full initial supply is minted once into a sealed LaunchCap. Allocation consumes that capability; Currency remains burn-only, with no public mint function. Claims and rewards distribute existing tokens. Actual burns reduce total supply; tokens awaiting a burn remain included until destroyed. [Sui Currency Standard](https://docs.sui.io/onchain-finance/fungible-tokens/create-a-fungible-token), [Coin Registry](https://docs.sui.io/references/framework/sui_sui/coin_registry).
 
-## 2. Allocation and V1PR Foundation
+## 2. Allocation and V1PER Foundation
 
-| Bucket | Supply | V1PR | Control |
+| Bucket | Supply | V1PER | Control |
 |---|---:|---:|---|
 | Free claims | 10% | 100,000,000 | Shared claim pool |
 | Feast claims | 10% | 100,000,000 | Shared Feast pool |
@@ -32,32 +32,32 @@ The full initial supply is minted once into a sealed LaunchCap. Allocation consu
 | Later liquidity reserve | 15% | 150,000,000 | Published reserve custodian |
 | Community programs | 20% | 200,000,000 | Separate Community wallet |
 | Lock rewards | 15% | 150,000,000 | Shared reward vault |
-| Ecosystem Operations | 10% | 100,000,000 | V1PR Foundation |
+| Ecosystem Operations | 10% | 100,000,000 | V1PER Foundation |
 | Total | 100% | 1,000,000,000 | |
 
-V1PR Foundation is the project's operating name for its founder-controlled funds and receiving wallets. It does not imply independent governance or a separate legal entity. Operations funds development, hosting, design, administration and collaborators at its controller's discretion, without contractual vesting. `launch::allocate` requires four nonzero, pairwise-distinct Sui custody addresses.
+V1PER Foundation is the project's operating name for its founder-controlled funds and receiving wallets. It does not imply independent governance or a separate legal entity. Operations funds development, hosting, design, administration and collaborators at its controller's discretion, without contractual vesting. `launch::allocate` requires four nonzero, pairwise-distinct Sui custody addresses.
 
 Token reserves alone do not create exchange liquidity. The 200-million initial liquidity bucket is a reserve, not a requirement to deposit it all at opening. Deposit sizing, Cetus price/range simulation, unused inventory custody, paired funding, opening price and LP-lock publication are operating trust assumptions in section 11.
 
 ## 3. The Feast: Feed the Viper
 
-The 21-day Feast allocates up to 100 million V1PR. The curated menu is SHIB, PEPE, SPX and FLOKI on Ethereum; PUMP, PENGU, BONK and WIF on Solana; native DOGE on Dogecoin; and native M on MemeCore mainnet (chain ID 4352, 18 decimals). DOGE uses eight decimals. Wrapped substitutes are not accepted. Exact contracts, native networks and Pyth feed IDs are frozen in the published configuration. [Dogecoin](https://dogecoin.com/), [MemeCore M](https://docs.memecore.com/memecore/token/usdm), [MemeCore network](https://docs.memecore.com/memecore/connect-to-memecore).
+The 21-day Feast allocates up to 100 million V1PER. The curated menu is SHIB, PEPE, SPX and FLOKI on Ethereum; PUMP, PENGU, BONK and WIF on Solana; native DOGE on Dogecoin; and native M on MemeCore mainnet (chain ID 4352, 18 decimals). DOGE uses eight decimals. Wrapped substitutes are not accepted. Exact contracts, native networks and Pyth feed IDs are frozen in the published configuration. [Dogecoin](https://dogecoin.com/), [MemeCore M](https://docs.memecore.com/memecore/token/usdm), [MemeCore network](https://docs.memecore.com/memecore/connect-to-memecore).
 
 Participants bind their source wallet to a Sui destination and confirm a liquid, 12-month or 24-month allocation with a second signature. Both texts include the source network and campaign's Unix-second opening timestamp. Submit the signed receipt and confirm acceptance before transferring. Ethereum and MemeCore support EOA personal-sign; Solana uses Ed25519; DOGE supports manually imported Dogecoin compact signatures from P2PKH wallets. Contract-wallet signatures and mixed-source DOGE inputs are unsupported. Native DOGE receipts identify the transaction output, all input addresses and confirmation depth; all inputs must belong to the bound source. The website does not submit bindings or transfer source assets. All bound sources for one Sui destination must choose the same term. [Dogecoin signature verification](https://github.com/dogecoin/dogecoin/blob/master/src/rpc/misc.cpp).
 
 Each finalized contribution is valued at the lesser of Pyth confirmation-time spot and the average of 1,440 preceding one-minute observations. Each observation must be no more than 60 seconds old at its sample time. Missing, stale or future prices stop scoring; the scorer requires Ethereum/MemeCore finalized-block anchors, Solana finalized commitment or at least 60 DOGE confirmations. It also reconciles every receiving wallet and asset against a second provider: inbound equals ending balance minus starting balance plus all outflows. Any mismatch stops CSV publication. Raw evidence, each input-file SHA-256 and the scorer commit accompany results. These checks rely on truthful complete exports; they do not prove chain history cryptographically. Points equal eligible USD value multiplied by participation and lock bonuses. Days 1–5 receive 1.50×; the bonus declines in daily steps to 1.00× on day 19 and remains there through day 21. Liquid, 12-month and 24-month choices receive 1.00×, 1.10× and 1.25× respectively.
 
-Allocations follow each wallet's share of total points, limited to 10,000 V1PR per USD before bonuses. No wallet cap applies. Rounding and the price floor can leave inventory, burned at finalization. Publication and independent reproduction of those inputs, receipts, archives, CSV/hash and scoring commit are trust assumptions in section 11. Clearing price is total eligible USD divided by V1PR allocated.
+Allocations follow each wallet's share of total points, limited to 10,000 V1PER per USD before bonuses. No wallet cap applies. Rounding and the price floor can leave inventory, burned at finalization. Publication and independent reproduction of those inputs, receipts, archives, CSV/hash and scoring commit are trust assumptions in section 11. Clearing price is total eligible USD divided by V1PER allocated.
 
 The Feast administrator sets or edits allocations and a 32-byte CSV hash through `feast::set_allocations`. Every edit records the chain clock and restarts review. `feast::finalize` requires the matching hash and at least seven days since the last edit; it freezes allocations and reserves every locked allocation's full reward in the vault, or aborts atomically if capacity is insufficient. Liquid claims release 50% immediately and 50% linearly over 60 days. `feast::claim_locked` consumes its reservation to open the recorded 12/24-month position, bypassing deposit pauses and the ordinary opening date. Terms start at claim time. Claims end after 90 days; `feast::burn_unclaimed` returns unused reward reservations to capacity before burning unclaimed principal. No administrator sweep exists.
 
-Feast proceeds are sent to the V1PR Foundation. Contributed coins are not burned, held in trust or governed by participants. Its founder controls the wallets and may hold, sell, reinvest or spend proceeds. Participants receive V1PR only, with no claim on Foundation assets or future income. Publication of receiving addresses and transfers is a trust assumption in section 11. There is no contribution refund path, including expired claims or delayed finalization.
+Feast proceeds are sent to the V1PER Foundation. Contributed coins are not burned, held in trust or governed by participants. Its founder controls the wallets and may hold, sell, reinvest or spend proceeds. Participants receive V1PER only, with no claim on Foundation assets or future income. Publication of receiving addresses and transfers is a trust assumption in section 11. There is no contribution refund path, including expired claims or delayed finalization.
 
 Exchange funding, the stated opening-price floor and the 25% proceeds commitment are explicit trust assumptions in section 11; no Sui function enforces cross-chain spending.
 
 ## 4. Free claims
 
-The 100-million-token pool admits at most 10,000 distinct approved Sui addresses, each entitled to one 10,000 V1PR claim (0.001% of initial supply). Claimants pay network gas only. The free-claim window precedes the planned exchange opening; receiving tokens is not a promise of immediate trading liquidity. Applications run for the seven days before day 0; claims run for 14 days from day 0. There is no open-ended mint, extension or recurring free allocation.
+The 100-million-token pool admits at most 10,000 distinct approved Sui addresses, each entitled to one 10,000 V1PER claim (0.001% of initial supply). Claimants pay network gas only. The free-claim window precedes the planned exchange opening; receiving tokens is not a promise of immediate trading liquidity. Applications run for the seven days before day 0; claims run for 14 days from day 0. There is no open-ended mint, extension or recurring free allocation.
 
 Applicants submit a wallet-signed application and one original meme, useful guide or valid testnet issue report through the published channel. Review checks authorship and duplicate work. Accepted applications are ordered by channel receipt time, with address and entry-link ordering breaking ties. The preparation tool verifies Sui signatures, rejects missing reviews and deduplicates wallet addresses, entry links and archived content hashes. The tool produces a reviewed manifest, reasons, exclusions and input hash; publication and approval receipts are trust assumptions in section 11. Submissions do not guarantee approval; the channel, receipt timestamp and original-work review remain operator responsibilities.
 
@@ -65,7 +65,7 @@ Applicants submit a wallet-signed application and one original meme, useful guid
 
 ## 5. Lock rewards
 
-The 150-million V1PR reward pool accepts locks first come, first served by successful transaction order. Each accepted position immediately escrows its complete term reward. If capacity is insufficient, the contract rejects the deposit. Accepted obligations remain funded.
+The 150-million V1PER reward pool accepts locks first come, first served by successful transaction order. Each accepted position immediately escrows its complete term reward. If capacity is insufficient, the contract rejects the deposit. Accepted obligations remain funded.
 
 `launch::allocate` fixes the vault's immutable opening timestamp. `lock_vault::open` and `deposit` reject ordinary deposits before that date; the emergency pause also rejects new deposits, while reserved Feast claims and exits remain available. Choose 1–24 whole program months; each month is 30 days. Principal, term, owner and reward are set at opening. Positions cannot be transferred, extended or topped up; those actions require a new lock. No deposit fee or automatic compounding applies.
 
@@ -73,17 +73,17 @@ The 150-million V1PR reward pool accepts locks first come, first served by succe
 
 Annual rates round down to integer parts per million. For principal in base units, term reward is `floor(principal × annual_rate_ppm(months) × months / 12,000,000)`.
 
-| Term | Days | Annual token rate | Total term reward on 1,000,000 V1PR |
+| Term | Days | Annual token rate | Total term reward on 1,000,000 V1PER |
 |---|---:|---:|---:|
-| 1 month | 30 | 1.0000% | 833.333333 V1PR |
-| 6 months | 180 | 1.6496% | 8,248 V1PR |
-| 12 months | 360 | 3.0078% | 30,078 V1PR |
-| 18 months | 540 | 5.4844% | 82,266 V1PR |
-| 24 months | 720 | 10.0000% | 200,000 V1PR |
+| 1 month | 30 | 1.0000% | 833.333333 V1PER |
+| 6 months | 180 | 1.6496% | 8,248 V1PER |
+| 12 months | 360 | 3.0078% | 30,078 V1PER |
+| 18 months | 540 | 5.4844% | 82,266 V1PER |
+| 24 months | 720 | 10.0000% | 200,000 V1PER |
 
-A 24-month lock earns 20% of initial principal: 10,000 V1PR becomes 12,000 V1PR before gas. Deposits earning zero base units are rejected. Shorter terms compounded over 24 months earn less, assuming continued admission and capacity.
+A 24-month lock earns 20% of initial principal: 10,000 V1PER becomes 12,000 V1PER before gas. Deposits earning zero base units are rejected. Shorter terms compounded over 24 months earn less, assuming continued admission and capacity.
 
-These locks distribute existing V1PR; they do not validate Sui or earn native validator rewards. Token rewards do not guarantee purchasing power or dollar returns. [Sui tokenomics](https://docs.sui.io/paper/tokenomics.pdf).
+These locks distribute existing V1PER; they do not validate Sui or earn native validator rewards. Token rewards do not guarantee purchasing power or dollar returns. [Sui tokenomics](https://docs.sui.io/paper/tokenomics.pdf).
 
 ## 6. Exits, burns and reward capacity
 
@@ -91,11 +91,11 @@ Owners may exit at any time. Mature exits have no project fee. Early exits earn 
 
 `fee = floor(principal × 5% × max(remaining time, 0) / agreed duration)`
 
-The early-exit fee starts at 5%, falls to 2.5% halfway through the term and reaches zero at maturity. Its split is 50% pending burn, 40% Community and 10% V1PR Foundation. Burn and Foundation shares round down; Community receives rounding dust. Early exits can return less than deposited.
+The early-exit fee starts at 5%, falls to 2.5% halfway through the term and reaches zero at maturity. Its split is 50% pending burn, 40% Community and 10% V1PER Foundation. Burn and Foundation shares round down; Community receives rounding dust. Early exits can return less than deposited.
 
 Exit burns accumulate separately in the vault. Anyone may call `flush_burns` to destroy that balance through Currency; closing a position does not require mutating Currency. Free-claim expiry, Feast finalization and Feast expiry also support actual supply-reducing burns. Ordinary transfers and swaps are untaxed.
 
-When available rewards run out, new reward-bearing locks stop. Existing principal and rewards remain escrowed. Early exits release unused reservations, and anyone may replenish capacity with existing V1PR; there is no inflation or promise of perpetual yield.
+When available rewards run out, new reward-bearing locks stop. Existing principal and rewards remain escrowed. Early exits release unused reservations, and anyone may replenish capacity with existing V1PER; there is no inflation or promise of perpetual yield.
 
 `available reward inventory + outstanding reserved rewards + rewards paid = rewards funded`
 
@@ -111,9 +111,9 @@ These subbudgets and publication of each award's recipient, purpose, amount and 
 
 Participation can be pseudonymous. The site does not require a legal name, email, social login or identity upload to read the paper or connect a wallet. Community members choose what identity information to disclose.
 
-The native ledger remains public: addresses, transfers, balances, claims, positions and fees are inspectable. Feast bindings publicly link source wallets to Sui destinations. Aliases and fresh wallets do not guarantee unlinkability. V1PR has no shielded balances or confidential transfers.
+The native ledger remains public: addresses, transfers, balances, claims, positions and fees are inspectable. Feast bindings publicly link source wallets to Sui destinations. Aliases and fresh wallets do not guarantee unlinkability. V1PER has no shielded balances or confidential transfers.
 
-Sui's privacy tools can support separate applications: Seal for controlled access to encrypted data and Nautilus for confidential computation. zkLogin concerns authentication, not hidden balances. None is integrated into V1PR. Any external privacy service must support the exact coin type and disclose its custody, security and entry/exit visibility. [Sui privacy overview](https://www.sui.io/privacy).
+Sui's privacy tools can support separate applications: Seal for controlled access to encrypted data and Nautilus for confidential computation. zkLogin concerns authentication, not hidden balances. None is integrated into V1PER. Any external privacy service must support the exact coin type and disclose its custody, security and entry/exit visibility. [Sui privacy overview](https://www.sui.io/privacy).
 
 Wallet software, hosting and RPC providers may receive connection metadata. Browser-local charts store aggregate observations; deleting them does not erase blockchain records or provider logs.
 
@@ -140,7 +140,7 @@ Day 0 (T) is the published UTC opening shared by free claims and the Feast. The 
 |---|---|---|
 | Before scheduling | Preparation | Everyone: read, inspect and follow; no contributions or free claims |
 | T − 7 days to T | Applications | Community applicants: signed wallet proof and original entry for review |
-| T to T + 14 days | Opening | Approved addresses: one free claim; bound contributors: Feast; V1PR holders: funded locks when unpaused |
+| T to T + 14 days | Opening | Approved addresses: one free claim; bound contributors: Feast; V1PER holders: funded locks when unpaused |
 | T + 14 to T + 21 days | Feast only | Free claims closed; contributors may still contribute; anyone may burn unused free inventory |
 | T + 21 to at least T + 28 days | Scoring and review | Everyone: inspect receipt, price and allocation archives; no Feast claims |
 | F to F + 90 days | Claims and pool opening | Contributors: frozen claims; trading only once paired funding, custody and LP lock are verified |

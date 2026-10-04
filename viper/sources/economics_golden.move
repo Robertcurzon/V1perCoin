@@ -5,7 +5,7 @@ use viper::lock_vault;
 #[test]
 fun shared_json_golden_vectors_0() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1200,1,0,1,0,60,24,30,6,1140);
     check(&mut vault,&mut clock,&mut ctx,1200,1,1,1,0,59,25,29,5,1141);
     check(&mut vault,&mut clock,&mut ctx,1200,1,2591999999,1,0,0,0,0,0,1200);
@@ -61,7 +61,7 @@ fun shared_json_golden_vectors_0() {
 #[test]
 fun shared_json_golden_vectors_1() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1200,6,15552000000,9,9,0,0,0,0,1209);
     check(&mut vault,&mut clock,&mut ctx,1200,6,15552000001,9,9,0,0,0,0,1209);
     check(&mut vault,&mut clock,&mut ctx,1200,7,0,12,0,60,24,30,6,1140);
@@ -117,7 +117,7 @@ fun shared_json_golden_vectors_1() {
 #[test]
 fun shared_json_golden_vectors_2() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1200,12,3110400000,36,1,54,22,27,5,1147);
     check(&mut vault,&mut clock,&mut ctx,1200,12,27993600000,36,24,6,3,3,0,1218);
     check(&mut vault,&mut clock,&mut ctx,1200,12,31103999999,36,29,0,0,0,0,1229);
@@ -173,7 +173,7 @@ fun shared_json_golden_vectors_2() {
 #[test]
 fun shared_json_golden_vectors_3() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1200,18,0,98,0,60,24,30,6,1140);
     check(&mut vault,&mut clock,&mut ctx,1200,18,1,98,0,59,25,29,5,1141);
     check(&mut vault,&mut clock,&mut ctx,1200,18,2591999999,98,0,56,23,28,5,1144);
@@ -229,7 +229,7 @@ fun shared_json_golden_vectors_3() {
 #[test]
 fun shared_json_golden_vectors_4() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1200,23,53654400000,208,134,6,3,3,0,1328);
     check(&mut vault,&mut clock,&mut ctx,1200,23,59615999999,208,180,0,0,0,0,1380);
     check(&mut vault,&mut clock,&mut ctx,1200,23,59616000000,208,208,0,0,0,0,1408);
@@ -285,7 +285,7 @@ fun shared_json_golden_vectors_4() {
 #[test]
 fun shared_json_golden_vectors_5() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1999,5,2592000000,12,1,79,33,39,7,1921);
     check(&mut vault,&mut clock,&mut ctx,1999,5,1296000000,12,0,89,37,44,8,1910);
     check(&mut vault,&mut clock,&mut ctx,1999,5,11664000000,12,8,9,5,4,0,1998);
@@ -341,7 +341,7 @@ fun shared_json_golden_vectors_5() {
 #[test]
 fun shared_json_golden_vectors_6() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1999,11,0,49,0,99,41,49,9,1900);
     check(&mut vault,&mut clock,&mut ctx,1999,11,1,49,0,99,41,49,9,1900);
     check(&mut vault,&mut clock,&mut ctx,1999,11,2591999999,49,0,90,36,45,9,1909);
@@ -397,7 +397,7 @@ fun shared_json_golden_vectors_6() {
 #[test]
 fun shared_json_golden_vectors_7() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1999,16,37324800000,119,85,9,5,4,0,2075);
     check(&mut vault,&mut clock,&mut ctx,1999,16,41471999999,119,101,0,0,0,0,2100);
     check(&mut vault,&mut clock,&mut ctx,1999,16,41472000000,119,119,0,0,0,0,2118);
@@ -453,7 +453,7 @@ fun shared_json_golden_vectors_7() {
 #[test]
 fun shared_json_golden_vectors_8() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1999,22,1,299,0,99,41,49,9,1900);
     check(&mut vault,&mut clock,&mut ctx,1999,22,2591999999,299,0,95,39,47,9,1904);
     check(&mut vault,&mut clock,&mut ctx,1999,22,2592000000,299,1,95,39,47,9,1905);
@@ -509,7 +509,7 @@ fun shared_json_golden_vectors_8() {
 #[test]
 fun shared_json_golden_vectors_9() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1000000,3,7776000001,3054,3054,0,0,0,0,1003054);
     check(&mut vault,&mut clock,&mut ctx,1000000,4,0,4501,0,50000,20000,25000,5000,950000);
     check(&mut vault,&mut clock,&mut ctx,1000000,4,1,4501,0,49999,20001,24999,4999,950001);
@@ -565,7 +565,7 @@ fun shared_json_golden_vectors_9() {
 #[test]
 fun shared_json_golden_vectors_10() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1000000,9,2332800000,16706,0,45000,18000,22500,4500,955000);
     check(&mut vault,&mut clock,&mut ctx,1000000,9,20995200000,16706,13435,5000,2000,2500,500,1008435);
     check(&mut vault,&mut clock,&mut ctx,1000000,9,23327999999,16706,13435,0,0,0,0,1013435);
@@ -621,7 +621,7 @@ fun shared_json_golden_vectors_10() {
 #[test]
 fun shared_json_golden_vectors_11() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1000000,15,1,50768,0,49999,20001,24999,4999,950001);
     check(&mut vault,&mut clock,&mut ctx,1000000,15,2591999999,50768,0,46666,18667,23333,4666,953334);
     check(&mut vault,&mut clock,&mut ctx,1000000,15,2592000000,50768,833,46666,18667,23333,4666,954167);
@@ -677,7 +677,7 @@ fun shared_json_golden_vectors_11() {
 #[test]
 fun shared_json_golden_vectors_12() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1000000,20,51839999999,111668,95978,0,0,0,0,1095978);
     check(&mut vault,&mut clock,&mut ctx,1000000,20,51840000000,111668,111668,0,0,0,0,1111668);
     check(&mut vault,&mut clock,&mut ctx,1000000,20,51840000001,111668,111668,0,0,0,0,1111668);
@@ -733,7 +733,7 @@ fun shared_json_golden_vectors_12() {
 #[test]
 fun shared_json_golden_vectors_13() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,2,518400000,1842000000,0,45000000000,18000000000,22500000000,4500000000,955000000000);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,2,4665600000,1842000000,833333333,5000000000,2000000000,2500000000,500000000,995833333333);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,2,5183999999,1842000000,833333333,9,5,4,0,1000833333324);
@@ -789,7 +789,7 @@ fun shared_json_golden_vectors_13() {
 #[test]
 fun shared_json_golden_vectors_14() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,8,0,13435333333,0,50000000000,20000000000,25000000000,5000000000,950000000000);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,8,1,13435333333,0,49999999997,20000000000,24999999998,4999999999,950000000003);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,8,2591999999,13435333333,0,43750000002,17500000001,21875000001,4375000000,956249999998);
@@ -845,7 +845,7 @@ fun shared_json_golden_vectors_14() {
 #[test]
 fun shared_json_golden_vectors_15() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,13,33695999999,36015416666,30078000000,1,1,0,0,1030077999999);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,13,33696000000,36015416666,36015416666,0,0,0,0,1036015416666);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,13,33696000001,36015416666,36015416666,0,0,0,0,1036015416666);
@@ -901,7 +901,7 @@ fun shared_json_golden_vectors_15() {
 #[test]
 fun shared_json_golden_vectors_16() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,19,2591999999,95978500000,0,47368421053,18947368422,23684210526,4736842105,952631578947);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,19,2592000000,95978500000,833333333,47368421052,18947368421,23684210526,4736842105,953464912281);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,19,4924800000,95978500000,833333333,45000000000,18000000000,22500000000,4500000000,955833333333);
@@ -957,7 +957,7 @@ fun shared_json_golden_vectors_16() {
 #[test]
 fun shared_json_golden_vectors_17() {
     let mut ctx=sui::tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
-    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1pr::V1PR>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
+    let (mut vault,cap)=lock_vault::create(sui::coin::mint_for_testing<viper::v1per::V1PER>(viper::allocation::lock_rewards(),&mut ctx),@0xC,@0xF,0,&mut ctx);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,24,62208000000,200000000000,200000000000,0,0,0,0,1200000000000);
     check(&mut vault,&mut clock,&mut ctx,1000000000000,24,62208000001,200000000000,200000000000,0,0,0,0,1200000000000);
     std::unit_test::destroy(vault); std::unit_test::destroy(cap); sui::clock::destroy_for_testing(clock);
@@ -965,7 +965,7 @@ fun shared_json_golden_vectors_17() {
 fun check(vault: &mut lock_vault::Vault, clock: &mut sui::clock::Clock, ctx: &mut TxContext, p: u64, term: u64, elapsed: u64, reserved: u64, earned: u64, fee: u64, community: u64, burn: u64, founder: u64, net: u64) {
     assert!(lock_vault::full_reward(p,term)==reserved);
     let start=clock.timestamp_ms();
-    let position=lock_vault::open(vault,sui::coin::mint_for_testing<viper::v1pr::V1PR>(p,ctx),term,clock,ctx);
+    let position=lock_vault::open(vault,sui::coin::mint_for_testing<viper::v1per::V1PER>(p,ctx),term,clock,ctx);
     sui::clock::set_for_testing(clock,start+elapsed);
     let (actual_p,e,f,c,b,o)=lock_vault::preview(&position,clock);
     assert!(actual_p==p && e==earned && f==fee && c==community && b==burn && o==founder);

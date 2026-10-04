@@ -1,18 +1,18 @@
-# Viper Coin (V1PR): liquidity, discovery and community strategy
+# V1PER Coin (V1PER): liquidity, discovery and community strategy
 
 Research date: 2 October 2026. This is an operating plan and research record, not a change to the coin's allocation or contract. No pool, listing, social account, campaign or third-party partnership has been created by this research.
 
 ## Decision
 
-Use a custom Sui coin and one primary V1PR/SUI pool. Cetus is the preferred venue to rehearse, conditional on actual coin-metadata compatibility, successful wallet buys/sells and review of the deployed exchange contracts. Preserve the existing fixed initial mint, burn-only supply, free claims and finite lock rewards. Build traction through a reusable character, community participation and accessible trading.
+Use a custom Sui coin and one primary V1PER/SUI pool. Cetus is the preferred venue to rehearse, conditional on actual coin-metadata compatibility, successful wallet buys/sells and review of the deployed exchange contracts. Preserve the existing fixed initial mint, burn-only supply, free claims and finite lock rewards. Build traction through a reusable character, community participation and accessible trading.
 
-The opening deposit is sized from verified paired funding and the Feast clearing price, rather than a fixed fraction of the 200-million V1PR liquidity reserve. Keep unused tokens in that initial reserve; the separate 150-million later reserve remains distinct. For a constant-product pool, paired USD value divided by deposited V1PR must meet or exceed the clearing price. If all proceeds equal eligible Feast value and conversion preserves value, pairing 25% of proceeds at the clearing price supports 25% of allocated Feast tokens: at most 25 million V1PR when all 100 million are allocated. A 50-million deposit would need additional paired funding in that example. Cetus concentrated-liquidity positions instead require the actual price, range and token amounts to be simulated together; a token-balance ratio is not their general price formula.
+The opening deposit is sized from verified paired funding and the Feast clearing price, rather than a fixed fraction of the 200-million V1PER liquidity reserve. Keep unused tokens in that initial reserve; the separate 150-million later reserve remains distinct. For a constant-product pool, paired USD value divided by deposited V1PER must meet or exceed the clearing price. If all proceeds equal eligible Feast value and conversion preserves value, pairing 25% of proceeds at the clearing price supports 25% of allocated Feast tokens: at most 25 million V1PER when all 100 million are allocated. A 50-million deposit would need additional paired funding in that example. Cetus concentrated-liquidity positions instead require the actual price, range and token amounts to be simulated together; a token-balance ratio is not their general price formula.
 
 ## Cetus implementation
 
 Cetus documents permissionless pool creation by coin type, with SUI as an accepted quote asset. Its guide lists 0.25% among its fee tiers and identifies it as common for non-stable pairs. The creator sets price and range, supplies the required token amounts and receives a position NFT. Start with 0.25% as the fee tier to test, checking current availability at execution. [Official pool guide](https://cetus-1.gitbook.io/cetus-docs/guides/how-to-create-a-new-pool)
 
-Use broad coverage for the opening position rather than a narrow range optimized around an assumed stable price. Concentrated liquidity becomes inactive and single-sided outside its range; liquidity in one position is not interchangeable with equal-value liquidity in another range. The exact ticks need simulation. A blanket formula of paired SUI divided by deposited V1PR does not determine price for every concentrated-liquidity position. [Cetus CLMM mechanics](https://cetus-1.gitbook.io/cetus-docs/clmm/concepts-and-features)
+Use broad coverage for the opening position rather than a narrow range optimized around an assumed stable price. Concentrated liquidity becomes inactive and single-sided outside its range; liquidity in one position is not interchangeable with equal-value liquidity in another range. The exact ticks need simulation. A blanket formula of paired SUI divided by deposited V1PER does not determine price for every concentrated-liquidity position. [Cetus CLMM mechanics](https://cetus-1.gitbook.io/cetus-docs/clmm/concepts-and-features)
 
 Before mainnet funding:
 
@@ -26,16 +26,16 @@ Adding a single asset to an out-of-range CLMM position is not inherently an imme
 
 Cetus suffered a CLMM exploit in May 2025 and publishes subsequent audit links. This makes matching the current deployment to relevant reviewed code part of venue selection; the presence of audits alone is not a guarantee. [Cetus incident report](https://cetusprotocol.notion.site/Cetus-Incident-Report-May-22-2025-Attack-Disclosure-1ff1dbf3ac8680d7a98de6158597d416), [audit directory](https://cetus-1.gitbook.io/cetus-docs/security/audit)
 
-Exchange swap fees are separate from V1PR's lock-exit fees. A Cetus pool does not automatically apply V1PR's 40% Community / 50% pending burn / 10% founder split to swaps. No exchange-fee buyback or burn mechanism is implemented in V1PR. Keep that distinction explicit.
+Exchange swap fees are separate from V1PER's lock-exit fees. A Cetus pool does not automatically apply V1PER's 40% Community / 50% pending burn / 10% founder split to swaps. No exchange-fee buyback or burn mechanism is implemented in V1PER. Keep that distinction explicit.
 
 ## What established projects actually do
 
-| Example | Evidence of its approach | Application to V1PR |
+| Example | Evidence of its approach | Application to V1PER |
 | --- | --- | --- |
 | BONK, Solana | Its launch paper allocated 50% to ecosystem communities including creators, developers and NFT participants. Its current integration directory spans trading, rewards and other applications. | Select contributors with existing Sui audiences and useful work; make acquisition and participation easy. Do not copy its percentage or attempt to build its mature ecosystem at launch. |
 | LOFI, Sui | Its ambassador program specifies campaigns, content, community support, calls and tiered participation. | Run a small contributor cohort with deliverables and a review process, rather than pay for raw follower counts. |
 | BLUB, Sui | The project connects its fish character to Sui's water identity, offers profile pictures, source/assets and a wallet-to-swap walkthrough. | Give Viper recognizable expressions and reusable assets; put the authentic coin type and buying instructions next to them. |
-| Pudgy Penguins | Its 2023 recap describes GIFs, stickers and memes reaching people outside Web3, reporting 3.1 billion GIF views at that time. | Make reactions people would share even without owning V1PR. Content can acquire an audience before a purchase pitch. Its mature brand resources are not a small project's starting budget. |
+| Pudgy Penguins | Its 2023 recap describes GIFs, stickers and memes reaching people outside Web3, reporting 3.1 billion GIF views at that time. | Make reactions people would share even without owning V1PER. Content can acquire an audience before a purchase pitch. Its mature brand resources are not a small project's starting budget. |
 
 Sources: [BONK launch paper](https://bonkcoin.com/BONK-Paper.pdf), [BONK integrations](https://www.bonkcoin.com/integrations), [LOFI ambassadors](https://ambassadors.lofitheyeti.com/), [BLUB official site](https://blubsui.com/en), [Pudgy's one-year recap](https://media.pudgypenguins.com/post/one-year-recap).
 
@@ -47,7 +47,7 @@ CoinGecko's pages retrieved for this research showed BONK approximately 93.7%, L
 
 Lead with **“Meme with a bite!”** and Viper's playful predator identity. Use the eating-the-other-memes artwork as one recurring joke, supplemented by expressive standalone Viper reactions: hungry, patient, skeptical, victorious, sleepy and surprised. Give people a character they can adopt; every post need not mention competitors.
 
-Follow the hook with a short factual description: Sui-native, once minted, burn-only, free approved claims and funded term-lock rewards. Present pseudonymous participation accurately; V1PR transfers are publicly visible and the token has no implemented confidential-transfer protocol. Do not market it as a private coin.
+Follow the hook with a short factual description: Sui-native, once minted, burn-only, free approved claims and funded term-lock rewards. Present pseudonymous participation accurately; V1PER transfers are publicly visible and the token has no implemented confidential-transfer protocol. Do not market it as a private coin.
 
 Start with X for public conversation and Telegram for community support. Keep one authoritative website linking the official accounts, verified coin type, pool, explorer and monitor. Add Discord only when contributors need structured work rooms. This channel selection is an operational recommendation, not measured proof that one platform produces better returns.
 
@@ -79,9 +79,9 @@ The free-claim allocation is 100 million tokens and may exceed the funded openin
 
 DEX Screener documents automatic indexing after a token has liquidity and at least one transaction. Verify that the chosen pool is supported and indexed, then publish that exact pair; enhanced metadata is separate from ordinary listing. [DEX Screener listing guide](https://docs.dexscreener.com/token-listing)
 
-Verify aggregator routes and wallet metadata before advertising them. Submit a normal CoinGecko application once V1PR is actively trading on an exchange it tracks; approval is not guaranteed and its guidance explicitly rejects community listing spam. [CoinGecko listing guidance](https://support.coingecko.com/hc/en-us/articles/4498866124057-Why-Are-Newer-Projects-Listed-Before-Mine)
+Verify aggregator routes and wallet metadata before advertising them. Submit a normal CoinGecko application once V1PER is actively trading on an exchange it tracks; approval is not guaranteed and its guidance explicitly rejects community listing spam. [CoinGecko listing guidance](https://support.coingecko.com/hc/en-us/articles/4498866124057-Why-Are-Newer-Projects-Listed-Before-Mine)
 
-Hop.fun and Turbos.fun token-creation workflows must not be used to create a second V1PR or silently replace the custom allocation and lock program. Their support for discovering or importing this existing coin requires separate verification. Do not call a platform a listing partner merely because it has a token-creation interface.
+Hop.fun and Turbos.fun token-creation workflows must not be used to create a second V1PER or silently replace the custom allocation and lock program. Their support for discovering or importing this existing coin requires separate verification. Do not call a platform a listing partner merely because it has a token-creation interface.
 
 ## Measures and readiness
 
@@ -96,7 +96,7 @@ The release still needs actual public destination wallets, paired SUI, the pool 
 
 Lead with “Memes with bite.” Viper is a calm, confident apex predator from day one. Join the community first; free claims and the Feast are secondary. Use original Viper art and generic cute critters, never recognizable coin mascots. Creator challenges, dated participation cards and educational posts should link to verified facts. Venom describes community momentum. Publish the allocation, vesting, funding and founder-controlled proceeds alongside campaign posts. Community grants reward original creative work and disclosed receipts; do not manufacture engagement or promise gains.
 
-**Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PR founder (the "V1PR Foundation"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PR only, with no claim on Foundation assets or future income. Foundation receiving addresses and all received transfers are published for verification.
+**Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PER founder (the "V1PER Foundation"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PER only, with no claim on Foundation assets or future income. Foundation receiving addresses and all received transfers are published for verification.
 
 The DEX pool opens at no less than the Feast clearing price, paired with 25% of Feast proceeds. Remaining proceeds are founder-controlled and discretionary.
 

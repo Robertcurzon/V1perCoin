@@ -9,7 +9,7 @@ export function isManifestConfigured(manifest: typeof launch): boolean {
   && ['testnet', 'mainnet'].includes(manifest.network)
   && [manifest.packageId, manifest.currencyId, manifest.vaultId, manifest.claimsId, manifest.feastId, manifest.upgradeCapId, ...custody, manifest.vaultAdminCapId, manifest.claimsAdminCapId, manifest.feastAdminCapId].every((id) => address.test(id) && id !== zero)
   && new Set(custody.map(a => a.toLowerCase())).size === custody.length
-  && manifest.coinType === `${manifest.packageId}::v1pr::V1PR`
+  && manifest.coinType === `${manifest.packageId}::v1per::V1PER`
   && [manifest.publishDigest, manifest.allocationDigest, manifest.immutableDigest, manifest.metadataDigest].every((digest) => /^[1-9A-HJ-NP-Za-km-z]{43,44}$/.test(digest))
   && Number.isSafeInteger(manifest.vaultOpensAtMs) && manifest.vaultOpensAtMs >= 0
   && (manifest.freeClaimsStartMs === 0 || manifest.vaultOpensAtMs === manifest.freeClaimsStartMs)

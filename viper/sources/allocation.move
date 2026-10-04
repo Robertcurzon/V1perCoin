@@ -1,4 +1,4 @@
-/// All initial buckets in V1PR base units. No allocation authority lives here.
+/// All initial buckets in V1PER base units. No allocation authority lives here.
 module viper::allocation;
 const INITIAL_SUPPLY: u64 = 1_000_000_000_000_000;
 const FREE_CLAIMS: u64 = 100_000_000_000_000;
