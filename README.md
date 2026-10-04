@@ -50,7 +50,7 @@ Feast claims use the shared 100-million pool. Only its AdminCap can set allocati
 
 ## Feed the Viper
 
-Cute memes in. More venom out. Babies grow fastest when you feed them — our baby Viper feeds on the meme jungle. Venom means participation and momentum; market upside remains speculative. The 21-day Feast uses the fixed accepted list and reproducible scorer in [scripts/feast](scripts/feast/README.md). Signatures bind source wallets and selected terms to Sui destinations. Publish canonical receipts, price archives, CSV/hash and the scoring commit before finalization.
+Memes with bite. Viper is the calm, confident apex predator in the Sui meme jungle. Venom means participation and community momentum; nothing promises gains. The 21-day Feast uses the fixed accepted list and reproducible scorer in [scripts/feast](scripts/feast/README.md). Signatures bind source wallets and selected terms to Sui destinations. Publish canonical receipts, price archives, CSV/hash and the scoring commit before finalization.
 
 **Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PR founder (the "V1PR Foundation"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PR only, with no claim on Foundation assets or future income. Foundation receiving addresses and all received transfers are published for verification.
 

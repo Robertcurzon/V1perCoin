@@ -89,8 +89,8 @@ export default function FeastPanel() {
     const a = document.createElement('a'); a.href = url; a.download = 'v1pr-feast-binding.json'; a.click(); URL.revokeObjectURL(url);
   }
   return <section id="feast" className="section feast-section"><div className="kicker">THE FEAST / FEED THE VIPER</div><h2>CUTE MEMES.<br/><em>MORE VENOM.</em></h2>
-    <p className="token-intro">Babies grow fastest when you feed them. Our baby Viper has an appetite: cute, cuddly meme coins are on the menu. Feed the Viper. Fuel the community. Bring more bite to the jungle.</p>
-    <div className="feast-status"><span className="status-label">{campaignOpen ? 'CAMPAIGN CONFIGURED' : 'CONTRIBUTIONS CLOSED'}</span><span>21-day window · 100 million V1PR allocation pool</span></div>
+    <p className="token-intro">Bring the cute coins. The Viper does the rest.</p>
+    <p className="feast-disclosure">Contributed coins go to wallets controlled by the founder-run V1PR Foundation, to use at its discretion, with no refunds.</p><div className="feast-status"><span className="status-label">{campaignOpen ? 'CAMPAIGN CONFIGURED' : 'CONTRIBUTIONS CLOSED'}</span><span>21-day window · 100 million V1PR allocation pool</span></div>
     <div className="feast-steps">{[
       ['01', 'Bind your wallets', 'Sign with your source wallet on its accepted network, choose your Sui destination and allocation term. Submit the receipt and confirm acceptance before transferring.'],
       ['02', 'Feed the Viper', 'Contribute an accepted meme coin during the published window. Eligible USD value, timing and lock choice determine your share of allocation points.'],

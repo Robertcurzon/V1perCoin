@@ -4,11 +4,11 @@
 
 ## Core idea
 
-**Memes with bite.** Viper is the predator in a meme jungle crowded with cuddly baby animals. The joke is energetic and self-aware; it is not an invitation to harass people or to claim affiliation with other meme projects. Make Viper recognizable on its own: yellow eyes, dark jungle, venom-lime scale pattern, and a calm, mischievous expression. Let other animal-coin references be occasional punch lines rather than the whole personality.
+**Memes with bite.** Viper is the predator in a meme jungle crowded with cute critters. The joke is energetic and self-aware; it is not an invitation to harass people or to claim affiliation with other meme projects. Make Viper recognizable on its own: yellow eyes, dark jungle, venom-lime scale pattern, and a calm, mischievous expression. Use generic critters only; never recognizable third-party coin mascots.
 
 Short lines to test:
 
-- “No more cuddly baby animals. The jungle has a new appetite.”
+- “No more cute critters. The jungle has a new appetite.”
 - “The meme coin food chain just changed.”
 - “Cute had its turn. Meet the bite.”
 - “Viper Coin (V1PR). Born on Sui. Built for memes with bite.”

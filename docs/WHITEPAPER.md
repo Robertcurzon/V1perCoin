@@ -4,7 +4,7 @@ Release specification · 3 October 2026
 
 Feed the Viper. Cute memes in. More venom out.
 
-Viper eats cuddly meme coins for lunch. Our baby Viper grows through participation, creativity and community momentum. “Venom” is the campaign metaphor; feeding and burning do not guarantee price gains.
+Viper Coin (V1PR) is the apex predator in the Sui meme jungle. “Venom” means participation, creativity and community momentum. Nothing on the site promises gains.
 
 Viper Coin (V1PR) combines Deflationary Supply, free community claims and fully funded lock rewards on Sui. No mainnet coin or funded exchange pool is live. Verify the complete Sui coin type and publication records before using the token.
 
