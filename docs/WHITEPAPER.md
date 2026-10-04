@@ -6,15 +6,15 @@ Feed the Viper. Cute memes in. More venom out.
 
 V1PER Coin (V1PER) is the apex predator in the Sui meme jungle. “Venom” means participation, creativity and community momentum. Nothing on the site promises gains.
 
-V1PER Coin (V1PER) combines Deflationary Supply, free community claims and fully funded lock rewards on Sui. No mainnet coin or funded exchange pool is live. Verify the complete Sui coin type and publication records before using the token.
+V1PER Coin (V1PER) combines Deflationary supply: minted once, burn-only, free community claims and fully funded lock rewards on Sui. No mainnet coin or funded exchange pool is live. Verify the complete Sui coin type and publication records before using the token.
 
-## 1. Deflationary Supply
+## 1. Deflationary supply: minted once, burn-only
 
 | Property | Release rule |
 |---|---|
 | Name / ticker | V1PER Coin / V1PER |
 | Chain / decimals | Sui / 6 |
-| Supply model | Deflationary Supply |
+| Supply model | Deflationary supply: minted once, burn-only |
 | Initial supply | 1,000,000,000 V1PER |
 | Subsequent minting | None |
 | Supply reductions | Onchain Currency burns |

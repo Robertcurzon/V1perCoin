@@ -19,7 +19,7 @@ const allocations = [
 
 export function AllocationSection() {
   return <section id="tokenomics" className="section allocation">
-    <div className="section-heading"><div><div className="kicker">THE INITIAL SUPPLY / 100%</div><h2>EVERY TOKEN.<br/><em>ACCOUNTED FOR.</em></h2></div><p>One billion <V1per /> minted once. Claims and rewards use this inventory; burns reduce it.</p></div>
+    <div className="section-heading"><div><div className="kicker">THE INITIAL SUPPLY / 100%</div><h2>EVERY TOKEN.<br/><em>ACCOUNTED FOR.</em></h2></div><p>Deflationary supply: minted once, burn-only. One billion <V1per /> at creation. Claims and rewards use this inventory; burns reduce it.</p></div>
     <div className="allocation-bar" aria-hidden="true">{allocations.map(a => <span key={a.name} style={{ width: `${a.percent}%`, background: a.color }} />)}</div>
     <div className="allocation-grid">{allocations.map(a => <article key={a.name}><div><i style={{ background: a.color }} /><span>{a.name}</span><strong>{a.percent}%</strong></div><p><BrandText text={a.description} /></p></article>)}</div>
     <div className="token-proof"><div><span className="kicker">DEFLATIONARY SUPPLY</span><h3>Less supply. Same bite.</h3><p>Burns come from early exits and unused claim inventory.</p><a className="text-link" href={siteUrl('rules/#burns')}>Full rules →</a></div><div><span className="kicker">SUI COIN TYPE / {isLaunchConfigured ? launch.network.toUpperCase() : 'PRE-LAUNCH'}</span><p className="coin-type">{isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p>{isLaunchConfigured && <ExplorerLink kind="coin" value={launch.coinType}>Verify on Suiscan ↗</ExplorerLink>}<a className="text-link" href={siteUrl('monitor/')}>Open the monitor →</a></div></div>

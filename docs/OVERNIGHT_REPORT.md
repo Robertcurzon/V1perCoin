@@ -31,3 +31,9 @@ Renamed the coin, currency symbol, one-time witness and module to V1PER / `viper
 The white paper remains in its existing editor and compiled successfully with the native compiler. White pages use dark letters and the magenta digit to preserve readability. The localnet scratch directory now stays inside the project; no existing deployment IDs or protocol amounts were changed.
 
 Task 3 validation: the full suite passed, including 80 Move tests and the localnet rehearsal with the explicit currency-identity assertions. Auditor references retain the actual immutable security commit, rather than implying the old tag was renamed. All frontend checks and the Pages build were repeated after the final presentation edits.
+
+## Task 4: supply wording
+
+The canonical description is “Deflationary supply: minted once, burn-only,” including the white paper identity table, website overview, README and PDF metadata. Regenerated the same LaTeX source. Added `test:supply` across tracked sources and built files, also run by deployment checks after building. CI now extracts the actual typeset PDF with pinned pypdf, checking its supply label and metadata before provenance or publication artifacts are accepted.
+
+Task 4 validation: native LaTeX compilation and the complete pre-push suite passed, including the new source/built-site supply guard. The extracted-PDF check runs on the CI-typeset artifact; its result is recorded after CI completes. Also corrected the chart accessible-label and unit rendering from the rename pass.

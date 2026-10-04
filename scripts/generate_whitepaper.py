@@ -35,7 +35,7 @@ PREAMBLE=r'''% Generated from docs/WHITEPAPER.md by scripts/generate_whitepaper.
 \definecolor{viper}{HTML}{101510}
 \definecolor{brandone}{HTML}{A3155E}
 \newcommand{\VOnePER}{\texorpdfstring{V\textcolor{brandone}{1}PER}{V1PER}}
-\hypersetup{pdftitle={V1PER Coin (V1PER): Protocol White Paper},pdfauthor={V1PER Coin},pdfsubject={Sui token, deflationary supply, funded lock rewards and public verification}}
+\hypersetup{pdftitle={V1PER Coin (V1PER): Protocol White Paper},pdfauthor={V1PER Coin},pdfsubject={Sui token, deflationary supply: minted once, burn-only; funded lock rewards and public verification}}
 \setlength{\parindent}{1em}
 \setlength{\parskip}{2pt}
 \setlength{\headheight}{14pt}

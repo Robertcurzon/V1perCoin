@@ -68,6 +68,10 @@ jobs:
           working_directory: docs
           root_file: Viper_Coin_Whitepaper.tex
           texlive_version: 2026
+      - name: Verify actual PDF supply text and metadata
+        run: |
+          python3 -m pip install pypdf==6.10.0
+          python3 scripts/test_supply_pdf.py docs/Viper_Coin_Whitepaper.pdf
       - name: Record PDF provenance
         run: |
           python3 - <<'PY'
@@ -106,6 +110,7 @@ jobs:
       - run: npm run test:monitor
       - run: npm run test:site
       - run: npm run test:brand
+      - run: npm run test:supply
       - run: npm run test:whitepaper
       - run: npm run typecheck
       - run: npm run lint

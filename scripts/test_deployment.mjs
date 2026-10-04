@@ -1,3 +1,4 @@
+import './test_supply.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createServer } from 'vite';

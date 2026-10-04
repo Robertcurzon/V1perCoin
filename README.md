@@ -1,5 +1,7 @@
 # V1PER Coin (V1PER)
 
+Deflationary supply: minted once, burn-only.
+
 **[Public website](https://robertcurzon.github.io/ViperCoin/) · [Journal PDF](https://robertcurzon.github.io/ViperCoin/whitepaper.pdf) · [Onchain monitor](https://robertcurzon.github.io/ViperCoin/monitor/)**
 
 Sui meme coin with a once-minted, burn-only supply, approved free claims and fully funded lock rewards. Website publication is separate from token deployment: no mainnet token or funded exchange pool is configured yet.

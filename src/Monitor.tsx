@@ -32,14 +32,14 @@ function Chart({ title, samples, series, tokens = true, unit = 'V1PER' }: {
   const max = Math.max(1, ...samples.flatMap((sample) => series.map((line) => Number(sample[line.key]) / divisor)));
   const width = 600, height = 190;
   return <article className="monitor-chart"><h3><BrandText text={title} /></h3>{samples.length === 0 ? <div className="chart-empty">Awaiting verified deployment and onchain samples.</div> : <>
-    <svg viewBox={`0 0 ${width + 65} ${height + 35}`} role="img" aria-label={`$<BrandText text={title} />. ${samples.length} observed onchain snapshots, vertical axis starts at zero.`}>
+    <svg viewBox={`0 0 ${width + 65} ${height + 35}`} role="img" aria-label={`${title}. ${samples.length} observed onchain snapshots, vertical axis starts at zero.`}>
       {[0, .5, 1].map((fraction) => <g key={fraction}><line x1="60" x2={width + 60} y1={height * (1-fraction)+5} y2={height * (1-fraction)+5} stroke="#475d3f"/><text x="2" y={height * (1-fraction)+10} fill="#aab8a5" fontSize="11">{(max * fraction).toLocaleString('en-US', { notation: 'compact', maximumFractionDigits: 2 })}</text></g>)}
       {series.map((line) => {
         const coordinates = samples.map((sample) => [60 + (sample.time - samples[0].time) * width / Math.max(1, samples[samples.length - 1].time - samples[0].time), 5 + height * (1 - Number(sample[line.key]) / divisor / max)]);
         return <g key={line.key}><polyline fill="none" stroke={line.color} strokeWidth="2.5" points={coordinates.map((point) => point.join(',')).join(' ')}/>{coordinates.length === 1 && <circle cx={coordinates[0][0]} cy={coordinates[0][1]} r="4" fill={line.color}/>}</g>;
       })}
     </svg><div className="chart-times"><span>{new Date(samples[0].time).toLocaleString()}</span><span>{new Date(samples[samples.length-1].time).toLocaleString()}</span></div>
-  </>}<div className="chart-legend">{series.map((line) => <span key={line.key}><i style={{ background: line.color }}/>{line.name}{tokens ? ` ($<BrandText text={unit} />)` : ''}</span>)}</div></article>;
+  </>}<div className="chart-legend">{series.map((line) => <span key={line.key}><i style={{ background: line.color }}/>{line.name}{tokens && <> (<BrandText text={unit} />)</>}</span>)}</div></article>;
 }
 
 export default function Monitor() {
