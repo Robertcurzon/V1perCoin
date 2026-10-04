@@ -14,7 +14,7 @@ import { exitPreview, formatAmount, fullReward, MONTH_MS, netReward, parseAmount
 type Position = ReturnType<typeof PositionBcs.parse>;
 type Vault = ReturnType<typeof VaultBcs.parse>;
 
-export default function LockPanel() {
+export default function LockPanel({ detailed = false }: { detailed?: boolean }) {
   const [months, setMonths] = useState(24);
   const [amount, setAmount] = useState('10000');
   const [vault, setVault] = useState<Vault | null>(null);
@@ -105,29 +105,24 @@ export default function LockPanel() {
   }
   const visiblePositions = loadedOwner === account?.address ? positions : [];
   const lockOpen = configured && vault !== null && chainTime >= BigInt(vault.opens_at_ms);
-  const freeOpen = configured && launch.freeClaimsStartMs > 0 && chainTime >= BigInt(launch.freeClaimsStartMs) && chainTime < BigInt(launch.freeClaimsStartMs) + 14n * 86_400_000n;
   const capacity = vault ? BigInt(vault.rewards) : null;
   return <section id="lock" className="section lock-section">
     <div className="kicker">LOCK & EARN / FUNDED REWARDS</div>
     <h2>LONGER LOCK.<br/><em>BIGGER BITE.</em></h2>
-    <p className="token-intro">First come, first served. The 150 million V1PR reward pool funds accepted locks until available capacity is exhausted. Your full reward is reserved when your lock opens.</p>
+    <p className="token-intro">1–10% annual V1PR rates for 1–24 months; first come, first fully funded.</p>
+    <p className="lock-summary">Early exit: up to 5% of principal × time remaining; no fee at maturity.</p>
+    <a className="text-link" href={siteUrl('rules/#lock')}>Full rules →</a>
     <div className="lock-grid">
       <div className="lock-card">
         <label htmlFor="lock-amount">V1PR to lock</label><input id="lock-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <label htmlFor="lock-months">{months} program months · {months * 30} days</label><input id="lock-months" type="range" min="1" max="24" value={months} onChange={(e) => setMonths(Number(e.target.value))} />
         <div className="facts"><div><span>ANNUAL TOKEN REWARD RATE</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>TOTAL TERM RATE</span><strong>{(Number(ratePpm(months)) / 10000 * months / 12).toFixed(4)}%</strong></div><div><span>MATURE EXIT FEE (0%)</span><strong>0 V1PR</strong></div><div><span>TOTAL TERM REWARD</span><strong>{formatAmount(reward)} V1PR</strong></div><div><span>FULL-TERM NET PAYOUT</span><strong>{formatAmount(principal + reward)} V1PR</strong></div><div><span>AVAILABLE REWARD CAPACITY</span><strong>{capacity === null ? 'NOT DEPLOYED / UNAVAILABLE' : `${formatAmount(capacity)} V1PR`}</strong></div></div>
         {inputError && <p role="alert">{inputError}</p>}{principal > 0n && netReward(principal, months) === 0n && <p role="alert">Increase the amount to earn at least one V1PR base unit for the selected term.</p>}
-        <p className="fine-print">One month = 30 days. Simple rewards in V1PR; no compounding or dollar-return promise. No deposit fee. No fee at maturity. Early exit pays the reward for whole completed months and charges up to 5% of principal, tapering continuously to zero. Every completed lock earns a positive net V1PR reward before network gas. Early exits can return less than deposited.</p>
+        {detailed && <p className="fine-print">One month = 30 days. Simple rewards in V1PR; no compounding or dollar-return promise. No deposit fee. No fee at maturity. Early exit pays the reward for whole completed months and charges up to 5% of principal, tapering continuously to zero. Every completed lock earns a positive net V1PR reward before network gas. Early exits can return less than deposited.</p>}
         <ConnectButton />
         <div className="buttons"><button className="button lime" disabled={!lockOpen || !account || !vault || vault.paused || pending || Boolean(inputError) || netReward(principal, months) === 0n || (capacity !== null && reward > capacity)} onClick={() => void submit('deposit')}>{pending ? 'PROCESSING…' : 'OPEN LOCK'}</button></div>
       </div>
-      <div className="lock-card">
-        <h3>FIRST COME. FULLY FUNDED.</h3><p>Annual simple token rates grow exponentially from 1% for a 1-month lock to 10% for a 24-month lock. Total reward is annual rate × months / 12: 20% for 24 months. The full term reward is escrowed. There is no new minting.</p>
-        <p>Early-exit fee = 5% × the fraction of the term remaining. It reaches zero at maturity. Of the fee, 50% is queued for permissionless burning, 40% goes to Community programs and 10% to the V1PR Foundation. Only completed program months earn rewards, at the rate for that completed length.</p>
-        <div id="claim-action" className="claim-action"><h3>FREE CLAIM STATUS</h3><p className="fine-print">{launch.freeClaimsStartMs > 0 ? `UTC window: ${new Date(launch.freeClaimsStartMs).toISOString()} → ${new Date(launch.freeClaimsStartMs + 14 * 86400000).toISOString()} · ${freeOpen ? 'OPEN' : 'NOT OPEN'}` : 'Opening date not announced. Free claims are closed.'}</p><p>Free claims require an approved address: one 10,000 V1PR claim per approved wallet during the 14-day scheduled window. Approvals freeze at opening; unclaimed tokens can be burned after the deadline.</p><button className="button outline" disabled={!freeOpen || !account || !vault || pending} onClick={() => void submit('claim')}>CLAIM 10,000 V1PR</button></div>
-        <p className="fine-print">{configured ? `Network: ${launch.network}. Wallet approval is required for every transaction.` : 'Contracts are implemented locally. Transactions remain disabled until deployment records and verified object IDs are published.'}</p>
-        <a className="text-link" href={siteUrl('whitepaper/')}>READ THE WHITE PAPER ↗</a> · <a className="text-link" href={siteUrl('whitepaper/')} target="_blank" rel="noreferrer">JOURNAL PDF ↗</a>
-      </div>
+
     </div>
     {visiblePositions.length > 0 && <div className="positions"><h3>YOUR LOCKS</h3>{visiblePositions.map((position) => {
       const quote = exitPreview(BigInt(position.principal), BigInt(position.reward), BigInt(position.duration_ms), chainTime - BigInt(position.start_ms));

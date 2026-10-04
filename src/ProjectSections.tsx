@@ -1,7 +1,9 @@
-import { ArrowUpRight, Flame, Fingerprint, Gift, Eye } from 'lucide-react';
+import { ArrowUpRight, Flame, Fingerprint, Eye } from 'lucide-react';
 import { siteUrl } from './site';
 import { FEAST_DISCLOSURE } from './feastData';
 import FreeClaimApplication from './FreeClaimApplication';
+import { launch, isLaunchConfigured } from './manifest';
+import ExplorerLink from './ExplorerLink';
 
 const allocations = [
   { name: 'Free claims', percent: 10, color: '#bdf332', description: '100M · approved community addresses' },
@@ -14,17 +16,22 @@ const allocations = [
 ];
 
 export function AllocationSection() {
-  return <section id="allocation" className="section allocation">
+  return <section id="tokenomics" className="section allocation">
     <div className="section-heading"><div><div className="kicker">THE INITIAL SUPPLY / 100%</div><h2>EVERY TOKEN.<br/><em>ACCOUNTED FOR.</em></h2></div><p>One billion V1PR minted once. Claims and rewards use this inventory; burns reduce it.</p></div>
     <div className="allocation-bar" aria-hidden="true">{allocations.map(a => <span key={a.name} style={{ width: `${a.percent}%`, background: a.color }} />)}</div>
     <div className="allocation-grid">{allocations.map(a => <article key={a.name}><div><i style={{ background: a.color }} /><span>{a.name}</span><strong>{a.percent}%</strong></div><p>{a.description}</p></article>)}</div>
-    <p className="fine-print">Liquidity allocations are token reserves, not evidence of a funded exchange pool. Operations is controlled through the V1PR Foundation. <a href="#foundation">Read the custody and funding policy ↓</a></p>
+    <div className="token-proof"><div><span className="kicker">DEFLATIONARY SUPPLY</span><h3>Less supply. Same bite.</h3><p>Burns come from early exits and unused claim inventory.</p><a className="text-link" href={siteUrl('rules/#burns')}>Full rules →</a></div><div><span className="kicker">VERIFIED COIN TYPE / {launch.network.toUpperCase()}</span><p className="coin-type">{isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p>{isLaunchConfigured && <ExplorerLink kind="coin" value={launch.coinType}>Verify on Suiscan ↗</ExplorerLink>}<a className="text-link" href={siteUrl('monitor/')}>Open the monitor →</a></div></div>
+    <p className="fine-print">Liquidity reserves do not prove a funded exchange pool. <a href={siteUrl('rules/#foundation')}>Full rules →</a></p>
   </section>;
 }
 
-export function FreeClaimsSection() {
+export function FreeClaimsSection({ detailed = false }: { detailed?: boolean }) {
   return <section id="claims" className="section free-claims-section">
-    <div className="claim-callout"><Gift size={32} aria-hidden="true" /><div><div className="kicker">FREE COMMUNITY CLAIMS / 10% OF SUPPLY</div><h2>A FIRST BITE.<br/><em>ON THE HOUSE.</em></h2><p>10,000 V1PR per approved Sui address. Up to 10,000 addresses. One claim each, within the 14-day scheduled claim window; network gas only.</p><p className="fine-print">Apply during the seven days before opening with a wallet-signed application and one original community entry. Review checks authorship and repeated entries; approvals freeze at opening. A wallet is not proof of one person. No paid referral or promotional purchase is required. Unclaimed tokens can be burned after expiry; the administrator cannot withdraw them.</p></div><a className="button outline" href="#claim-action">CLAIM STATUS <ArrowUpRight size={18} /></a></div><FreeClaimApplication />
+    <div className="kicker">02 / FREE COMMUNITY CLAIMS</div><h2>FIRST BITE'S<br/><em>FREE.</em></h2>
+    <p className="token-intro">10,000 V1PR for up to 10,000 approved wallets. Make something original, apply, claim. Gas only.</p>
+    <div className="claim-summary"><span className="status-label">{launch.freeClaimsStartMs > 0 ? `SCHEDULED: ${new Date(launch.freeClaimsStartMs).toISOString()}` : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href={siteUrl('rules/#claims')}>How to apply →</a></div>
+    <p className="fine-print">Apply in the seven days before opening; approved wallets have 14 days to claim. <a href={siteUrl('rules/#claims')}>Full rules →</a></p>
+    {detailed && <><p>Apply with a wallet-signed application and one original community entry. Review checks authorship and repeated entries; approvals freeze at opening. A wallet is not proof of one person. No paid referral or promotional purchase is required. Unclaimed tokens can be burned after expiry; the administrator cannot withdraw them.</p><FreeClaimApplication /></>}
   </section>;
 }
 
