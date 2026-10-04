@@ -216,3 +216,17 @@ footer nav { display: flex; flex-wrap: wrap; gap: 22px; }
 .rules-page .rules-prose{margin-top:30px}
 .rules-page .free-claims-section{padding-bottom:65px;border-bottom:1px solid #475d3f}
 @media(max-width:650px){.rules-page .section h2{font-size:clamp(46px,12vw,64px)}.rules-page .header nav{gap:18px;font-size:10px}.rules-intro{padding-top:45px;padding-bottom:45px}.rules-intro h1{font-size:65px}.rules-page .rules-prose p{font-size:14px}}
+
+.header-join{border:0;white-space:nowrap;flex:none;font-family:inherit;cursor:pointer;gap:8px;min-height:44px;padding:0 15px;font-size:10px}
+.home-header{gap:22px}
+.home-header nav{gap:clamp(12px,1.6vw,22px)}
+.community-links{display:flex;gap:12px;flex-wrap:wrap;align-items:center;max-width:430px}
+.community-links p{width:100%;margin-bottom:0;font-size:15px;line-height:1.7}
+.den-dialog{border:1px solid #bdf332;background:#101510;color:#e9ecdf;padding:32px;max-width:min(600px,calc(100% - 32px));width:560px;box-shadow:0 18px 100px #000c}
+.den-dialog::backdrop{background:#000b}
+.dialog-top{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.den-dialog h2{font-size:52px;line-height:1}
+.den-dialog>p{line-height:1.7;color:#b2beaf;margin:22px 0}
+.dialog-close{font:400 36px/1 Arial,sans-serif;color:#bdf332;background:none;border:1px solid #475d3f;width:42px;height:42px;cursor:pointer;flex:none}
+@media(max-width:1100px){.home-header .brand{margin-right:auto}.home-header .header-join{order:2}.home-header .menu-toggle{order:3}.home-header nav{order:4}}
+@media(max-width:650px){.home-header{gap:9px;padding:0 16px}.home-header .brand{gap:8px;font-size:23px}.home-header .brand img{width:32px;height:32px}.header-join{font-size:9px;letter-spacing:.07em;padding:0 11px;min-height:40px}.home-header .menu-toggle{padding:7px}.den-dialog{padding:22px}.den-dialog h2{font-size:40px}}

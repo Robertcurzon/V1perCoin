@@ -1,0 +1,6 @@
+{
+  "home": { "title": "Viper Coin (V1PR) — Memes with Bite", "description": "Cute had its turn. Meet Viper Coin (V1PR), the new top of the Sui meme food chain. Join the den. Pre-launch; not deployed." },
+  "rules": { "title": "Rules — Viper Coin (V1PR)", "description": "The launch timeline, free claims, Feast terms, lock rewards, Foundation custody and on-chain privacy for Viper Coin (V1PR)." },
+  "monitor": { "title": "Onchain Monitor — Viper Coin (V1PR)", "description": "Verify Viper Coin (V1PR): supply, burns, funded rewards, claims and custody. Live figures appear only after verified deployment." },
+  "whitepaper": { "title": "White Paper — Viper Coin (V1PR)", "description": "Read the Viper Coin (V1PR) release specification: deflationary supply, community participation, funded lock rewards and public proof on Sui." }
+}

@@ -67,3 +67,10 @@ The Feast menu includes native DOGE and native MemeCore M; all four receiving ne
 ## Trust assumptions
 
 Cross-chain finality, complete exports and historical-price provenance; correct CSV publication and AdminCap allocation entries; original-work eligibility review and intake timestamps; receipt publication and multisig custody; 25% proceeds conversion/funding, exchange opening-price floor and LP locking; discretionary Foundation/Community budgets; and deployment/source correspondence are operator responsibilities, not restrictions imposed by Move. See the white paper section 11 for the full list. Contract rules are enforced by feast::set_allocations/finalize/claim_locked/burn_unclaimed (hash, review, reservations and expiry), lock_vault::open/deposit (opening and emergency pause), free_claims::schedule/approve/claim (one-time claim dates/caps) and launch::allocate (custody and once-only allocation).
+
+## Website configuration
+
+The homepage has seven sections, with the full participation and custody rules at `/rules/`.
+Set `VITE_SOCIAL_X`, `VITE_SOCIAL_TELEGRAM` and `VITE_SOCIAL_DISCORD` to official HTTPS channel URLs. They default to empty strings; absent channels stay hidden and Join the Den shows GitHub with “Channels opening soon.” Both rendering and the release build reject unexpected platform domains or URLs containing credentials.
+
+`VITE_PUBLIC_SITE_URL` sets the absolute HTTPS publication root for canonical and sharing URLs (default: `https://robertcurzon.github.io/ViperCoin/`). `VITE_BASE_PATH` still controls physical project-path deployment. Every route gets its own metadata from `site-pages.json` and the original `public/social-preview.png` card, whose editable source is `public/social-preview.svg`.

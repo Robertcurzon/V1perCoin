@@ -21,7 +21,8 @@
     "test:claims": "node scripts/claims/test.mjs",
     "test:rehearsal": "node scripts/rehearse_localnet.mjs",
     "test:pyth": "node scripts/feast/test_pyth.mjs",
-    "check:pyth": "node scripts/feast/check_pyth.mjs"
+    "check:pyth": "node scripts/feast/check_pyth.mjs",
+    "test:site": "node scripts/test_site.mjs"
   },
   "dependencies": {
     "@mysten/dapp-kit-react": "^2.1.37",

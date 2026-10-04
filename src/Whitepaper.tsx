@@ -21,7 +21,7 @@ export default function Whitepaper() {
     <header className="header">
       <a className="brand" href={siteUrl('')}><img src={siteUrl('viper-logo.webp')} alt=""/><span>VIPER<span className="accent">.</span></span></a>
       <nav aria-label="White paper navigation">
-        <a href={siteUrl('')}>Home</a><a href={siteUrl('monitor/')}>Onchain monitor</a>
+        <a href={siteUrl('')}>Home</a><a href={siteUrl('rules/')}>Rules</a><a href={siteUrl('monitor/')}>Onchain monitor</a>
         {verified && <><a href={siteUrl('whitepaper.pdf')} target="_blank" rel="noreferrer">Open PDF ↗</a><a href={siteUrl('whitepaper.pdf')} download>Download PDF ↓</a></>}
         <a href={siteUrl('Viper_Coin_Whitepaper.tex')} download>LaTeX source ↓</a>
       </nav>

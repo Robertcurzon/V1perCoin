@@ -1,5 +1,4 @@
 import { siteUrl } from './site';
-import LaunchTimeline from './LaunchTimeline';
 import { useEffect, useState } from 'react';
 import { useCurrentClient } from '@mysten/dapp-kit-react';
 import { readChainState, INITIAL_SUPPLY } from './chainState';
@@ -97,9 +96,9 @@ export default function Monitor() {
     return () => { active = false; controller.abort(); window.clearInterval(interval); window.removeEventListener('focus', refresh); };
   }, [client, revision]);
   const value = (key: keyof Omit<Snapshot, 'time' | 'volume24h'>, tokens = true) => latest ? tokens ? formatAmount(BigInt(latest[key])) : BigInt(latest[key]).toLocaleString() : '—';
-  return <div className="site monitor-page"><header className="header"><a className="brand" href={siteUrl('')}><img src={siteUrl('viper-logo.webp')} alt=""/><span>VIPER<span className="accent">.</span></span></a><a className="text-link" href={siteUrl('')}>BACK TO VIPER ↗</a></header><main className="section">
+  return <div className="site monitor-page"><header className="header"><a className="brand" href={siteUrl('')}><img src={siteUrl('viper-logo.webp')} alt=""/><span>VIPER<span className="accent">.</span></span></a><a className="text-link" href={siteUrl('')}>VIPER COIN (V1PR) ↗</a></header><main className="section">
     <div className="kicker">V1PR / ONCHAIN MONITOR</div><h1>FOLLOW<br/><em>THE BITE.</em></h1>
-    <p className="token-intro">Supply, funded rewards, and community contract activity. {isLaunchConfigured ? `Sui ${launch.network}; refreshes every 30 seconds.` : 'No verified deployment is configured. No live figures or trading activity are implied.'}</p>
+    <p className="token-intro">Viper Coin (V1PR): supply, funded rewards and community contract activity. {isLaunchConfigured ? `Sui ${launch.network}; refreshes every 30 seconds.` : 'No verified deployment is configured. No live figures or trading activity are implied.'}</p>
     <p className="fine-print coin-type">Coin type: {isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p>
     <div className="monitor-metrics">{[
       ['Current total supply', value('supply')], ['Total actually burned', value('burned')], ['Pending exit burns', value('pendingBurn')], ['Available lock rewards', value('available')], ['Reserved lock rewards', value('committed')], ['Rewards paid', value('paid')], ['Total rewards funded', value('funded')], ['V1PR currently locked', value('locked')], ['Locks opened / closed', `${value('opened', false)} / ${value('closed', false)}`], ['Free claims paid', value('claims', false)], ['Community exit-fee receipts', value('community')], ['V1PR Foundation exit-fee receipts', value('founder')],
@@ -111,7 +110,7 @@ export default function Monitor() {
     <Chart title="EXCHANGE VOLUME / ROLLING 24H USD" samples={samples.filter((sample) => sample.volume24h !== null && sample.volume24h !== undefined)} unit="USD" series={[{key:'volume24h',name:'Configured pair 24h volume',color:'#66c9f3'}]}/>
     <p className="fine-print">{launch.dexPairId ? `Source: DEX Screener, configured Sui pair ${launch.dexPairId}. Rolling 24-hour USD volume for this pair only; not all-exchange volume or cumulative lifetime trading. ${volumeError ? `Volume unavailable/stale: ${volumeError}` : ''}` : 'Trading volume is not available until a real, verified mainnet exchange pair is configured. No synthetic trades or zero-volume claim is displayed.'} <a href="https://docs.dexscreener.com/api/reference" target="_blank" rel="noreferrer">Provider documentation ↗</a></p>
     <p className="fine-print">Charts show observed onchain snapshots stored in this browser, starting when this page first loads after deployment. They are not a complete historical index. Counters are cumulative successful lock opens, closes and free claims; they do not count ordinary transfers, unique people, every transaction, or exchange trades. Total supply includes reserves and locked inventory; it is not circulating supply. Separate object reads can briefly span concurrent transactions. Network/API failures leave saved data marked stale.</p>
-    <LaunchTimeline />
+    <a className="text-link" href={siteUrl('rules/#timeline')}>The launch, step by step →</a>
     <FeastMonitor />
     <Transparency />
   </main></div>;
