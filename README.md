@@ -1,6 +1,8 @@
-# Viper Coin (V1PR)
+# V1PER Coin (V1PER)
 
-**[Public website](https://robertcurzon.github.io/ViperCoin/) · [Journal PDF](https://robertcurzon.github.io/ViperCoin/whitepaper.pdf) · [Onchain monitor](https://robertcurzon.github.io/ViperCoin/monitor/)**
+Deflationary supply: minted once, burn-only.
+
+**[Public website](https://robertcurzon.github.io/V1perCoin/) · [Journal PDF](https://robertcurzon.github.io/V1perCoin/whitepaper.pdf) · [Onchain monitor](https://robertcurzon.github.io/V1perCoin/monitor/)**
 
 Sui meme coin with a once-minted, burn-only supply, approved free claims and fully funded lock rewards. Website publication is separate from token deployment: no mainnet token or funded exchange pool is configured yet.
 
@@ -21,7 +23,7 @@ sui move test --path viper
 
 [White paper](docs/WHITEPAPER.md) · [Vault](docs/STAKING_DESIGN.md) · [Distribution](docs/DISTRIBUTION_DESIGN.md) · [Launch runbook](docs/LAUNCH.md)
 
-The 150 million V1PR reward pool is first come, first served. Each accepted lock escrows its full reward. Net total term rewards after the mature-exit fee grow exponentially from 0.5% of initial principal at 1 month to 5% at 24 months. A month is 30 days. Exit fee is at most 2%, tapering to 0.3% at maturity; split 70% Community / 20% burn / 10% founder. The pool also funds a mature-fee offset, so every completed term earns positive net V1PR before gas. Ordinary transfers and swaps are untaxed. No inflation, confidential transfers, cross-chain paid campaign or specialty-action tax is included.
+The 150 million V1PER reward pool is first come, first served. Each accepted lock escrows its full reward. Annual simple token rates grow exponentially from 1% for one month to 10% for 24 months. Term reward = annual rate × months / 12, reaching 20% at 24 months. A month is 30 days. Early exits earn the completed-month reward and pay 5% × remaining fraction, split 50% pending burn / 40% Community / 10% founder. Mature exits have no fee. Permissionless flushing burns the pending balance. Ordinary transfers and swaps are untaxed. No inflation, confidential transfers or specialty-action tax is included. The Feast scorer and claim contracts are implemented; contributions stay closed until real launch inputs and historical pricing access are verified.
 
 The wallet interface uses official Sui dApp Kit with gRPC and remains disabled until `src/launch.json` contains verified deployment records. Wallet destinations, independent review, testnet rehearsal, hosted metadata, package immutability and funded exchange liquidity remain launch work. No private keys belong in this repository.
 
@@ -32,9 +34,9 @@ The `/monitor` page charts onchain supply, funded/available/reserved/paid reward
 
 ### Website verification and monitoring
 
-`/whitepaper` renders `docs/WHITEPAPER.md` with navigation and tables. Production builds automatically synchronize the downloadable Markdown copy. `/monitor` polls onchain state every 30 seconds, shows freshness and object versions, links to Suiscan, and reads scoped contract events and public custody wallet balances. Charts are browser observations, not a full index. Wallet actions re-read validated currency/vault/claim state before signature; claim eligibility is checked onchain.
+`/whitepaper` embeds the journal PDF with black side margins. Production builds automatically synchronize the downloadable Markdown copy. `/monitor` polls onchain state every 30 seconds, shows freshness and object versions, links to Suiscan, and reads scoped contract events and public custody wallet balances. Charts are browser observations, not a full index. Wallet actions re-read validated currency/vault/claim state before signature; claim eligibility is checked onchain.
 
-Before enabling the website, fill all manifest deployment records and custody fields in `src/launch.json`: `publicReserve`, `initialLiquidity`, `laterLiquidity`, `vaultAdminCapId`, `claimsAdminCapId`, and `metadataDigest` supplement the existing coin, shared objects, founder/Community and transaction fields. Record the actual allocation recipients and admin capability IDs, then independently verify current capability owners in Suiscan. All custody and admin IDs and the metadata-deletion digest are required before the manifest enables transactions. Exchange pair configuration remains optional until a funded pair exists. Status `verified` is an operator assertion; it does not independently verify package immutability or source bytecode. Delete metadata authority and make the package immutable before participant use. The shared currency check fails closed if metadata remains mutable.
+Before enabling the website, populate real coin/object IDs, four distinct Sui custody addresses, three AdminCap IDs, the original upgradeCapId and publication/allocation/immutability/metadata-deletion digests in src/launch.json. Include feastId and feastAdminCapId for the shared Feast pool. The client requires authenticated creation of the configured package/UpgradeCap and make_immutable deletion of the same untouched capability, immutable metadata and reconciled Feast/vault accounting. Transport errors fail closed. RPC history must provide those receipts; configured IDs and checks are not a bytecode audit. feastOpen defaults false. Opening requires valid chain Foundation destinations, feastStartMs and a published HTTPS binding-submission channel. Exchange-pair configuration remains separate.
 
 The Move events now include the vault/pool ID for scoping. Lock and claim events include chain-clock timestamps; funding and pause events use their ledger checkpoint. Keep the frontend and deployed contract event schemas together. No deployment identifiers or funded liquidity have been fabricated.
 
@@ -42,3 +44,37 @@ The Move events now include the vault/pool ID for scoping. Lock and claim events
 ### Publication
 
 See [website deployment](docs/WEBSITE_DEPLOYMENT.md). Main-branch publication automatically typesets the journal-style white paper, runs website checks and deploys GitHub Pages. All routes and assets support the project subdirectory. The downloadable PDF and standalone LaTeX source are linked from the reader. The Markdown document remains the canonical text; `npm run whitepaper:source` regenerates LaTeX without changing the economic rules.
+
+Custody addresses must be nonzero and pairwise distinct. Named allocation constants sum to the complete initial supply. Approval and expiry boundaries, multi-user funding/exits and permissionless burn flushing are covered by unit tests.
+
+Feast claims use the shared 100-million pool. Only its AdminCap can set allocations before finalization; no edits afterward. Finalization burns unallocated tokens. Liquid claims vest 50% immediately and 50% over 60 days; finalization reserves all 12/24-month rewards or aborts, and locked claims consume those reservations despite pauses, the ordinary opening date or later capacity exhaustion. Anyone may burn unclaimed tokens after 90 days. Unscheduled free pools expire 60 days after allocation; unfinalized Feast pools expire at 120 days. No minting or administrator sweep exists.
+
+
+## Feed the Viper
+
+Memes with bite. Viper is the calm, confident apex predator in the Sui meme jungle. Venom means participation and community momentum; nothing promises gains. The 21-day Feast uses the fixed accepted list and reproducible scorer in [scripts/feast](scripts/feast/README.md). Source signatures bind wallets; Sui personal-message signatures authorize terms and include a T+23-day binding deadline. Receiving-wallet returns are netted out. Base allocation quantities are calculated at 10,000 tokens per eligible USD before bonuses; capped inventory scales bonus quantities proportionally. Publish canonical receipts, price archives, CSV/file hash, chained allocation commitment/row count and the scoring commit before finalization.
+
+**Feast proceeds.** Coins sacrificed during the Feast are transferred to wallets controlled by the V1PER founder (the "V1PER Foundation"). They are not burned, held in trust, or governed by participants. The founder may hold, sell, reinvest or spend them at the founder's sole discretion. Participants receive V1PER only, with no claim on Foundation assets or future income. Foundation receiving addresses and all received transfers are published for verification.
+
+The DEX pool opens at no less than the Feast clearing price, paired with 25% of Feast proceeds. Remaining proceeds are founder-controlled and discretionary.
+
+The monitor publishes Foundation explorer links and hash-verified export totals/clearing price; onchain claims and burns refresh independently. For public/feast-results.json use the scorer's exact results.json bytes, set feastResultsSha256 to their SHA-256 hash, and match feastStartMs to the frozen scoring config. Scheduled vesting requires a complete, reconciled table read. Never label export totals as live Foundation balances.
+
+
+Free claims are limited to 100M V1PER: at most 10,000 reviewed addresses, exactly 10,000 each, one claim per address. Seven-day signed applications precede day 0; the onchain window is scheduled once with at least seven days' notice, approvals freeze at opening and claims end 14 days later. No extension or administrator sweep. See scripts/claims/README.md and the white paper's phase table.
+
+The Feast menu includes native DOGE and native MemeCore M; all four receiving networks must be configured and rehearsed. Network- and campaign-bound signatures, native receipt checks and pricing rules are in scripts/feast/. No contribution campaign is open.
+
+
+## Trust assumptions
+
+Cross-chain finality, complete exports and historical-price provenance; correct CSV publication and AdminCap allocation entries; original-work eligibility review and intake timestamps; receipt publication and multisig custody; 25% proceeds conversion/funding, exchange opening-price floor and LP locking; discretionary Foundation/Community budgets; and deployment/source correspondence are operator responsibilities, not restrictions imposed by Move. See the white paper section 11 for the full list. Contract rules are enforced by feast::set_allocations/finalize/claim_locked/burn_unclaimed (calculated row commitment/count, review, reservations and expiry), lock_vault::open/deposit (opening and emergency pause), free_claims::schedule/approve/claim (one-time claim dates/caps) and launch::allocate (custody and once-only allocation).
+
+## Website configuration
+
+The homepage has seven sections, with the full participation and custody rules at `/rules/`.
+Set `VITE_SOCIAL_X`, `VITE_SOCIAL_TELEGRAM` and `VITE_SOCIAL_DISCORD` to official HTTPS channel URLs. They default to empty strings; absent channels stay hidden and Join the Den shows GitHub with “Channels opening soon.” Both rendering and the release build reject unexpected platform domains or URLs containing credentials.
+
+`VITE_PUBLIC_SITE_URL` sets the absolute HTTPS publication root for canonical and sharing URLs (default: `https://robertcurzon.github.io/V1perCoin/`). `VITE_BASE_PATH` still controls physical project-path deployment. Every route gets its own metadata from `site-pages.json` and the original `public/social-preview.png` card, whose editable source is `public/social-preview.svg`.
+
+Upload batches are strictly address-sorted, capped at 500 and routinely sized at 250. Restart review and re-upload the complete table after any edit/removal. See scripts/feast/README.md and docs/SECURITY_SPEC.md for exact signing, reconciliation, pricing, commitment and gas rules. Rehearsal uses SUI_BIN or sui on PATH; it never reads personal wallet configuration.

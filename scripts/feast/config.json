@@ -1,0 +1,119 @@
+{
+  "snapshotDate": "2026-10-03",
+  "snapshotSource": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=meme-token&order=market_cap_desc&per_page=30&page=1",
+  "snapshotSha256": "8df72f864dace3782ca07f09afeffa5754c70ff53e7ce06b2c4e5663b748c2ef",
+  "windowStart": null,
+  "liquidityProceedsPercent": 25,
+  "coins": [
+    {
+      "id": "shiba-inu",
+      "symbol": "SHIB",
+      "chain": "ethereum",
+      "contract": "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce",
+      "decimals": 18,
+      "pythFeed": "f0d57deca57b3da2fe63a493f4c25925fdfd8edf834b20f93e1f84dbd1504d4a",
+      "pythSymbol": "Crypto.SHIB/USD",
+      "treasury": ""
+    },
+    {
+      "id": "pump-fun",
+      "symbol": "PUMP",
+      "chain": "solana",
+      "contract": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+      "decimals": 6,
+      "pythFeed": "7a01fca212788bba7c5bf8c9efd576a8a722f070d2c17596ff7bb609b8d5c3b9",
+      "pythSymbol": "Crypto.PUMP/USD",
+      "treasury": ""
+    },
+    {
+      "id": "pepe",
+      "symbol": "PEPE",
+      "chain": "ethereum",
+      "contract": "0x6982508145454ce325ddbe47a25d4ec3d2311933",
+      "decimals": 18,
+      "pythFeed": "d69731a2e74ac1ce884fc3890f7ee324b6deb66147055249568869ed700882e4",
+      "pythSymbol": "Crypto.PEPE/USD",
+      "treasury": ""
+    },
+    {
+      "id": "dogecoin",
+      "symbol": "DOGE",
+      "chain": "dogecoin",
+      "contract": "native",
+      "decimals": 8,
+      "pythFeed": "dcef50dd0a4cd2dcc17e45df1676dcb336a11a61c69df7a0299b0150c672d25c",
+      "pythSymbol": "Crypto.DOGE/USD",
+      "treasury": "",
+      "assetSource": "https://dogecoin.com/"
+    },
+    {
+      "id": "pudgy-penguins",
+      "symbol": "PENGU",
+      "chain": "solana",
+      "contract": "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv",
+      "decimals": 6,
+      "pythFeed": "bed3097008b9b5e3c93bec20be79cb43986b85a996475589351a21e67bae9b61",
+      "pythSymbol": "Crypto.PENGU/USD",
+      "treasury": ""
+    },
+    {
+      "id": "spx6900",
+      "symbol": "SPX",
+      "chain": "ethereum",
+      "contract": "0xe0f63a424a4439cbe457d80e4f4b51ad25b2c56c",
+      "decimals": 8,
+      "pythFeed": "8414cfadf82f6bed644d2e399c11df21ec0131aa574c56030b132113dbbf3a0a",
+      "pythSymbol": "Crypto.SPX6900/USD",
+      "treasury": ""
+    },
+    {
+      "id": "bonk",
+      "symbol": "BONK",
+      "chain": "solana",
+      "contract": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+      "decimals": 5,
+      "pythFeed": "72b021217ca3fe68922a19aaf990109cb9d84e9ad004b4d2025ad6f529314419",
+      "pythSymbol": "Crypto.BONK/USD",
+      "treasury": ""
+    },
+    {
+      "id": "floki",
+      "symbol": "FLOKI",
+      "chain": "ethereum",
+      "contract": "0xcf0c122c6b73ff809c693db761e7baebe62b6a2e",
+      "decimals": 9,
+      "pythFeed": "6b1381ce7e874dc5410b197ac8348162c0dd6c0d4c9cd6322672d6c2b1d58293",
+      "pythSymbol": "Crypto.FLOKI/USD",
+      "treasury": ""
+    },
+    {
+      "id": "dogwifcoin",
+      "symbol": "WIF",
+      "chain": "solana",
+      "contract": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+      "decimals": 6,
+      "pythFeed": "4ca4beeca86f0d164160323817a4e42b10010a724c2217c6ee41b54cd4cc61fc",
+      "pythSymbol": "Crypto.WIF/USD",
+      "treasury": ""
+    },
+    {
+      "id": "memecore",
+      "symbol": "M",
+      "chain": "memecore",
+      "contract": "native",
+      "decimals": 18,
+      "pythFeed": "b6ce29b819a310fd10a24f1a056ab3926d1c3e436b746d941acaf11e1a9f7eac",
+      "pythSymbol": "Crypto.M/USD",
+      "treasury": "",
+      "assetSource": "https://docs.memecore.com/memecore/token/usdm"
+    }
+  ],
+  "selectionPolicy": "Curated ten-asset Feast list; native DOGE and native MemeCore M replace two Solana assets. Historical market snapshot is provenance, not an automatic selection rule.",
+  "finalityRules": {
+    "ethereum": "finalized-block",
+    "solana": "finalized-slot",
+    "dogecoin": "60-confirmations",
+    "memecore": "finalized-block"
+  },
+  "bindingDeadline": null
+}

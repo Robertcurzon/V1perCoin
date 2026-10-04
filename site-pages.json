@@ -1,0 +1,6 @@
+{
+  "home": { "title": "V1PER Coin (V1PER) — Memes with Bite", "description": "Cute had its turn. Meet V1PER Coin (V1PER), the new top of the Sui meme food chain. Join the den. Pre-launch; not deployed." },
+  "rules": { "title": "Rules — V1PER Coin (V1PER)", "description": "The launch timeline, free claims, Feast terms, lock rewards, Foundation custody and on-chain privacy for V1PER Coin (V1PER)." },
+  "monitor": { "title": "Onchain Monitor — V1PER Coin (V1PER)", "description": "Verify V1PER Coin (V1PER): supply, burns, funded rewards, claims and custody. Live figures appear only after verified deployment." },
+  "whitepaper": { "title": "White Paper — V1PER Coin (V1PER)", "description": "Read the V1PER Coin (V1PER) release specification: deflationary supply, community participation, funded lock rewards and public proof on Sui." }
+}

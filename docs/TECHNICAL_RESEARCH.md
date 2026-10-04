@@ -1,4 +1,4 @@
-# V1PR technical release scope
+# V1PER technical release scope
 
 Implemented on Sui with the Currency Standard: one-time creation, burn-only supply, sealed atomic allocation, approved free claims, prefunded lock positions, exponential fixed integer rates, tapered early-exit fees, real Currency burns, deposit pause and voluntary reward replenishment. The React site uses the official current `@mysten/dapp-kit-react` and `@mysten/sui` packages with gRPC rather than deprecated JSON-RPC-only dApp Kit. Object content is parsed as BCS to avoid transport-dependent JSON layouts. [Official integration guide](https://sdk.mystenlabs.com/dapp-kit/getting-started/react).
 

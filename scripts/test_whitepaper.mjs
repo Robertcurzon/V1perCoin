@@ -6,11 +6,13 @@ const server = await createServer({ server: { middlewareMode: true, hmr: false, 
 try {
   const { default: Whitepaper } = await server.ssrLoadModule('/src/Whitepaper.tsx');
   const html = renderToStaticMarkup(React.createElement(Whitepaper));
-  assert(html.includes('<iframe'));
-  assert(html.includes('whitepaper.pdf#toolbar=0&amp;navpanes=0&amp;view=FitH'));
-  assert(html.includes('title="Viper Coin (V1PR) white paper PDF"'));
-  assert(html.includes('Download PDF'));
-  assert(html.includes('Open PDF'));
-  assert(!html.includes('paper-content'));
-  console.log('White paper page passed: embedded PDF and direct open/download links.');
+  assert(!html.includes('<iframe'));
+  assert(html.includes('Checking the current white paper PDF'));
+  assert(html.includes('LaTeX source'));
+  assert(!html.includes('Download PDF'));
+  const { validWhitepaperProof } = await server.ssrLoadModule('/src/whitepaperProof.ts');
+  const source='a'.repeat(64),pdf='b'.repeat(64);
+  assert(validWhitepaperProof({sourceSha256:source,pdfSha256:pdf},source,pdf));
+  for(const proof of [null,{}, {sourceSha256:pdf,pdfSha256:pdf},{sourceSha256:source,pdfSha256:source}]) assert(!validWhitepaperProof(proof,source,pdf));
+  console.log('White paper page passed: current source/PDF fingerprint match required before embed or download; stale copies stay hidden.');
 } finally { await server.close(); }

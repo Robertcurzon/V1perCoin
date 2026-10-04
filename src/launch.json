@@ -12,10 +12,26 @@
   "allocationDigest": "",
   "immutableDigest": "",
   "dexPairId": "",
-  "publicReserve": "",
   "initialLiquidity": "",
   "laterLiquidity": "",
   "vaultAdminCapId": "",
   "claimsAdminCapId": "",
-  "metadataDigest": ""
+  "metadataDigest": "",
+  "feastId": "",
+  "feastAdminCapId": "",
+  "upgradeCapId": "",
+  "feastTreasury": {
+    "ethereum": "",
+    "solana": "",
+    "dogecoin": "",
+    "memecore": ""
+  },
+  "feastOpen": false,
+  "feastStartMs": 0,
+  "feastSubmissionUrl": "",
+  "feastResultsSha256": "",
+  "freeClaimsStartMs": 0,
+  "freeClaimsApplicationUrl": "",
+  "vaultOpensAtMs": 0,
+  "feastBindingDeadlineMs": 0
 }
