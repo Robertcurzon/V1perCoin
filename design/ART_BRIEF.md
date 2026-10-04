@@ -14,11 +14,17 @@ Wide composition. Viper looms over a crowd of generic cute critters: puppies, ki
 
 ## 3. Logo mark
 
-Square composition that remains readable at 32 px. A Viper head in profile inside a coin ring, lime on night-jungle. No text inside the mark. The “VIPER.” wordmark sits beside it. Supply a one-color version and transparent exports.
+Square composition that remains readable at 32 px. A Viper head in profile inside a coin ring, lime on night-jungle. No text inside the mark. The “V1PER.” wordmark sits beside it. Supply a one-color version and transparent exports.
 
 ## 4. Social cards
 
 Re-skin the three layouts in `social-kit.html` with art 1–3: square character reveal, square Hunt Board prompt, and wide Memes with Bite card. Keep headings short and readable at phone size. Never imply a claim window, reward round or product is live before verification.
+
+## 5. Feast menu
+
+Owner-generated illustration for `public/feast-menu.webp`. It appears in the Feast section, the Two ways in thumbnail and the social kit. The text menu board remains the fallback until a valid image loads. Supply 16:9 WebP; keep text outside the artwork limited to the short tags specified below. No logos or official mascots.
+
+> Bold inked illustration, dark night jungle background (#101510), venom-lime (#BDF332) and bone-white (#E9ECDF) accents, a few magenta jungle flowers. A calm, confident giant green viper with half-lidded yellow-lime eyes and a slight smirk curls around a rustic jungle dinner table under hanging vines, holding a chalkboard menu in its tail. Lined up nervously along the table are generic cartoon critters, each wearing a small paper name tag: a shiba-style dog, a green frog, a dog in a Viking helmet, a penguin, an orange dog holding a toy mallet, a dog in a knitted beanie, a fluffy golden dog, a capsule-shaped pill creature, a tiny rocket-chart creature, and a round creature with an "M" badge. Funny and mischievous, not violent; nothing is being bitten. No real logos, no official mascots, no text other than short name tags. Wide 16:9 composition with empty space on the left for headline text.
 
 ## Deliverables and rights
 

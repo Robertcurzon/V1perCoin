@@ -1,3 +1,4 @@
+import FeastMenu from './FeastMenu';
 import { V1per } from './V1per';
 import { siteUrl, currentPage, site } from './site';
 import { CommunityLinks, JoinDenButton } from './CommunityLinks';
@@ -43,7 +44,7 @@ function App() {
         <div className="kicker" id="ways-heading">TWO WAYS IN</div>
         <div className="entry-grid">
           <article className="entry-card free-entry"><h2>FIRST BITE'S<br/><em>FREE.</em></h2><p>10,000 <V1per /> per approved wallet.</p><span className="status-label">{launch.freeClaimsStartMs > 0 ? 'WINDOW SCHEDULED' : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href="#claims">How it works ↓</a></article>
-          <article className="entry-card feast-entry"><div><h2>FEED THE<br/><em>VIPER.</em></h2><p>1.00× / 1.10× / 1.25× allocation points</p><a className="text-link" href="#feast">See the menu ↓</a></div><div className="menu-preview" aria-label="Feast menu: SHIB, PEPE, SPX, FLOKI, PUMP, PENGU, BONK, WIF, DOGE, M"><span>ON THE MENU</span><p>SHIB · PEPE · SPX · FLOKI<br/>PUMP · PENGU · BONK · WIF<br/>DOGE · M</p></div></article>
+          <article className="entry-card feast-entry"><div><h2>FEED THE<br/><em>VIPER.</em></h2><p>1.00× / 1.10× / 1.25× allocation points</p><a className="text-link" href="#feast">See the menu ↓</a></div><FeastMenu compact /></article>
         </div>
       </section>
       <section id="story" className="section story">

@@ -256,16 +256,29 @@ footer nav { display: flex; flex-wrap: wrap; gap: 22px; }
 .entry-card .status-label { display: inline-block; line-height: 1.7; }
 .entry-card .text-link { display: flex; margin-top: 24px; }
 .feast-entry { display: grid; grid-template-columns: 1fr 0.85fr; align-items: center; gap: 20px; }
-.menu-preview { border: 1px solid #bdf332; background: #101510; padding: 22px 16px; transform: rotate(-2deg); text-align: center; }
-.menu-preview > span { color: #bdf332; font: 700 22px 'Barlow Condensed',sans-serif; }
-.menu-preview p { font: 600 14px/2 'Barlow Condensed',sans-serif; margin: 15px 0 0; }
 button:disabled, button:disabled:hover { opacity: 1; background: #101510; color: #e9ecdf; border: 1px solid #73856a; cursor: not-allowed; transform: none; --brand-one: #bdf332; }
 .closing .community-links { color: #101510; }
 @media(max-width:800px) { .entry-grid { grid-template-columns: 1fr; } }
-@media(max-width:650px) { .ways-in { padding-top: 36px; padding-bottom: 36px; } .entry-card { padding: 24px; } .feast-entry { grid-template-columns: 1fr; } .menu-preview { max-width: 300px; } }
+@media(max-width:650px) { .ways-in { padding-top: 36px; padding-bottom: 36px; } .entry-card { padding: 24px; } .feast-entry { grid-template-columns: 1fr; } }
 
 button:disabled .v1per { color: #e9ecdf; }
 
 .info-detail summary:hover { --brand-one: #e9ecdf; }
 
 .text-link { color: #bdf332; }
+
+/* Optional owner artwork; the text board remains until a valid image loads. */
+[hidden] { display: none !important; }
+.feast-art { margin: 30px 0; width: min(100%,900px); min-width: 0; background: #101510; border: 1px solid #475d3f; }
+.feast-art img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.text-menu-board { padding: 30px; text-align: center; }
+.text-menu-board ul { display: grid; grid-template-columns: repeat(5,1fr); gap: 18px 12px; list-style: none; padding: 0; margin: 26px 0 18px; }
+.text-menu-board li { color: #e9ecdf; font: 700 clamp(22px,3vw,38px) 'Barlow Condensed',sans-serif; letter-spacing: .04em; }
+.text-menu-board p { color: #b2beaf; font-size: 12px; margin: 0; }
+.feast-art.compact { margin: 0; border-color: #bdf332; transform: rotate(-2deg); }
+.compact .text-menu-board { padding: 20px 12px; }
+.compact .kicker { font-size: 10px; line-height: 1.7; }
+.compact .text-menu-board ul { grid-template-columns: repeat(2,1fr); gap: 9px; margin: 16px 0; }
+.compact .text-menu-board li { font-size: 20px; }
+.compact .text-menu-board p { font-size: 10px; line-height: 1.7; margin: 0; }
+@media(max-width:650px) { .text-menu-board { padding: 24px 16px; } .text-menu-board ul { grid-template-columns: repeat(2,1fr); gap: 14px; } .feast-art.compact { max-width: 300px; } }

@@ -1,3 +1,4 @@
+import FeastMenu from './FeastMenu';
 import { V1per, BrandText } from './V1per';
 import { useState } from 'react';
 import { useCurrentAccount, useCurrentClient, useDAppKit } from '@mysten/dapp-kit-react';
@@ -91,6 +92,7 @@ export default function FeastPanel({ detailed = false }: { detailed?: boolean })
   }
   return <section id="feast" className="section feast-section"><div className="kicker">THE FEAST / FEED THE VIPER</div><h2>FEED THE<br/><em>VIPER.</em></h2>
     <p className="token-intro">Bring the cute coins. The Viper does the rest.</p>
+    <FeastMenu />
 <div className="feast-status"><span className="status-label">{campaignOpen ? 'CAMPAIGN CONFIGURED' : 'CONTRIBUTIONS CLOSED'}</span><span>21-day window · 100 million <V1per /> allocation pool</span></div>
     <div className="feast-steps">{[
       ['01', 'Bind your wallets', 'Sign with your source wallet on its accepted network, choose your Sui destination and allocation term. Submit the receipt and confirm acceptance before transferring.'],

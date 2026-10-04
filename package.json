@@ -25,7 +25,8 @@
     "test:site": "node scripts/test_site.mjs",
     "test:brand": "node scripts/test_brand.mjs",
     "test:supply": "node scripts/test_supply.mjs",
-    "test:contrast": "PLAYWRIGHT_BROWSERS_PATH=tmp/playwright-browsers node scripts/test_contrast.mjs"
+    "test:contrast": "PLAYWRIGHT_BROWSERS_PATH=tmp/playwright-browsers node scripts/test_contrast.mjs",
+    "test:menu": "node scripts/test_menu.mjs"
   },
   "dependencies": {
     "@mysten/dapp-kit-react": "^2.1.37",

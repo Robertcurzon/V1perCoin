@@ -99,7 +99,20 @@ try{
    // Open native dialog and mobile navigation too; text on their surfaces counts.
    const toggle=page.getByRole('button',{name:'Open navigation'});if(await toggle.isVisible()){await toggle.click();await scan(page,{width,route:'/',state:'mobile navigation'});await page.getByRole('button',{name:'Close navigation'}).click();}
    await page.getByRole('button',{name:'JOIN THE DEN ↗'}).first().click();await scan(page,{width,route:'/',state:'community dialog'});await page.getByRole('button',{name:'Close community links'}).click();
-   if(process.argv.includes('--capture')){await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`docs/overnight-review/after-home-${width}.jpg`,type:'jpeg',quality:85,fullPage:true,animations:'disabled'});}
+   const slots=page.locator('.feast-art');assert.equal(await slots.count(),2);
+   // Reuse an existing project asset as an isolated decode/load fixture. This
+   // creates no illustration and is never saved as the owner's menu artwork.
+   await page.route('**/feast-menu.webp',route=>route.fulfill({path:'public/social-preview.png',contentType:'image/png'}));
+   await page.reload({waitUntil:'networkidle'});
+   await page.waitForFunction(()=>document.querySelectorAll('.feast-art[data-menu-state="art"]').length===2);
+   for(const image of await page.locator('.feast-art img').all())assert(await image.isVisible());
+   await page.unroute('**/feast-menu.webp');
+   await page.route('**/feast-menu.webp',route=>route.fulfill({status:404,body:''}));
+   await page.reload({waitUntil:'networkidle'});
+   await page.waitForFunction(()=>document.querySelectorAll('.feast-art[data-menu-state="board"]').length===2);
+   for(const image of await page.locator('.feast-art img').all())assert(!await image.isVisible());
+   await page.unroute('**/feast-menu.webp');
+   if(process.argv.includes('--capture')){await page.reload({waitUntil:'networkidle'});await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`docs/overnight-review/after-home-${width}.jpg`,type:'jpeg',quality:85,fullPage:true,animations:'disabled'});}
   }
   results.push({width,route:'/'+route,textRuns:count,hoveredControls:hovered});console.log(JSON.stringify(results.at(-1)));await page.close();
  }

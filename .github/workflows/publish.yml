@@ -109,6 +109,7 @@ jobs:
       - run: npm run test:economics
       - run: npm run test:monitor
       - run: npm run test:site
+      - run: npm run test:menu
       - run: npm run test:brand
       - run: npm run test:supply
       - run: npm run test:whitepaper
