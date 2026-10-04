@@ -24,7 +24,8 @@
     "check:pyth": "node scripts/feast/check_pyth.mjs",
     "test:site": "node scripts/test_site.mjs",
     "test:brand": "node scripts/test_brand.mjs",
-    "test:supply": "node scripts/test_supply.mjs"
+    "test:supply": "node scripts/test_supply.mjs",
+    "test:contrast": "PLAYWRIGHT_BROWSERS_PATH=tmp/playwright-browsers node scripts/test_contrast.mjs"
   },
   "dependencies": {
     "@mysten/dapp-kit-react": "^2.1.37",
@@ -48,6 +49,8 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "fast-check": "^4.6.0",
     "globals": "^17.12.0",
+    "playwright": "1.63.0",
+    "pngjs": "7.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.71.0",
     "vite": "^8.3.1"

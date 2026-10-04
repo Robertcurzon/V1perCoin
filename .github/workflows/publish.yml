@@ -118,6 +118,9 @@ jobs:
         env:
           VITE_BASE_PATH: /ViperCoin/
       - run: npm run test:deployment
+      - name: Install pinned Chromium for contrast checks
+        run: PLAYWRIGHT_BROWSERS_PATH=tmp/playwright-browsers npx playwright install --with-deps chromium
+      - run: npm run test:contrast
       - name: Require the published PDF and provenance
         run: |
           test -s dist/whitepaper.pdf

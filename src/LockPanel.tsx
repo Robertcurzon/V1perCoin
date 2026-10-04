@@ -106,7 +106,7 @@ export default function LockPanel({ detailed = false }: { detailed?: boolean }) 
         {inputError && <p role="alert">{inputError}</p>}{principal > 0n && netReward(principal, months) === 0n && <p role="alert">Increase the amount to earn at least one <V1per /> base unit for the selected term.</p>}
         {detailed && <p className="fine-print">One month = 30 days. Simple rewards in <V1per />; no compounding or dollar-return promise. No deposit fee. No fee at maturity. Early exit pays the reward for whole completed months and charges up to 5% of principal, tapering continuously to zero. Every completed lock earns a positive net <V1per /> reward before network gas. Early exits can return less than deposited.</p>}
         <ConnectButton />
-        <div className="buttons"><button className="button lime" disabled={!lockOpen || !account || !vault || vault.paused || pending || Boolean(inputError) || netReward(principal, months) === 0n || (capacity !== null && reward > capacity)} onClick={() => void submit('deposit')}>{pending ? 'PROCESSING…' : 'OPEN LOCK'}</button></div>
+        <div className="buttons"><button className="button lime" disabled={!lockOpen || !account || !vault || vault.paused || pending || Boolean(inputError) || netReward(principal, months) === 0n || (capacity !== null && reward > capacity)} onClick={() => void submit('deposit')}>{!configured ? 'Not live yet' : pending ? 'PROCESSING…' : 'OPEN LOCK'}</button></div>
       </div>
 
     </div>

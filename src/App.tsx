@@ -8,6 +8,7 @@ const Rules = lazy(() => import('./Rules'));
 import LockPanel from './LockPanel';
 import FeastPanel from './FeastPanel';
 import { Menu, X } from 'lucide-react';
+import { launch } from './manifest';
 import { AllocationSection, FreeClaimsSection } from './ProjectSections';
 
 const repoUrl = site.repository;
@@ -32,11 +33,18 @@ function App() {
         <div className="hero-copy">
           <div className="eyebrow"><V1per /> Coin (<V1per />) · BUILT ON SUI · PRE-LAUNCH</div>
           <h1>MEMES<br/><em>WITH BITE.</em></h1>
-          <p>Cute had its turn. <V1per /> Coin is the new top of the Sui meme food chain.</p>
-          <div className="buttons"><JoinDenButton /><a className="button outline" href="#claims">GET A FREE BITE ↓</a></div>
+          <p>Cute had its turn.<br/><V1per /> Coin bites back.</p>
+          <div className="buttons"><JoinDenButton /></div>
           <p className="fine-print">Pre-launch: <V1per /> is not deployed, and nothing on this site promises gains. <a href={siteUrl('rules/#status')}>Full rules →</a></p>
         </div>
         <div className="hero-foot"><span><V1per /> Coin / <V1per /></span><span>THE JUNGLE HAS A NEW REGULAR ↓</span></div>
+      </section>
+      <section id="ways-in" className="section ways-in" aria-labelledby="ways-heading">
+        <div className="kicker" id="ways-heading">TWO WAYS IN</div>
+        <div className="entry-grid">
+          <article className="entry-card free-entry"><h2>FIRST BITE'S<br/><em>FREE.</em></h2><p>10,000 <V1per /> per approved wallet.</p><span className="status-label">{launch.freeClaimsStartMs > 0 ? 'WINDOW SCHEDULED' : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href="#claims">How it works ↓</a></article>
+          <article className="entry-card feast-entry"><div><h2>FEED THE<br/><em>VIPER.</em></h2><p>1.00× / 1.10× / 1.25× allocation points</p><a className="text-link" href="#feast">See the menu ↓</a></div><div className="menu-preview" aria-label="Feast menu: SHIB, PEPE, SPX, FLOKI, PUMP, PENGU, BONK, WIF, DOGE, M"><span>ON THE MENU</span><p>SHIB · PEPE · SPX · FLOKI<br/>PUMP · PENGU · BONK · WIF<br/>DOGE · M</p></div></article>
+        </div>
       </section>
       <section id="story" className="section story">
         <div className="kicker">01 / THE FOOD CHAIN</div>
