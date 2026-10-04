@@ -201,3 +201,18 @@ footer nav { display: flex; flex-wrap: wrap; gap: 22px; }
 .home-page .closing-grid{min-height:310px}
 @media(max-width:800px){.home-page .story .two-col{grid-template-columns:1fr;gap:26px}.token-proof{grid-template-columns:1fr}.home-page .hero-copy{width:100%}.home-page .eyebrow{max-width:330px;line-height:1.8;display:block}}
 @media(max-width:650px){.home-page .hero{height:630px}.home-page h1{font-size:clamp(67px,17vw,100px);white-space:normal}.home-page .story .prose p{margin-bottom:0}.home-page .section h2{font-size:clamp(48px,12vw,68px)}.home-page .lock-card .facts{grid-template-columns:1fr}.home-page .closing-grid{padding-top:55px;padding-bottom:55px}.home-page .story,.home-page .free-claims-section,.home-page .feast-section,.home-page .lock-section,.home-page .allocation{padding-top:52px;padding-bottom:52px}.home-page .hero-foot{bottom:22px}.home-page .eyebrow{font-size:10px}.home-page .hero-copy .fine-print{max-width:315px}}
+
+.rules-page .header{height:auto;min-height:84px;gap:24px;padding-top:20px;padding-bottom:20px;flex-wrap:wrap}
+.rules-page .brand small{display:block;font:600 9px 'DM Sans',sans-serif;letter-spacing:.22em;margin-top:3px;color:#abb9a6}
+.rules-page .header nav{gap:22px;flex-wrap:wrap}
+.rules-page .header nav a{display:block}
+.rules-intro{padding-top:70px;padding-bottom:65px;border-bottom:1px solid #475d3f}
+.rules-intro h1{white-space:normal;font-size:clamp(65px,8vw,115px);line-height:.9;margin:32px 0}
+.rules-intro p,.rules-prose p,.rules-page #claims>p{color:#b2beaf;font-size:15px;line-height:1.85;max-width:900px}
+.rules-index{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.rules-index a{border:1px solid #475d3f;padding:12px 16px;font-size:12px;color:#c6e789}
+.rules-index a:hover{border-color:#bdf332}
+.rules-page .section h2{font-size:clamp(50px,5vw,76px);margin-bottom:26px}
+.rules-page .rules-prose{margin-top:30px}
+.rules-page .free-claims-section{padding-bottom:65px;border-bottom:1px solid #475d3f}
+@media(max-width:650px){.rules-page .section h2{font-size:clamp(46px,12vw,64px)}.rules-page .header nav{gap:18px;font-size:10px}.rules-intro{padding-top:45px;padding-bottom:45px}.rules-intro h1{font-size:65px}.rules-page .rules-prose p{font-size:14px}}

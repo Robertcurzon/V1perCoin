@@ -2,6 +2,7 @@ import { siteUrl, currentPage } from './site';
 import { lazy, Suspense, useState } from 'react';
 const Monitor = lazy(() => import('./Monitor'));
 const Whitepaper = lazy(() => import('./Whitepaper'));
+const Rules = lazy(() => import('./Rules')); 
 import LockPanel from './LockPanel';
 import FeastPanel from './FeastPanel';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
@@ -10,6 +11,7 @@ import { AllocationSection, FreeClaimsSection } from './ProjectSections';
 const repoUrl = 'https://github.com/Robertcurzon/ViperCoin';
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  if (currentPage() === 'rules') return <Suspense fallback={<p className="section">Loading project rules…</p>}><Rules /></Suspense>;
   if (currentPage() === 'monitor') return <Suspense fallback={<p className="section">Loading onchain monitor…</p>}><Monitor /></Suspense>;
   if (currentPage() === 'whitepaper') return <Suspense fallback={<p className="section">Loading white paper…</p>}><Whitepaper /></Suspense>;
   return <div className="site home-page">

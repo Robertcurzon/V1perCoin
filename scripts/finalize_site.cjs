@@ -1,5 +1,5 @@
 const fs = require('node:fs');
-for (const page of ['monitor', 'whitepaper']) {
+for (const page of ['monitor', 'whitepaper', 'rules']) {
   fs.mkdirSync(`dist/${page}`, { recursive: true });
   fs.copyFileSync('dist/index.html', `dist/${page}/index.html`);
 }

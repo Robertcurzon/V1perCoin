@@ -5,8 +5,7 @@ import { ConnectButton } from '@mysten/dapp-kit-react/ui';
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { PositionBcs, VaultBcs } from './chainSchemas';
 import { Transaction, coinWithBalance } from '@mysten/sui/transactions';
-import { bcs } from '@mysten/sui/bcs';
-import { readChainState, objectAbsent } from './chainState';
+import { readChainState } from './chainState';
 import ExplorerLink from './ExplorerLink';
 import { launch, isLaunchConfigured as configured } from './manifest';
 import { exitPreview, formatAmount, fullReward, MONTH_MS, netReward, parseAmount, ratePpm } from './economics';
@@ -65,30 +64,16 @@ export default function LockPanel({ detailed = false }: { detailed?: boolean }) 
     return () => { active = false; controller.abort(); window.clearInterval(interval); };
   }, [account?.address, client, revision]);
 
-  async function submit(action: 'deposit' | 'claim' | 'withdraw', position?: Position) {
+  async function submit(action: 'deposit' | 'withdraw', position?: Position) {
     if (!configured || !account || !vault || pending) return;
     setPending(true); setError(''); setMessage('');
     try {
       const state = await readChainState(client);
       if (!account.chains.includes(`sui:${launch.network}`)) throw new Error('Connected wallet does not support the configured network.');
-      if (action === 'claim') {
-        if (BigInt(state.p.end_ms) === 0n || state.time < BigInt(state.p.start_ms)) throw new Error('The free-claim window is not open.');
-        if (state.time >= BigInt(state.p.end_ms)) throw new Error('The 14-day free-claim window has ended.');
-        let claimed: boolean;
-        try {
-          const { dynamicField } = await client.core.getDynamicField({ parentId: state.p.eligibility.id, name: { type: 'address', bcs: bcs.Address.serialize(account.address).toBytes() }, signal: AbortSignal.timeout(20_000) });
-          claimed = bcs.bool().parse(dynamicField.value.bcs);
-        } catch (error) {
-          if (objectAbsent(error)) throw new Error('This wallet is not approved for a free claim.');
-          throw new Error('Network or data error: claim eligibility could not be verified. Please retry.');
-        }
-        if (claimed) throw new Error('This wallet already claimed its allocation.');
-      }
       if (action === 'deposit' && (state.time < BigInt(state.v.opens_at_ms))) throw new Error('New locks open at the published day-0 opening.');
       if (action === 'deposit' && state.v.paused) throw new Error('New locks are paused. Existing locks can still exit.');
       const tx = new Transaction();
       tx.setSender(account.address);
-      if (action === 'claim') tx.moveCall({ target: `${launch.packageId}::free_claims::claim`, arguments: [tx.object(launch.claimsId), tx.object('0x6')] });
       if (action === 'deposit') {
         const value = parseAmount(amount);
         if (netReward(value, months) === 0n || fullReward(value, months) > BigInt(state.v.rewards)) throw new Error('This lock exceeds available reward capacity or is too small.');

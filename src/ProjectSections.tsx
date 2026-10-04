@@ -2,6 +2,7 @@ import { ArrowUpRight, Flame, Fingerprint, Eye } from 'lucide-react';
 import { siteUrl } from './site';
 import { FEAST_DISCLOSURE } from './feastData';
 import FreeClaimApplication from './FreeClaimApplication';
+import FreeClaimAction from './FreeClaimAction';
 import { launch, isLaunchConfigured } from './manifest';
 import ExplorerLink from './ExplorerLink';
 
@@ -31,7 +32,7 @@ export function FreeClaimsSection({ detailed = false }: { detailed?: boolean }) 
     <p className="token-intro">10,000 V1PR for up to 10,000 approved wallets. Make something original, apply, claim. Gas only.</p>
     <div className="claim-summary"><span className="status-label">{launch.freeClaimsStartMs > 0 ? `SCHEDULED: ${new Date(launch.freeClaimsStartMs).toISOString()}` : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href={siteUrl('rules/#claims')}>How to apply →</a></div>
     <p className="fine-print">Apply in the seven days before opening; approved wallets have 14 days to claim. <a href={siteUrl('rules/#claims')}>Full rules →</a></p>
-    {detailed && <><p>Apply with a wallet-signed application and one original community entry. Review checks authorship and repeated entries; approvals freeze at opening. A wallet is not proof of one person. No paid referral or promotional purchase is required. Unclaimed tokens can be burned after expiry; the administrator cannot withdraw them.</p><FreeClaimApplication /></>}
+    {detailed && <><p>Apply with a wallet-signed application and one original community entry. Review checks authorship and repeated entries; approvals freeze at opening. A wallet is not proof of one person. No paid referral or promotional purchase is required. Unclaimed tokens can be burned after expiry; the administrator cannot withdraw them.</p><FreeClaimApplication /><FreeClaimAction /></>}
   </section>;
 }
 
@@ -57,19 +58,21 @@ export function CommunitySection() {
       ['5%', 'Community reserve', 'Future programs and changing needs.'],
     ].map(([percent, title, text]) => <article key={title}><span>{percent}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
     <p className="fine-print">Percentages are of total initial supply. Subbudgets are operating policy, not contract-enforced restrictions. Award recipients, purposes, amounts and transaction receipts should be published. There is no token-holder governance or paid affiliate program in this release.</p>
-    <details id="foundation" className="info-detail"><summary>V1PR Foundation: operations, custody and liquidity</summary><div>
+
+  </section>;
+}
+
+export function FoundationSection() { return <section id="foundation" className="section feature-section"><div className="kicker">FOUNDATION / CUSTODY & LIQUIDITY</div><h2>THE FUNDS.<br/><em>THE CONTROL.</em></h2><div className="rules-prose">
       <p>V1PR Foundation is the project's operating name for its founder-controlled funds and receiving wallets. It does not imply independent governance or a separate legal entity.</p>
       <p>The 10% Ecosystem Operations allocation pays for development, hosting, design, administration and collaborators at its controller's discretion, without contractual vesting. Community, initial liquidity, later liquidity and Operations use four separate published Sui custody addresses.</p>
       <p>{FEAST_DISCLOSURE}</p>
       <p>25% of Feast proceeds is committed to liquidity; the opening DEX price must be no lower than the Feast clearing price. The opening token deposit is sized to verified paired funding and the pool's price and range; unused tokens stay in the initial reserve. Remaining proceeds are discretionary Foundation funds. Cross-chain conversions and spending are operating commitments, not automatically enforced by the Sui contract. Paired funding, balances, custody and LP-lock terms must be published before trading is announced.</p>
       <a className="text-link" href={siteUrl('monitor/')}>INSPECT THE CUSTODY DIRECTORY <ArrowUpRight size={16} /></a>
-    </div></details>
-  </section>;
-}
+    </div></section>; }
 
 export function PrivacySection() {
   return <section id="privacy" className="section feature-section privacy-section">
-    <div className="privacy-copy"><div className="kicker">PRIVACY & ACCOUNTABILITY</div><h2>YOUR ALIAS.<br/><em>PUBLIC PROOF.</em></h2><p className="token-intro">Join pseudonymously. No legal name, email or social login is required to read the paper or connect a wallet. Choose what identity information you share.</p><a className="text-link" href={siteUrl('whitepaper/')}>READ THE PRIVACY SECTION <ArrowUpRight size={16} /></a></div>
+    <div className="privacy-copy"><div className="kicker">PRIVACY & ACCOUNTABILITY</div><h2>WHAT'S PUBLIC<br/><em>ON-CHAIN.</em></h2><p className="token-intro">Join pseudonymously. No legal name, email or social login is required to read the paper or connect a wallet. Choose what identity information you share.</p><a className="text-link" href={siteUrl('whitepaper/')}>READ THE PRIVACY SECTION <ArrowUpRight size={16} /></a></div>
     <div className="feature-card"><Fingerprint size={36} aria-hidden="true" /><h3>Know what stays visible</h3><p>Sui addresses, transfers, balances, claims and locks remain public. Feast bindings publicly link your source wallet to your Sui destination. Fresh wallets and aliases do not guarantee unlinkability.</p><p>V1PR has no confidential transfers or shielded balances. Seal and Nautilus are external Sui privacy tools; neither is integrated into this release.</p><p className="fine-print">Wallet, hosting and RPC providers may receive connection metadata. Clearing browser-local charts does not erase blockchain records or provider logs.</p></div>
   </section>;
 }
