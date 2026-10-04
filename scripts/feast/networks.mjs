@@ -26,8 +26,20 @@ export function assetKey(chain, contract) {
   if (chain === 'dogecoin' || chain === 'memecore') throw new Error('Only the native asset is accepted on this network');
   return `${chain}:${normalizeAddress(chain,contract)}`;
 }
-export function bindingMessage(source, sui, chain, windowStart) {
+export function bindingMessage(source, sui, chain, windowStart, bindingDeadline = windowStart + 23 * 86400) {
   if (!networks[chain] || !Number.isSafeInteger(windowStart) || windowStart <= 0) throw new Error('Invalid binding network or campaign start');
-  return `Bind ${source} to Sui ${sui} for the V1PER Feast\nSource network: ${chain}\nCampaign start: ${windowStart}`;
+  return `Bind ${source} to Sui ${sui} for the V1PER Feast\nSource network: ${chain}\nCampaign start: ${windowStart}\nBinding deadline: ${bindingDeadline}`;
 }
 export function lockMessage(message, months) { return `${message}\nLock choice: ${months} months`; }
+
+export function suiLockMessage(sui, months, windowStart, bindingDeadline = windowStart + 23 * 86400) {
+  return `V1PER Feast Sui allocation choice\nSui wallet: ${sui.toLowerCase()}\nCampaign start: ${windowStart}\nBinding deadline: ${bindingDeadline}\nLock choice: ${months} months`;
+}
+export function transactionHash(chain, value) {
+  if (typeof value !== 'string') throw Error('Invalid transaction hash');
+  const canonical = chain === 'solana' ? value : value.toLowerCase();
+  if ((chain === 'ethereum' || chain === 'memecore') && /^0x[0-9a-f]{64}$/.test(canonical)) return canonical;
+  if (chain === 'dogecoin' && /^[0-9a-f]{64}$/.test(canonical)) return canonical;
+  if (chain === 'solana' && /^[1-9A-HJ-NP-Za-km-z]{64,88}$/.test(canonical) && fromBase58(canonical).length === 64) return canonical;
+  throw Error('Invalid network transaction hash');
+}

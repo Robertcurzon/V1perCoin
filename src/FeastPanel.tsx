@@ -13,7 +13,7 @@ import { FEAST_DISCLOSURE, treasuryExplorer, treasuryAddressValid } from './feas
 import ExplorerLink from './ExplorerLink';
 import { siteUrl } from './site';
 import accepted from '../scripts/feast/config.json';
-import { addressValid, networks, bindingMessage, lockMessage, type SourceChain } from '../scripts/feast/networks.mjs';
+import { addressValid, networks, bindingMessage, suiLockMessage, type SourceChain } from '../scripts/feast/networks.mjs';
 
 interface EthereumProvider { request(input: { method: string; params?: unknown[] }): Promise<unknown>; }
 interface SolanaProvider { connect(): Promise<{ publicKey: { toString(): string } }>; signMessage(message: Uint8Array, encoding?: string): Promise<{ signature: Uint8Array }>; }
@@ -21,7 +21,7 @@ export default function FeastPanel({ detailed = false }: { detailed?: boolean })
   const account = useCurrentAccount(), client = useCurrentClient(), kit = useDAppKit();
   const [consent, setConsent] = useState(false), [months, setMonths] = useState(0), [chain, setChain] = useState<SourceChain>('ethereum');
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [receipt, setReceipt] = useState(''), [binding, setBinding] = useState('');
-  const [dogeSource, setDogeSource] = useState(''), [dogeSignature, setDogeSignature] = useState(''), [dogeLockSignature, setDogeLockSignature] = useState('');
+  const [dogeSource, setDogeSource] = useState(''), [dogeSignature, setDogeSignature] = useState('');
   const windowStart = launch.feastStartMs / 1000;
   const dogeMessage = account && addressValid('dogecoin',dogeSource) && windowStart > 0 ? bindingMessage(dogeSource,account.address,'dogecoin',windowStart) : '';
   const campaignOpen = isLaunchConfigured && launch.feastOpen;
@@ -31,10 +31,10 @@ export default function FeastPanel({ detailed = false }: { detailed?: boolean })
     try {
       const state = await readChainState(client);
       if (!account.chains.includes(`sui:${launch.network}`)) throw new Error('Connect a Sui wallet on the configured network.');
-      if (state.f.finalized) throw new Error('Feast contributions have closed.');
-      if (state.time < BigInt(launch.feastStartMs) || state.time >= BigInt(launch.feastStartMs) + 21n * 86_400_000n) throw new Error('The 21-day contribution window is not open.');
+      if (state.f.finalized || state.f.abandoned) throw new Error('Feast contributions have closed.');
+      if (state.time < BigInt(launch.feastStartMs) || state.time >= BigInt(launch.feastStartMs) + 23n * 86_400_000n) throw new Error('Wallet binding is closed; deadline is 48 hours after the contribution window.');
       const wallets = window as Window & { ethereum?: EthereumProvider; solana?: SolanaProvider };
-      let source: string, signature: string, lockSignature: string;
+      let source: string, signature: string;
       if (chain === 'ethereum' || chain === 'memecore') {
         const provider = wallets.ethereum; if (!provider) throw new Error('Install an Ethereum wallet supporting personal_sign.');
         const network = await provider.request({ method: 'eth_chainId' });
@@ -48,20 +48,21 @@ export default function FeastPanel({ detailed = false }: { detailed?: boolean })
           const result = await provider.request({ method: 'personal_sign', params: [hex, source] });
           if (typeof result !== 'string') throw new Error('Wallet returned an invalid signature.'); return result;
         };
-        signature = await sign(message); lockSignature = await sign(lockMessage(message,months));
+        signature = await sign(message);
       } else if (chain === 'solana') {
         const provider = wallets.solana; if (!provider) throw new Error('Install a Solana wallet supporting signMessage.');
         source = (await provider.connect()).publicKey.toString(); if (!treasuryAddressValid(chain, source)) throw new Error('Invalid source account.');
         const message = bindingMessage(source,account.address,chain,windowStart);
         signature = toBase58((await provider.signMessage(new TextEncoder().encode(message), 'utf8')).signature);
-        lockSignature = toBase58((await provider.signMessage(new TextEncoder().encode(lockMessage(message,months)), 'utf8')).signature);
       }
       else {
         source = dogeSource;
-        if (!addressValid('dogecoin',source) || !/^[A-Za-z0-9+/]{87}=$/.test(dogeSignature) || !/^[A-Za-z0-9+/]{87}=$/.test(dogeLockSignature)) throw new Error('Enter a native Dogecoin P2PKH address and both compact Base64 signatures.');
-        signature = dogeSignature; lockSignature = dogeLockSignature;
+        if (!addressValid('dogecoin',source) || !/^[A-Za-z0-9+/]{87}=$/.test(dogeSignature)) throw new Error('Enter a native Dogecoin P2PKH address and a compact Base64 signature.');
+        signature = dogeSignature;
       }
-      setBinding(JSON.stringify({ chain, windowStart, source, sui: account.address, lockMonths: months, message: bindingMessage(source,account.address,chain,windowStart), signature, lockSignature }, null, 2));
+      const bindingDeadline=launch.feastBindingDeadlineMs/1000;
+      const signed=await kit.signPersonalMessage({message:new TextEncoder().encode(suiLockMessage(account.address,months,windowStart,bindingDeadline))});
+      setBinding(JSON.stringify({ chain, windowStart, bindingDeadline, source, sui: account.address, lockMonths: months, message: bindingMessage(source,account.address,chain,windowStart,bindingDeadline), signature, suiLockSignature:signed.signature }, null, 2));
     } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
   }
   async function claim() {
@@ -90,31 +91,29 @@ export default function FeastPanel({ detailed = false }: { detailed?: boolean })
     const url = URL.createObjectURL(new Blob([binding + '\n'], { type: 'application/json' }));
     const a = document.createElement('a'); a.href = url; a.download = 'v1per-feast-binding.json'; a.click(); URL.revokeObjectURL(url);
   }
-  return <section id="feast" className="section feast-section"><div className="kicker">THE FEAST / FEED THE VIPER</div><h2>FEED THE<br/><em>VIPER.</em></h2>
+  return <section id="feast" className="section feast-section"><div className="kicker">THE FEAST / FEED THE VIPER</div><h2>THE FEAST,<br/><em>STEP BY STEP.</em></h2>
     <p className="token-intro">Bring the cute coins. The Viper does the rest.</p>
     <FeastMenu />
 <div className="feast-status"><span className="status-label">{campaignOpen ? 'CAMPAIGN CONFIGURED' : 'CONTRIBUTIONS CLOSED'}</span><span>21-day window · 100 million <V1per /> allocation pool</span></div>
     <div className="feast-steps">{[
-      ['01', 'Bind your wallets', 'Sign with your source wallet on its accepted network, choose your Sui destination and allocation term. Submit the receipt and confirm acceptance before transferring.'],
+      ['01', 'Bind your wallets', 'Sign with your source wallet on its accepted network, choose your Sui destination and allocation term. The source signs the binding; the Sui wallet signs the term. Submit and confirm acceptance before transferring.'],
       ['02', 'Feed the Viper', 'Contribute an accepted meme coin during the published window. Eligible USD value, timing and lock choice determine your share of allocation points.'],
       ['03', 'Claim on Sui', 'Allocations freeze at finalization. Choose liquid vesting or the recorded lock. Claim within 90 days; network gas applies.'],
     ].map(([n,title,text]) => <article key={n}><span>{n}</span><h3>{title}</h3><p>{detailed ? text : ({'01': 'Bind your source wallet to your Sui destination.', '02': 'Send accepted coins during the 21-day window.', '03': 'Claim your finalized allocation on Sui.'}[n])}</p></article>)}</div>
     <div className="menu-board"><div className="kicker">ON THE MENU / EXACT NETWORKS & ASSETS</div>{(Object.keys(networks) as SourceChain[]).map(source => <div key={source}><span>{networks[source].label}</span><p>{accepted.coins.filter(c => c.chain === source).map(c => <a key={c.id} href={c.contract === 'native' ? c.assetSource : `${source === 'ethereum' ? 'https://etherscan.io/token/' : 'https://solscan.io/token/'}${c.contract}`} target="_blank" rel="noreferrer">{c.symbol}{c.contract === 'native' ? ' · native' : ''} ↗</a>)}</p></div>)}</div>
     <div className="feast-choices"><article><span>LIQUID</span><strong>1.00×</strong><p>50% immediately; 50% vests linearly over 60 days.</p></article><article><span>12-MONTH LOCK</span><strong>1.10×</strong><p>Allocation points bonus; a reserved 12-month reward-bearing lock at claim.</p></article><article><span>24-MONTH LOCK</span><strong>1.25×</strong><p>Allocation points bonus; a reserved 24-month reward-bearing lock at claim.</p></article></div>
-    {detailed && <><details className="info-detail"><summary>Timing, valuation and allocation rules</summary><div><p>Days 1–5 earn 1.50× points. The timing bonus declines in daily steps to 1.00× on day 19 and stays there through day 21. It multiplies eligible USD value and your allocation-choice bonus; these are allocation points, not guaranteed returns.</p><p>Contribution value is the lower of Pyth confirmation-time spot and the preceding 1,440 one-minute average. Missing, stale or future prices stop scoring. Allocations are proportional to total points, capped at 10,000 <V1per /> per eligible USD before bonuses, with no wallet cap. Unallocated inventory is burned at finalization.</p><p>Publish finalized receipts, price archives, allocation CSV, SHA-256 hash and scoring commit. All source wallets bound to the same Sui destination must choose the same term. Ethereum and MemeCore use EOA personal-sign signatures; Solana uses Ed25519. Native DOGE uses Dogecoin compact signatures from a P2PKH wallet, imported manually. Contract-wallet signatures and mixed-source DOGE inputs are unsupported. Signatures include the source network and campaign start to prevent reuse across campaigns.</p></div></details>
+    {detailed && <><details className="info-detail"><summary>Timing, valuation and allocation rules</summary><div><p>Days 1–5 earn 1.50× points. The timing bonus declines in daily steps to 1.00× on day 19 and stays there through day 21. It multiplies eligible USD value and your allocation-choice bonus; these are allocation points, not guaranteed returns.</p><p>Contribution value is the lower of Pyth confirmation-time spot and the preceding 1,440 one-minute average. Missing, stale or future prices stop scoring. Calculate a base quantity at 10,000 <V1per /> per eligible USD, then apply timing and lock bonuses. If total bonus-weighted quantities exceed 100 million, reduce them proportionally. No wallet cap applies. Unallocated inventory is burned at finalization.</p><p>Publish finalized receipts, itemized receiving-wallet outflows, price archives, allocation CSV, file hash, on-chain allocation commitment and scoring commit. Only the destination Sui wallet can authorize a lock term through a personal-message signature. Source-only choices default to liquid. Conflicting Sui-signed choices resolve to liquid and are reported. Ethereum and MemeCore use EOA personal-sign signatures; Solana uses Ed25519. Native DOGE uses Dogecoin compact signatures from a P2PKH wallet, imported manually. Contract-wallet signatures and mixed-source DOGE inputs are unsupported. Bindings include the campaign start and a deadline 48 hours after contributions close. Submit before that deadline and confirm acceptance. Returned receiving-wallet funds are netted out before scoring; receiving wallets cannot earn allocations.</p></div></details>
     <details className="info-detail"><summary>Proceeds, liquidity and claim conditions</summary><div><p><BrandText text={FEAST_DISCLOSURE} /></p><p>25% of proceeds is committed to exchange liquidity. The opening DEX price must be no lower than the Feast clearing price. Cross-chain funding is an operating commitment, not automatically enforced by the Sui contract.</p><p>Finalization reserves the full reward for every locked Feast allocation or aborts. Reserved claims bypass emergency deposit pauses and the ordinary opening date. Unclaimed allocations and their reservations expire after 90 days. There is no contribution refund path. The lock begins at claim time.</p><p>The site does not automatically submit bindings or transfer contributed coins. Binding signatures publicly link source and destination wallets; reading this page does not open a campaign.</p></div></details>
     <p className="fine-print">{campaignOpen ? 'The contribution window and immutable contracts are checked again before signing.' : 'The Feast is in preparation. Contributions and source-wallet binding are closed.'} <a href={siteUrl('whitepaper/')}>Read the complete Feast specification ↗</a></p>
     </>}
     <p className="feast-disclosure">Contributed coins go to wallets controlled by the founder-run <V1per /> Foundation, to use at its discretion, with no refunds.</p><a className="text-link" href={siteUrl('rules/#feast')}>Full Feast rules →</a>
     {detailed && campaignOpen && <div className="lock-card"><h3>FEAST PROCEEDS</h3><p><BrandText text={FEAST_DISCLOSURE} /></p><p>The DEX pool opens at no less than the Feast clearing price, paired with 25% of Feast proceeds. Remaining proceeds are discretionary <V1per /> Foundation funds.</p><p>Signing links your source wallet publicly to your Sui destination. No transfer is requested by this signature. Download the signed receipt, submit through the published channel and confirm acceptance before transferring. The site does not automatically submit bindings or send contributed coins.</p><p>A signed lock choice does not itself reserve rewards. Finalization must reserve the full reward for all locked allocations or abort. After finalization, your reservation survives deposit pauses and other users exhausting capacity. Claim within 90 days; expiry releases unused rewards and burns unclaimed principal. Contributions are not refunded.</p><ConnectButton />
-      <label htmlFor="feast-chain">Source chain</label><select id="feast-chain" value={chain} onChange={e => { setChain(e.target.value as typeof chain); setBinding(''); setDogeSignature(''); setDogeLockSignature(''); }}>{(Object.keys(networks) as SourceChain[]).map(n => <option key={n} value={n}>{networks[n].label}</option>)}</select>
-      <label htmlFor="feast-term">Allocation choice</label><select id="feast-term" value={months} onChange={e => { setMonths(Number(e.target.value)); setBinding(''); setDogeSignature(''); setDogeLockSignature(''); }}><option value="0">Liquid · 1.00× points · 50% now / 50% over 60 days</option><option value="12">12-month lock · 1.10× points</option><option value="24">24-month lock · 1.25× points</option></select>
-      {chain === 'dogecoin' && <div className="doge-binding"><label htmlFor="doge-source">Native DOGE source address (P2PKH)</label><input id="doge-source" value={dogeSource} onChange={e=>{setDogeSource(e.target.value.trim());setBinding('');setDogeSignature('');setDogeLockSignature('');}} />
-        <p>Use your Dogecoin wallet's message-signing tool to sign both exact texts below. Paste the Base64 signatures; never enter a private key or seed. The scorer verifies these signatures before acceptance.</p>
+      <label htmlFor="feast-chain">Source chain</label><select id="feast-chain" value={chain} onChange={e => { setChain(e.target.value as typeof chain); setBinding(''); setDogeSignature(''); }}>{(Object.keys(networks) as SourceChain[]).map(n => <option key={n} value={n}>{networks[n].label}</option>)}</select>
+      <label htmlFor="feast-term">Allocation choice</label><select id="feast-term" value={months} onChange={e => { setMonths(Number(e.target.value)); setBinding(''); setDogeSignature(''); }}><option value="0">Liquid · 1.00× points · 50% now / 50% over 60 days</option><option value="12">12-month lock · 1.10× points</option><option value="24">24-month lock · 1.25× points</option></select>
+      {chain === 'dogecoin' && <div className="doge-binding"><label htmlFor="doge-source">Native DOGE source address (P2PKH)</label><input id="doge-source" value={dogeSource} onChange={e=>{setDogeSource(e.target.value.trim());setBinding('');setDogeSignature('');}} />
+        <p>Use your Dogecoin wallet's message-signing tool to sign the binding text below. Your connected Sui wallet separately authorizes the lock choice. Paste the Base64 signature below; never enter a private key or seed. The scorer verifies these signatures before acceptance.</p>
         <label htmlFor="doge-binding-text">Wallet binding text</label><textarea id="doge-binding-text" readOnly value={dogeMessage} />
         <label htmlFor="doge-signature">Binding signature</label><textarea id="doge-signature" value={dogeSignature} onChange={e=>{setDogeSignature(e.target.value.trim());setBinding('');}} />
-        <label htmlFor="doge-lock-text">Lock choice text</label><textarea id="doge-lock-text" readOnly value={dogeMessage ? lockMessage(dogeMessage,months) : ''} />
-        <label htmlFor="doge-lock-signature">Lock choice signature</label><textarea id="doge-lock-signature" value={dogeLockSignature} onChange={e=>{setDogeLockSignature(e.target.value.trim());setBinding('');}} />
       </div>}
       <p><V1per /> Foundation receiving wallet (founder-controlled): {treasuryExplorer(chain, launch.feastTreasury[chain]) && <a href={treasuryExplorer(chain, launch.feastTreasury[chain])!} target="_blank" rel="noreferrer">{launch.feastTreasury[chain]} ↗</a>}</p>
       <label><input type="checkbox" checked={consent} onChange={e => { setConsent(e.target.checked); setBinding(''); }} /> I understand and accept the Feast proceeds disclosure and public wallet linkage.</label>

@@ -24,10 +24,12 @@ fun fixed_seed_600_operations_five_users() {
     // One physical initial inventory, split and recycled: no extra mint during the sequence.
     let mut stock=coin::mint_for_testing<V1PER>(viper::allocation::initial_supply(),s.ctx());
     let (mut vault,cap)=create(stock.split(viper::allocation::lock_rewards(),s.ctx()),@0xC,@0x99,0,s.ctx());
-    let (mut pool,fcap)=viper::feast::create(stock.split(viper::allocation::public_reserve(),s.ctx()),s.ctx());
+    let (mut pool,fcap)=viper::feast::create(stock.split(viper::allocation::public_reserve(),s.ctx()),&clock,s.ctx());
     let users=vector[@0xA,@0xB,@0xD,@0xE,@0xF]; let terms=vector[1,3,6,12,24];
-    let hash=vector[7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7];
-    viper::feast::set_allocations(&mut pool,&fcap,users,vector[1_000_000_000,1_000_000_000,1_000_000_000,1_000_000_000,1_000_000_000],vector[12,24,0,0,12],hash,&clock);
+    let mut hash=vector[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    let feast_terms=vector[12,24,0,0,12];let mut row=0;
+    while (row < users.length()) {let mut bytes=hash;let amount=1_000_000_000u64;bytes.append(sui::bcs::to_bytes(&users[row]));bytes.append(sui::bcs::to_bytes(&amount));bytes.append(sui::bcs::to_bytes(&feast_terms[row]));hash=std::hash::sha2_256(bytes);row=row+1;};
+    viper::feast::set_allocations(&mut pool,&fcap,users,vector[1_000_000_000,1_000_000_000,1_000_000_000,1_000_000_000,1_000_000_000],feast_terms,hash,5,true,&clock);
     sui::clock::set_for_testing(&mut clock,7*86_400_000);
     viper::feast::finalize(&mut pool,&fcap,&mut vault,&mut currency,hash,&clock);
     let mut positions: vector<Option<Position>> = vector[option::none(),option::none(),option::none(),option::none(),option::none()];
@@ -57,7 +59,7 @@ fun fixed_seed_600_operations_five_users() {
             } else if((op==1 || op==2) && positions[user].is_some()) {
                 let position=positions.borrow_mut(user).extract();
                 let (start,duration)=viper::lock_vault::sequence_time(&position);
-                if(op==2 && clock.timestamp_ms()<start+duration) sui::clock::set_for_testing(&mut clock,start+duration);
+                if(op==2 && clock.timestamp_ms() < start+duration) sui::clock::set_for_testing(&mut clock,start+duration);
                 let (principal,earned,fee,_,burn,_)=preview(&position,&clock);
                 let elapsed=clock.timestamp_ms()-start; let completed=if(elapsed>=duration) duration/MONTH_MS else elapsed/MONTH_MS;
                 let limit=principal+if(completed==0) 0 else net_reward(principal,completed);

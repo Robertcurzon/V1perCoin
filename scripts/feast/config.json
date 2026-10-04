@@ -114,5 +114,6 @@
     "solana": "finalized-slot",
     "dogecoin": "60-confirmations",
     "memecore": "finalized-block"
-  }
+  },
+  "bindingDeadline": null
 }

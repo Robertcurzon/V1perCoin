@@ -13,7 +13,7 @@ export const ClockBcs = bcs.struct('Clock', { id: bcs.Address, timestamp_ms: bcs
 export const ClaimsBcs = bcs.struct('Pool', {
   id: bcs.Address, inventory: bcs.u64(),
   eligibility: bcs.struct('Table', { id: bcs.Address, size: bcs.u64() }),
-  approved: bcs.u64(), claimed: bcs.u64(), start_ms: bcs.u64(), end_ms: bcs.u64(),
+  approved: bcs.u64(), claimed: bcs.u64(), start_ms: bcs.u64(), end_ms: bcs.u64(), schedule_deadline_ms: bcs.u64(), abandoned: bcs.bool(),
 });
 export const CurrencyBcs = bcs.struct('Currency', {
   id: bcs.Address, decimals: bcs.u8(), name: bcs.string(), symbol: bcs.string(),
@@ -34,5 +34,5 @@ export const FeastAllocationBcs = bcs.struct('Allocation', { amount: bcs.u64(), 
 export const FeastBcs = bcs.struct('Pool', {
   id: bcs.Address, inventory: bcs.u64(), allocations: bcs.struct('Table', { id: bcs.Address, size: bcs.u64() }),
   allocated: bcs.u64(), claimed: bcs.u64(), burned: bcs.u64(), finalized: bcs.bool(), start_ms: bcs.u64(),
-  allocations_hash: bcs.vector(bcs.u8()), last_change_ms: bcs.u64(), locked_reward_required: bcs.u64(), reward_reserve: bcs.u64(), reservation_vault: bcs.option(bcs.Address),
+  allocations_hash: bcs.vector(bcs.u8()), last_change_ms: bcs.u64(), locked_reward_required: bcs.u64(), reward_reserve: bcs.u64(), reservation_vault: bcs.option(bcs.Address), finalize_deadline_ms: bcs.u64(), abandoned: bcs.bool(), running_hash: bcs.vector(bcs.u8()), uploaded_rows: bcs.u64(), committed_rows: bcs.u64(), last_address: bcs.Address,
 });

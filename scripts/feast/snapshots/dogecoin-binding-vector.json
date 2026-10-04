@@ -2,12 +2,13 @@
   "provenance": "Independent bitcoinjs-message 2.2.0 compact-signature vector, transient TEST key generated only in memory; Dogecoin Core message prefix. Independently verified before export.",
   "binding": {
     "chain": "dogecoin",
-    "source": "DLnd98BFrmg4vUm8aKdMZtcnLgAHY1ry2e",
+    "source": "DL3xKm6trLYuVZ5G4fWcFXg8fnsMwdeGWX",
     "sui": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "windowStart": 1000000,
-    "lockMonths": 12,
-    "message": "Bind DLnd98BFrmg4vUm8aKdMZtcnLgAHY1ry2e to Sui 0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa for the V1PER Feast\nSource network: dogecoin\nCampaign start: 1000000",
-    "signature": "IHiy1uCZs9PYtFU853dCZTyQ5nFOFQz3jHJRabqprFanZvostwhrFnn+CZ2IRamQJc03JEQeX60ySxP+fKBdPkQ=",
-    "lockSignature": "H8AQP4IWh7gQa/Z0mv6ON6GjI4+LvqTI/KqPsNx+x/cdZt+iBXN+ddi/PgPzRvOVQIWbDjKqSRd+Nhp1uhk8R1I="
+    "lockMonths": 0,
+    "bindingDeadline": 2987200,
+    "receivedAt": 1000000,
+    "message": "Bind DL3xKm6trLYuVZ5G4fWcFXg8fnsMwdeGWX to Sui 0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa for the V1PER Feast\nSource network: dogecoin\nCampaign start: 1000000\nBinding deadline: 2987200",
+    "signature": "IJL9gqlYyq7NgB/DCkeM5Mr95J7Zw9J7miJXh0vB7RjrHsKbXQ59jbtiVSynTTFz0MvD44iWFiAI6VqgOhi8RqY="
   }
 }

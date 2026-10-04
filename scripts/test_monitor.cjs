@@ -36,7 +36,7 @@ const position = PositionBcs.parse(PositionBcs.serialize({ id, vault: id, owner:
 assert.equal(position.reward, '53000000000'); assert.equal(position.owner, other);
 const vault = VaultBcs.parse(VaultBcs.serialize({ id, rewards: '100', community: id, founder: other, paused: false, total_locked: '1000', reward_committed: '30', reward_paid: '20', reward_funded: '150', community_paid: '7', founder_paid: '1', burned: '2', pending_burn: '3', locks_opened: '5', locks_closed: '2', opens_at_ms:'604800000', feast_committed:'0' }).toBytes());
 assert.equal(BigInt(vault.rewards) + BigInt(vault.reward_committed) + BigInt(vault.reward_paid), BigInt(vault.reward_funded));
-const pool = ClaimsBcs.parse(ClaimsBcs.serialize({ id, inventory: '99990000000000', eligibility: { id, size: '1' }, approved: '1', claimed: '1', start_ms: '604800000', end_ms: '1814400000' }).toBytes());
+const pool = ClaimsBcs.parse(ClaimsBcs.serialize({ id, inventory: '99990000000000', eligibility: { id, size: '1' }, approved: '1', claimed: '1', start_ms: '604800000', end_ms: '1814400000',schedule_deadline_ms:'5184000000',abandoned:false }).toBytes());
 assert.equal(pool.claimed, '1');
 console.log('Monitor checks passed: verified-pair volume rejects mismatches and missing data; BCS supply, escrow, claim, and activity fields preserve integer precision.');
 
@@ -60,7 +60,7 @@ assert.throws(() => decodeActivity({ ...event, bcs: new Uint8Array([0]) }, id, i
 const claimEvent = { ...event, eventType: `${id}::free_claims::Claimed`, bcs: EventSchemas.Claimed.serialize({ pool: id, timestamp_ms: '1000', owner: other, amount: '10000000000' }).toBytes() };
 assert.equal(decodeActivity(claimEvent, id, id, id).label, 'Free claim paid');
 assert.equal(decodeActivity(claimEvent, id, id, other), null);
-const feast = FeastBcs.parse(FeastBcs.serialize({id, inventory:'0', allocations:{id,size:'2'}, allocated:'10000000000000',claimed:'10000000000000',burned:'90000000000000',finalized:true,start_ms:'604800000',allocations_hash:new Array(32).fill(7),last_change_ms:'0',locked_reward_required:'0',reward_reserve:'0',reservation_vault:id}).toBytes());
+const feast = FeastBcs.parse(FeastBcs.serialize({id, inventory:'0', allocations:{id,size:'2'}, allocated:'10000000000000',claimed:'10000000000000',burned:'90000000000000',finalized:true,start_ms:'604800000',allocations_hash:new Array(32).fill(7),last_change_ms:'0',locked_reward_required:'0',reward_reserve:'0',reservation_vault:id,finalize_deadline_ms:'10368000000',abandoned:false,running_hash:new Array(32).fill(7),uploaded_rows:'2',committed_rows:'2',last_address:other}).toBytes());
 fixtures.set(path.resolve('src/launch.json'), { currencyId: id, vaultId: id, claimsId: id, feastId: id, founder: other, community: id, freeClaimsStartMs:604800000,vaultOpensAtMs:604800000 });
 const { validateState } = load('src/chainState.ts');
 validateState(currency, vault, pool, feast);
@@ -81,7 +81,7 @@ for (const [c,v,p] of [
 console.log('Verification checks passed: explorer routing, freshness, scoped event decoding and fail-closed currency/accounting checks.');
 
 const { isManifestConfigured } = load('src/manifest.ts');
-const manifest = { network: 'testnet', status: 'verified', packageId: id, currencyId: id, vaultId: id, claimsId: id, founder: other, community: id, feastId:id, feastAdminCapId:id, upgradeCapId:id, feastOpen:false, feastStartMs:0, feastSubmissionUrl:'', freeClaimsStartMs:604800000,vaultOpensAtMs:604800000, freeClaimsApplicationUrl:'https://example.com/apply', feastTreasury:{ethereum:'',solana:'',dogecoin:'',memecore:''}, initialLiquidity: `0x${'c'.repeat(64)}`, laterLiquidity: `0x${'d'.repeat(64)}`, vaultAdminCapId: id, claimsAdminCapId: id, coinType: coin, publishDigest: txDigest, allocationDigest: txDigest, immutableDigest: txDigest, metadataDigest: txDigest, dexPairId: '' };
+const manifest = { network: 'testnet', status: 'verified', packageId: id, currencyId: id, vaultId: id, claimsId: id, founder: other, community: id, feastId:id, feastAdminCapId:id, upgradeCapId:`0x${'2'.repeat(64)}`, feastOpen:false, feastStartMs:0, feastSubmissionUrl:'', freeClaimsStartMs:604800000,vaultOpensAtMs:604800000, freeClaimsApplicationUrl:'https://example.com/apply', feastTreasury:{ethereum:'',solana:'',dogecoin:'',memecore:''}, initialLiquidity: `0x${'c'.repeat(64)}`, laterLiquidity: `0x${'d'.repeat(64)}`, vaultAdminCapId: id, claimsAdminCapId: id, coinType: coin, publishDigest: txDigest, allocationDigest: txDigest, immutableDigest: 'B'.repeat(44), metadataDigest: txDigest, dexPairId: '' };
 assert.equal(isManifestConfigured(manifest), true);
 for (const patch of [{ network: 'devnet' },{ feastId: '' },{ upgradeCapId:'' },{ initialLiquidity:other },{ feastOpen:true },{ metadataDigest: '' },{ founder: id },{ vaultAdminCapId: `0x${'0'.repeat(64)}` },{ publishDigest: '<script>' },{ coinType: `${other}::v1per::V1PER` }]) assert.equal(isManifestConfigured({ ...manifest, ...patch }), false);
 console.log('Manifest checks passed: required custody, authorities, network, coin type and receipts.');
@@ -95,7 +95,7 @@ assert.equal(objectAbsent(new ObjectError('UNKNOWN','unknown',{reason:'unknown',
 assert.equal(objectAbsent(new Error('not found')),false);
 const { vestedAllocation, treasuryExplorer } = load('src/feastData.ts');
 const { parseFeastReport } = load('src/feastReport.ts');
-const report = {csvSha256:'a'.repeat(64),scriptCommit:'b'.repeat(40),windowStart:1000,liquidityProceedsPercent:25,usdScale:'100000000',receivedBaseUnits:{dogecoin:'100'},treasuryReceivedBaseUnits:{dogecoin:'101'},totalUsdScaled:'100000000',allocatedBaseUnits:'1000000',burnAtFinalizeBaseUnits:'99999999000000',clearingPrice:{usdNumerator:'100000000000000',tokenDenominator:'100000000000000'}};
+const report = {csvSha256:'a'.repeat(64),allocationCommitment:'7'.repeat(64),allocationRows:1,bindingDeadline:1000+23*86400,scriptCommit:'b'.repeat(40),windowStart:1000,liquidityProceedsPercent:25,usdScale:'100000000',receivedBaseUnits:{dogecoin:'100'},treasuryReceivedBaseUnits:{dogecoin:'101'},totalUsdScaled:'100000000',allocatedBaseUnits:'1000000',burnAtFinalizeBaseUnits:'99999999000000',clearingPrice:{usdNumerator:'100000000000000',tokenDenominator:'100000000000000'}};
 assert.equal(parseFeastReport(report,['dogecoin'],1000),report);
 for(const changed of [{receivedBaseUnits:{}},{treasuryReceivedBaseUnits:{}},{receivedBaseUnits:{dogecoin:'102'}},{treasuryReceivedBaseUnits:{dogecoin:'101',unexpected:'0'}},{allocatedBaseUnits:'1000001'},{burnAtFinalizeBaseUnits:'0'},{clearingPrice:null},{clearingPrice:{usdNumerator:'1',tokenDenominator:'1'}},{liquidityProceedsPercent:24},{windowStart:1001},{usdScale:'1'}]) assert.throws(()=>parseFeastReport({...report,...changed},['dogecoin'],1000));
 assert.equal(parseFeastReport({...report,receivedBaseUnits:{dogecoin:'0'},treasuryReceivedBaseUnits:{dogecoin:'0'},totalUsdScaled:'0',allocatedBaseUnits:'0',burnAtFinalizeBaseUnits:'100000000000000',clearingPrice:null},['dogecoin'],1000).clearingPrice,null);
@@ -107,9 +107,25 @@ assert.equal(vestedAllocation({amount:'1001',claimed:'0',lock_months:'24'},0n),1
 assert.equal(treasuryExplorer('ethereum','0x'+'1'.repeat(40)),'https://etherscan.io/address/0x'+'1'.repeat(40));
 assert.equal(treasuryExplorer('ethereum','https://bad.example'),null);
 void (async () => {
-  for (const reason of ['notFound','deleted']) await verifyUpgradeCap({core:{getObject:async()=>{throw new ObjectError('absent','absent',{reason,objectId:id});}}},id,AbortSignal.timeout(1000));
-  for (const error of [new Error('RPC timed out'),new ObjectError('UNKNOWN','unknown',{reason:'unknown',objectId:id}),new ObjectError('notFound','wrong lookup',{reason:'notFound',objectId:other})]) await assert.rejects(verifyUpgradeCap({core:{getObject:async()=>{throw error;}}},id,AbortSignal.timeout(1000)));
-  await assert.rejects(verifyUpgradeCap({core:{getObject:async()=>({object:{}})}},id,AbortSignal.timeout(1000)),/still exists/);
+  function lifecycle(m,patch={}) {
+    const creation={objectId:m.upgradeCapId,idOperation:'Created',inputState:'DoesNotExist',outputState:'ObjectWrite',outputVersion:'2',outputDigest:'cap-digest'};
+    const published={digest:m.publishDigest,status:{success:true},effects:{changedObjects:[creation,{objectId:m.packageId,idOperation:'Created',inputState:'DoesNotExist',outputState:'PackageWrite'}]},objectTypes:{[m.upgradeCapId]:'0x2::package::UpgradeCap'},transaction:{commands:[{Publish:{modules:[],dependencies:[]}}],inputs:[]}};
+    const immutable={digest:m.immutableDigest,status:{success:true},effects:{changedObjects:[{objectId:m.upgradeCapId,idOperation:'Deleted',inputState:'Exists',outputState:'DoesNotExist',inputVersion:'2',inputDigest:'cap-digest'}]},objectTypes:{},transaction:{commands:[{MoveCall:{package:'0x2',module:'package',function:'make_immutable',arguments:[{Input:0}]}}],inputs:[{Object:{ImmOrOwnedObject:{objectId:m.upgradeCapId,version:'2',digest:'cap-digest'}}}]}};
+    Object.assign(published,patch.published);Object.assign(immutable,patch.immutable);
+    return {getTransaction:async({digest})=>({Transaction:digest===m.publishDigest?published:immutable}),getObject:async({objectId})=>{throw new ObjectError('deleted','deleted',{reason:'deleted',objectId});}};
+  }
+  await verifyUpgradeCap({core:lifecycle(manifest)},manifest,AbortSignal.timeout(1000));
+  // Absent random IDs and another package's cap cannot satisfy authentic publication.
+  for(const m of [{...manifest,upgradeCapId:other},{...manifest,packageId:other}])await assert.rejects(verifyUpgradeCap({core:lifecycle(manifest)},m,AbortSignal.timeout(1000)),/Publication/);
+  for(const core of [
+    {...lifecycle(manifest),getObject:async()=>{throw Error('RPC timed out');}},
+    {...lifecycle(manifest),getObject:async()=>({object:{}})},
+    {...lifecycle(manifest),getTransaction:async()=>{throw Error('RPC disconnected');}},
+    lifecycle(manifest,{immutable:{transaction:{commands:[],inputs:[]}}}),
+    lifecycle(manifest,{immutable:{effects:{changedObjects:[]}}}),
+    lifecycle(manifest,{published:{status:{success:false}}}),
+  ])await assert.rejects(verifyUpgradeCap({core},manifest,AbortSignal.timeout(1000)));
+  console.log('Lifecycle proof regressions passed: authentic publish/create, make_immutable/delete, random ID, other package and missing/unknown history fail closed.');
   const panel=fs.readFileSync('src/FeastPanel.tsx','utf8');
   assert(panel.includes('!campaignOpen || !consent || !account'));
   assert(panel.includes('FEAST_DISCLOSURE'));
@@ -126,7 +142,7 @@ void (async () => {
     [rpcManifest.feastId,{objectId:rpcManifest.feastId,type:`${id}::feast::Pool`,owner:{$kind:'Shared'},content:content(FeastBcs,{...feast,id:rpcManifest.feastId,reservation_vault:rpcManifest.vaultId})}],
     ['0x6',{objectId:'0x6',type:'0x2::clock::Clock',owner:{$kind:'Shared'},content:content(ClockBcs,{id:'0x6',timestamp_ms:'1000'})}],
   ]);
-  const mock = {core:{getObject:async ({objectId})=>{
+  const mock = {core:{...lifecycle(rpcManifest),getObject:async ({objectId})=>{
     if (objectId===rpcManifest.upgradeCapId) throw new ObjectError('deleted','deleted',{reason:'deleted',objectId});
     return {object:rows.get(objectId)};
   }}};

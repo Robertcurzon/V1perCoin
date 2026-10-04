@@ -32,5 +32,6 @@
   "feastResultsSha256": "",
   "freeClaimsStartMs": 0,
   "freeClaimsApplicationUrl": "",
-  "vaultOpensAtMs": 0
+  "vaultOpensAtMs": 0,
+  "feastBindingDeadlineMs": 0
 }

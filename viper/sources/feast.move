@@ -5,6 +5,8 @@ use sui::coin::{Self, Coin};
 use sui::clock::Clock;
 use sui::coin_registry::Currency;
 use sui::event;
+use std::hash::sha2_256;
+use sui::bcs;
 use sui::table::{Self, Table};
 use viper::v1per::V1PER;
 use viper::lock_vault::{Self, Vault};
@@ -25,42 +27,58 @@ public struct Pool has key {
     allocated: u64, claimed: u64, burned: u64, finalized: bool, start_ms: u64,
     allocations_hash: vector<u8>, last_change_ms: u64, locked_reward_required: u64,
     reward_reserve: Balance<V1PER>, reservation_vault: Option<ID>,
+    finalize_deadline_ms: u64, abandoned: bool, running_hash: vector<u8>, uploaded_rows: u64, committed_rows: u64, last_address: address,
 }
 public struct AdminCap has key, store { id: UID, pool: ID }
 public struct AllocationsSet has copy, drop { pool: ID, timestamp_ms: u64, allocated: u64, allocations_hash: vector<u8> }
 public struct Finalized has copy, drop { pool: ID, timestamp_ms: u64, allocated: u64, burned: u64, allocations_hash: vector<u8>, reserved_rewards: u64, vault: ID }
 public struct Claimed has copy, drop { pool: ID, timestamp_ms: u64, owner: address, amount: u64, lock_months: u64 }
 public struct ClaimsBurned has copy, drop { pool: ID, timestamp_ms: u64, amount: u64, released_rewards: u64 }
-public(package) fun create(fund: Coin<V1PER>, ctx: &mut TxContext): (Pool, AdminCap) {
+public(package) fun create(fund: Coin<V1PER>, clock: &Clock, ctx: &mut TxContext): (Pool, AdminCap) {
     assert!(fund.value() == viper::allocation::public_reserve(), EAllocation);
     let pool = Pool { id: object::new(ctx), inventory: fund.into_balance(), allocations: table::new(ctx), allocated: 0, claimed: 0, burned: 0, finalized: false, start_ms: 0,
-        allocations_hash: vector[], last_change_ms: 0, locked_reward_required: 0, reward_reserve: balance::zero(), reservation_vault: option::none() };
+        allocations_hash: vector[], last_change_ms: 0, locked_reward_required: 0, reward_reserve: balance::zero(), reservation_vault: option::none(), finalize_deadline_ms: clock.timestamp_ms()+120*DAY_MS, abandoned: false, running_hash: zero_hash(), uploaded_rows: 0, committed_rows: 0, last_address: @0x0 };
     let cap = AdminCap { id: object::new(ctx), pool: object::id(&pool) };
     (pool, cap)
 }
 fun reward_for(amount: u64, term: u64): u64 { if (term == 0) 0 else lock_vault::full_reward(amount,term) }
-public fun set_allocations(pool: &mut Pool, cap: &AdminCap, addresses: vector<address>, amounts: vector<u64>, lock_months: vector<u64>, allocations_hash: vector<u8>, clock: &Clock) {
-    assert!(cap.pool == object::id(pool), EAdmin); assert!(!pool.finalized, EState);
+fun zero_hash(): vector<u8> { vector[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] }
+fun row_hash(running: vector<u8>, address: address, amount: u64, term: u64): vector<u8> {
+    let mut bytes=running; bytes.append(bcs::to_bytes(&address)); bytes.append(bcs::to_bytes(&amount)); bytes.append(bcs::to_bytes(&term)); sha2_256(bytes)
+}
+/// A restart requires a complete sorted upload of the resulting table. Zero rows remove entries.
+public fun set_allocations(pool: &mut Pool, cap: &AdminCap, addresses: vector<address > , amounts: vector<u64>, lock_months: vector<u64>, allocations_hash: vector<u8>, committed_rows: u64, restart: bool, clock: &Clock) {
+    assert!(cap.pool == object::id(pool), EAdmin);
+    assert!(!pool.finalized && !pool.abandoned && clock.timestamp_ms() < pool.finalize_deadline_ms, EState);
     assert!(allocations_hash.length() == 32, EHash);
-    assert!(addresses.length() == amounts.length() && addresses.length() == lock_months.length(), EAllocation);
-    let mut i = 0;
+    assert!(addresses.length()<=500 && addresses.length() == amounts.length() && addresses.length() == lock_months.length(), EAllocation);
+    if(restart) {
+        pool.running_hash=zero_hash(); pool.uploaded_rows=0; pool.last_address=@0x0;
+        pool.allocations_hash=allocations_hash; pool.committed_rows=committed_rows;
+    } else assert!(pool.allocations_hash==allocations_hash && pool.committed_rows==committed_rows, EHash);
+    let mut i=0;
     while (i < addresses.length()) {
-        let address = addresses[i]; let amount = amounts[i]; let term = lock_months[i];
-        assert!(address != @0x0 && amount > 0 && (term == 0 || term == 12 || term == 24), EAllocation);
-        let reward = reward_for(amount,term); assert!(term == 0 || reward > 0, EAllocation);
-        let mut j = 0; while (j < i) { assert!(addresses[j] != address, EAllocation); j = j + 1; };
-        let old = if (pool.allocations.contains(address)) pool.allocations.remove(address) else Allocation {amount:0,claimed:0,lock_months:0};
-        assert!(amount <= viper::allocation::public_reserve() - (pool.allocated - old.amount), EAllocation);
-        pool.allocated = pool.allocated - old.amount + amount;
-        pool.locked_reward_required = pool.locked_reward_required - reward_for(old.amount,old.lock_months) + reward;
-        pool.allocations.add(address, Allocation { amount, claimed: 0, lock_months: term }); i = i + 1;
+        let address=addresses[i]; let amount=amounts[i]; let term=lock_months[i];
+        assert!(sui::address::to_u256(address) > sui::address::to_u256(pool.last_address) && (term==0 || term==12 || term==24), EAllocation);
+        assert!(amount > 0 || (term==0 && pool.allocations.contains(address)), EAllocation);
+        let reward=reward_for(amount,term);assert!(term==0 || reward>0, EAllocation);
+        let old=if(pool.allocations.contains(address)) pool.allocations.remove(address) else Allocation {amount:0,claimed:0,lock_months:0};
+        assert!(amount<=viper::allocation::public_reserve()-(pool.allocated-old.amount), EAllocation);
+        pool.allocated=pool.allocated-old.amount+amount;
+        pool.locked_reward_required=pool.locked_reward_required-reward_for(old.amount,old.lock_months)+reward;
+        if(amount > 0) {
+            pool.allocations.add(address,Allocation {amount,claimed:0,lock_months:term});
+            pool.running_hash=row_hash(pool.running_hash,address,amount,term);
+            pool.uploaded_rows=pool.uploaded_rows+1;
+        };
+        pool.last_address=address;i=i+1;
     };
-    pool.allocations_hash = allocations_hash; pool.last_change_ms = clock.timestamp_ms();
+    pool.last_change_ms=clock.timestamp_ms();
     event::emit(AllocationsSet {pool:object::id(pool),timestamp_ms:pool.last_change_ms,allocated:pool.allocated,allocations_hash});
 }
 public fun finalize(pool: &mut Pool, cap: &AdminCap, vault: &mut Vault, currency: &mut Currency<V1PER>, allocations_hash: vector<u8>, clock: &Clock) {
-    assert!(cap.pool == object::id(pool), EAdmin); assert!(!pool.finalized, EState);
-    assert!(pool.allocations_hash.length() == 32 && allocations_hash == pool.allocations_hash, EHash);
+    assert!(cap.pool == object::id(pool), EAdmin); assert!(!pool.finalized && !pool.abandoned && clock.timestamp_ms() < pool.finalize_deadline_ms, EState);
+    assert!(pool.allocations_hash.length() == 32 && allocations_hash == pool.allocations_hash && pool.running_hash==allocations_hash && pool.uploaded_rows==pool.committed_rows && pool.uploaded_rows==pool.allocations.length(), EHash);
     assert!(clock.timestamp_ms() >= pool.last_change_ms + REVIEW_MS, EReview);
     // This whole transaction aborts if capacity cannot cover every accepted lock.
     pool.reward_reserve.join(lock_vault::reserve_feast(vault,pool.locked_reward_required));
@@ -93,7 +111,9 @@ public fun claim_locked(pool: &mut Pool, vault: &mut Vault, clock: &Clock, ctx: 
     event::emit(Claimed {pool:object::id(pool),timestamp_ms:clock.timestamp_ms(),owner:sender,amount,lock_months:term});
 }
 public fun burn_unclaimed(pool: &mut Pool, vault: &mut Vault, currency: &mut Currency<V1PER>, clock: &Clock) {
-    assert!(pool.finalized && clock.timestamp_ms() >= pool.start_ms+WINDOW_MS,EState); assert_vault(pool,vault);
+    assert!((pool.finalized && clock.timestamp_ms() >= pool.start_ms+WINDOW_MS) || (!pool.finalized && clock.timestamp_ms() >= pool.finalize_deadline_ms),EState);
+    if(pool.reservation_vault.is_some()) assert_vault(pool,vault);
+    if(!pool.finalized) pool.abandoned=true;
     let released_rewards = pool.reward_reserve.value();
     lock_vault::release_feast(vault,pool.reward_reserve.split(released_rewards));
     let amount = pool.inventory.value(); currency.burn_balance(pool.inventory.split(amount)); pool.burned = pool.burned + amount;
@@ -102,14 +122,21 @@ public fun burn_unclaimed(pool: &mut Pool, vault: &mut Vault, currency: &mut Cur
 public fun accounting(pool: &Pool): (u64,u64,u64,u64) { (pool.inventory.value(),pool.allocated,pool.claimed,pool.burned) }
 public(package) fun share(pool: Pool) { transfer::share_object(pool); }
 #[test_only]
+fun upload(pool: &mut Pool, cap: &AdminCap, addresses: vector<address > , amounts: vector<u64>, terms: vector<u64>, supplied: vector<u8>, clock: &Clock) {
+    assert!(supplied.length()==32,EHash);
+    let mut commitment=zero_hash();let mut i=0;
+    while (i < addresses.length()) {if(amounts[i] > 0) commitment=row_hash(commitment,addresses[i],amounts[i],terms[i]);i=i+1;};
+    set_allocations(pool,cap,addresses,amounts,terms,commitment,addresses.length(),true,clock);
+}
+#[test_only]
 fun hash(): vector<u8> { vector[7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7] }
 #[test_only]
-fun setup(ctx: &mut TxContext): (Pool,AdminCap) { create(coin::mint_for_testing<V1PER>(viper::allocation::public_reserve(),ctx),ctx) }
+fun setup(ctx: &mut TxContext): (Pool,AdminCap) { let clock=sui::clock::create_for_testing(ctx); let (pool,cap)=create(coin::mint_for_testing<V1PER>(viper::allocation::public_reserve(),ctx),&clock,ctx); sui::clock::destroy_for_testing(clock); (pool,cap) }
 #[test_only]
 fun test_vault(opens: u64, ctx: &mut TxContext): (Vault,lock_vault::AdminCap) { lock_vault::create(coin::mint_for_testing<V1PER>(viper::allocation::lock_rewards(),ctx),@0xC,@0xF,opens,ctx) }
 #[test_only]
 fun ready(pool: &mut Pool, cap: &AdminCap, vault: &mut Vault, currency: &mut Currency<V1PER>, clock: &mut Clock) {
-    sui::clock::set_for_testing(clock,pool.last_change_ms+REVIEW_MS); finalize(pool,cap,vault,currency,hash(),clock);
+    sui::clock::set_for_testing(clock,pool.last_change_ms+REVIEW_MS); let commitment=pool.allocations_hash; finalize(pool,cap,vault,currency,commitment,clock);
 }
 #[test]
 fun vesting_rounds_and_boundaries() {
@@ -119,7 +146,7 @@ fun vesting_rounds_and_boundaries() {
 fun liquid_claims_and_expiry_reconcile() {
     let mut s=sui::test_scenario::begin(@0xA); let mut clock=sui::clock::create_for_testing(s.ctx());
     let (mut currency,metadata)=viper::v1per::test_currency(s.ctx()); let (mut pool,cap)=setup(s.ctx()); let (mut vault,vcap)=test_vault(0,s.ctx());
-    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000],vector[0],hash(),&clock); ready(&mut pool,&cap,&mut vault,&mut currency,&mut clock);
+    upload(&mut pool,&cap,vector[@0xA],vector[1_000],vector[0],hash(),&clock); ready(&mut pool,&cap,&mut vault,&mut currency,&mut clock);
     let start=pool.start_ms; let times=vector[0,30*DAY_MS,60*DAY_MS]; let amounts=vector[500,250,250]; let mut i=0;
     while (i < 3) { sui::clock::set_for_testing(&mut clock,start+times[i]); claim(&mut pool,&clock,s.ctx()); s.next_tx(@0xA);
         let coin=s.take_from_sender<Coin<V1PER>>(); assert!(coin.value()==amounts[i]); coin::burn_for_testing(coin);
@@ -133,7 +160,7 @@ fun check_reserved_claim(term: u64, before_opening: bool, exhaust: bool) {
     let mut s=sui::test_scenario::begin(@0xA); let mut clock=sui::clock::create_for_testing(s.ctx());
     let (mut currency,metadata)=viper::v1per::test_currency(s.ctx()); let (mut pool,cap)=setup(s.ctx());
     let (mut vault,vcap)=test_vault(if(before_opening) 30*DAY_MS else 0,s.ctx());
-    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000_000_000],vector[term],hash(),&clock);
+    upload(&mut pool,&cap,vector[@0xA],vector[1_000_000_000],vector[term],hash(),&clock);
     ready(&mut pool,&cap,&mut vault,&mut currency,&mut clock);
     let reserved=lock_vault::full_reward(1_000_000_000,term);
     let (available,committed,paid,_)=lock_vault::accounting(&vault); assert!(available+committed+paid==lock_vault::funded(&vault) && committed==reserved);
@@ -153,36 +180,36 @@ fun check_reserved_claim(term: u64, before_opening: bool, exhaust: bool) {
 fun early_finalize_fails() {
     let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx);
     let (mut pool,cap)=setup(&mut ctx); let (mut vault,_vcap)=test_vault(0,&mut ctx); let (mut currency,_metadata)=viper::v1per::test_currency(&mut ctx);
-    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000],vector[0],hash(),&clock);
-    finalize(&mut pool,&cap,&mut vault,&mut currency,hash(),&clock); abort 999
+    upload(&mut pool,&cap,vector[@0xA],vector[1_000],vector[0],hash(),&clock);
+    {let h=pool.allocations_hash; finalize(&mut pool,&cap,&mut vault,&mut currency,h,&clock)}; abort 999
 }
 #[test, expected_failure(abort_code=EHash)]
 fun wrong_hash_finalize_fails() {
     let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
     let (mut pool,cap)=setup(&mut ctx); let (mut vault,_vcap)=test_vault(0,&mut ctx); let (mut currency,_metadata)=viper::v1per::test_currency(&mut ctx);
-    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000],vector[0],hash(),&clock); sui::clock::set_for_testing(&mut clock,REVIEW_MS);
+    upload(&mut pool,&cap,vector[@0xA],vector[1_000],vector[0],hash(),&clock); sui::clock::set_for_testing(&mut clock,REVIEW_MS);
     let mut wrong=hash(); *wrong.borrow_mut(0)=8; finalize(&mut pool,&cap,&mut vault,&mut currency,wrong,&clock); abort 999
 }
 #[test, expected_failure(abort_code=EReview)]
 fun edit_restarts_review_period() {
     let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
     let (mut pool,cap)=setup(&mut ctx); let (mut vault,_vcap)=test_vault(0,&mut ctx); let (mut currency,_metadata)=viper::v1per::test_currency(&mut ctx);
-    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000],vector[0],hash(),&clock);
-    sui::clock::set_for_testing(&mut clock,3*DAY_MS); set_allocations(&mut pool,&cap,vector[@0xA],vector[2_000],vector[0],hash(),&clock);
-    sui::clock::set_for_testing(&mut clock,REVIEW_MS); finalize(&mut pool,&cap,&mut vault,&mut currency,hash(),&clock); abort 999
+    upload(&mut pool,&cap,vector[@0xA],vector[1_000],vector[0],hash(),&clock);
+    sui::clock::set_for_testing(&mut clock,3*DAY_MS); upload(&mut pool,&cap,vector[@0xA],vector[2_000],vector[0],hash(),&clock);
+    sui::clock::set_for_testing(&mut clock,REVIEW_MS); {let h=pool.allocations_hash; finalize(&mut pool,&cap,&mut vault,&mut currency,h,&clock)}; abort 999
 }
 #[test, expected_failure(abort_code=3,location=viper::lock_vault)]
 fun finalize_requires_full_reward_capacity() {
     let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
     let (mut pool,cap)=setup(&mut ctx); let (mut vault,_vcap)=test_vault(0,&mut ctx); let (mut currency,_metadata)=viper::v1per::test_currency(&mut ctx);
     let _position=lock_vault::open(&mut vault,coin::mint_for_testing<V1PER>(750_000_000_000_000,&mut ctx),24,&clock,&mut ctx);
-    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000_000_000],vector[24],hash(),&clock); ready(&mut pool,&cap,&mut vault,&mut currency,&mut clock); abort 999
+    upload(&mut pool,&cap,vector[@0xA],vector[1_000_000_000],vector[24],hash(),&clock); ready(&mut pool,&cap,&mut vault,&mut currency,&mut clock); abort 999
 }
 #[test]
 fun expiry_releases_unclaimed_reward_reservations() {
     let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx);
     let (mut pool,cap)=setup(&mut ctx); let (mut vault,vcap)=test_vault(0,&mut ctx); let (mut currency,metadata)=viper::v1per::test_currency(&mut ctx);
-    set_allocations(&mut pool,&cap,vector[@0xA],vector[1_000_000_000],vector[24],hash(),&clock); ready(&mut pool,&cap,&mut vault,&mut currency,&mut clock);
+    upload(&mut pool,&cap,vector[@0xA],vector[1_000_000_000],vector[24],hash(),&clock); ready(&mut pool,&cap,&mut vault,&mut currency,&mut clock);
     sui::clock::set_for_testing(&mut clock,pool.start_ms+WINDOW_MS); burn_unclaimed(&mut pool,&mut vault,&mut currency,&clock);
     let (available,committed,paid,_)=lock_vault::accounting(&vault);
     assert!(committed==0 && paid==0 && available==lock_vault::funded(&vault) && pool.reward_reserve.value()==0 && pool.inventory.value()==0);
@@ -191,41 +218,41 @@ fun expiry_releases_unclaimed_reward_reservations() {
     std::unit_test::destroy(currency); std::unit_test::destroy(metadata); sui::clock::destroy_for_testing(clock);
 }
 #[test,expected_failure(abort_code=EAdmin)]
-fun wrong_admin_fails() { let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,_c)=setup(&mut ctx); let (_q,c)=setup(&mut ctx); set_allocations(&mut p,&c,vector[@0xA],vector[1],vector[0],hash(),&clock); abort 999 }
+fun wrong_admin_fails() { let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,_c)=setup(&mut ctx); let (_q,c)=setup(&mut ctx); upload(&mut p,&c,vector[@0xA],vector[1],vector[0],hash(),&clock); abort 999 }
 #[test,expected_failure(abort_code=EAdmin)]
-fun wrong_admin_cannot_finalize() { let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,_c)=setup(&mut ctx); let (_q,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1per::test_currency(&mut ctx); finalize(&mut p,&c,&mut v,&mut currency,hash(),&clock); abort 999 }
+fun wrong_admin_cannot_finalize() { let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,_c)=setup(&mut ctx); let (_q,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1per::test_currency(&mut ctx); {let h=p.allocations_hash; finalize(&mut p,&c,&mut v,&mut currency,h,&clock)}; abort 999 }
 #[test,expected_failure(abort_code=EAllocation)]
-fun oversubscribed_fails() { let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); set_allocations(&mut p,&c,vector[@0xA,@0xB],vector[viper::allocation::public_reserve(),1],vector[0,0],hash(),&clock); abort 999 }
+fun oversubscribed_fails() { let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); upload(&mut p,&c,vector[@0xA,@0xB],vector[viper::allocation::public_reserve(),1],vector[0,0],hash(),&clock); abort 999 }
 #[test,expected_failure(abort_code=EAllocation)]
-fun zero_address_fails() { let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); set_allocations(&mut p,&c,vector[@0x0],vector[1],vector[0],hash(),&clock); abort 999 }
+fun zero_address_fails() { let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); upload(&mut p,&c,vector[@0x0],vector[1],vector[0],hash(),&clock); abort 999 }
 #[test,expected_failure(abort_code=EAllocation)]
-fun duplicate_batch_fails() { let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); set_allocations(&mut p,&c,vector[@0xA,@0xA],vector[1,1],vector[0,0],hash(),&clock); abort 999 }
+fun duplicate_batch_fails() { let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); upload(&mut p,&c,vector[@0xA,@0xA],vector[1,1],vector[0,0],hash(),&clock); abort 999 }
 #[test,expected_failure(abort_code=EState)]
-fun no_edits_after_finalize() { let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1per::test_currency(&mut ctx); set_allocations(&mut p,&c,vector[],vector[],vector[],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); set_allocations(&mut p,&c,vector[@0xA],vector[1],vector[0],hash(),&clock); abort 999 }
+fun no_edits_after_finalize() { let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1per::test_currency(&mut ctx); upload(&mut p,&c,vector[],vector[],vector[],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); upload(&mut p,&c,vector[@0xA],vector[1],vector[0],hash(),&clock); abort 999 }
 #[test,expected_failure(abort_code=EState)]
-fun premature_burn_fails() { let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1per::test_currency(&mut ctx); set_allocations(&mut p,&c,vector[],vector[],vector[],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); burn_unclaimed(&mut p,&mut v,&mut currency,&clock); abort 999 }
+fun premature_burn_fails() { let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1per::test_currency(&mut ctx); upload(&mut p,&c,vector[],vector[],vector[],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); burn_unclaimed(&mut p,&mut v,&mut currency,&clock); abort 999 }
 #[test,expected_failure(abort_code=EClaim)]
-fun unallocated_claim_fails() { let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1per::test_currency(&mut ctx); set_allocations(&mut p,&c,vector[],vector[],vector[],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); claim(&mut p,&clock,&mut ctx); abort 999 }
+fun unallocated_claim_fails() { let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1per::test_currency(&mut ctx); upload(&mut p,&c,vector[],vector[],vector[],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); claim(&mut p,&clock,&mut ctx); abort 999 }
 #[test,expected_failure(abort_code=EClaim)]
-fun repeated_locked_claim_fails() { let mut s=sui::test_scenario::begin(@0xA); let mut clock=sui::clock::create_for_testing(s.ctx()); let (mut p,c)=setup(s.ctx()); let (mut v,_vc)=test_vault(0,s.ctx()); let (mut currency,_m)=viper::v1per::test_currency(s.ctx()); set_allocations(&mut p,&c,vector[@0xA],vector[1_000_000_000],vector[12],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); claim_locked(&mut p,&mut v,&clock,s.ctx()); claim_locked(&mut p,&mut v,&clock,s.ctx()); abort 999 }
+fun repeated_locked_claim_fails() { let mut s=sui::test_scenario::begin(@0xA); let mut clock=sui::clock::create_for_testing(s.ctx()); let (mut p,c)=setup(s.ctx()); let (mut v,_vc)=test_vault(0,s.ctx()); let (mut currency,_m)=viper::v1per::test_currency(s.ctx()); upload(&mut p,&c,vector[@0xA],vector[1_000_000_000],vector[12],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); claim_locked(&mut p,&mut v,&clock,s.ctx()); claim_locked(&mut p,&mut v,&clock,s.ctx()); abort 999 }
 #[test,expected_failure(abort_code=EState)]
-fun claim_at_expiry_fails() { let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1per::test_currency(&mut ctx); set_allocations(&mut p,&c,vector[@0xA],vector[1_000],vector[0],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); sui::clock::set_for_testing(&mut clock,p.start_ms+WINDOW_MS); claim(&mut p,&clock,&mut ctx); abort 999 }
+fun claim_at_expiry_fails() { let mut ctx=tx_context::dummy(); let mut clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx); let (mut v,_vc)=test_vault(0,&mut ctx); let (mut currency,_m)=viper::v1per::test_currency(&mut ctx); upload(&mut p,&c,vector[@0xA],vector[1_000],vector[0],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock); sui::clock::set_for_testing(&mut clock,p.start_ms+WINDOW_MS); claim(&mut p,&clock,&mut ctx); abort 999 }
 
 #[test,expected_failure(abort_code=EHash)]
 fun invalid_commitment_width_fails() {
     let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx);
-    set_allocations(&mut p,&c,vector[],vector[],vector[],vector[7],&clock); abort 999
+    upload(&mut p,&c,vector[],vector[],vector[],vector[7],&clock); abort 999
 }
 #[test,expected_failure(abort_code=EAllocation)]
 fun unsupported_locked_allocation_term_fails() {
     let mut ctx=tx_context::dummy(); let clock=sui::clock::create_for_testing(&mut ctx); let (mut p,c)=setup(&mut ctx);
-    set_allocations(&mut p,&c,vector[@0xA],vector[1_000_000],vector[3],hash(),&clock); abort 999
+    upload(&mut p,&c,vector[@0xA],vector[1_000_000],vector[3],hash(),&clock); abort 999
 }
 #[test,expected_failure(abort_code=EClaim)]
 fun repeated_liquid_claim_without_new_vesting_fails() {
     let mut s=sui::test_scenario::begin(@0xA); let mut clock=sui::clock::create_for_testing(s.ctx());
     let (mut p,c)=setup(s.ctx()); let (mut v,_vc)=test_vault(0,s.ctx()); let (mut currency,_m)=viper::v1per::test_currency(s.ctx());
-    set_allocations(&mut p,&c,vector[@0xA],vector[1_000],vector[0],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock);
+    upload(&mut p,&c,vector[@0xA],vector[1_000],vector[0],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock);
     claim(&mut p,&clock,s.ctx()); claim(&mut p,&clock,s.ctx()); abort 999
 }
 #[test,expected_failure(abort_code=EVault)]
@@ -233,6 +260,53 @@ fun wrong_vault_cannot_consume_feast_reservation() {
     let mut s=sui::test_scenario::begin(@0xA); let mut clock=sui::clock::create_for_testing(s.ctx());
     let (mut p,c)=setup(s.ctx()); let (mut v,_vc)=test_vault(0,s.ctx()); let (mut wrong,_wc)=test_vault(0,s.ctx());
     let (mut currency,_m)=viper::v1per::test_currency(s.ctx());
-    set_allocations(&mut p,&c,vector[@0xA],vector[1_000_000],vector[12],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock);
+    upload(&mut p,&c,vector[@0xA],vector[1_000_000],vector[12],hash(),&clock); ready(&mut p,&c,&mut v,&mut currency,&mut clock);
     claim_locked(&mut p,&mut wrong,&clock,s.ctx()); abort 999
+}
+
+#[test]
+fun removal_updates_totals_and_complete_reupload() {
+    let mut ctx=tx_context::dummy();let mut clock=sui::clock::create_for_testing(&mut ctx);let (mut pool,cap)=setup(&mut ctx);
+    let (mut vault,vcap)=test_vault(0,&mut ctx);let (mut currency,metadata)=viper::v1per::test_currency(&mut ctx);
+    upload(&mut pool,&cap,vector[@0xA,@0xB],vector[1000000,2000000],vector[12,24],hash(),&clock);
+    let commitment=row_hash(zero_hash(),@0xB,2000000,24);
+    set_allocations(&mut pool,&cap,vector[@0xA,@0xB],vector[0,2000000],vector[0,24],commitment,1,true,&clock);
+    assert!(pool.allocated==2000000 && pool.allocations.length()==1 && pool.locked_reward_required==reward_for(2000000,24));
+    ready(&mut pool,&cap,&mut vault,&mut currency,&mut clock);
+    std::unit_test::destroy(pool);std::unit_test::destroy(cap);std::unit_test::destroy(vault);std::unit_test::destroy(vcap);std::unit_test::destroy(currency);std::unit_test::destroy(metadata);sui::clock::destroy_for_testing(clock);
+}
+#[test,expected_failure(abort_code=EHash)]
+fun incomplete_reupload_cannot_finalize() {
+    let mut ctx=tx_context::dummy();let mut clock=sui::clock::create_for_testing(&mut ctx);let (mut pool,cap)=setup(&mut ctx);
+    let (mut vault,_vcap)=test_vault(0,&mut ctx);let (mut currency,_metadata)=viper::v1per::test_currency(&mut ctx);
+    upload(&mut pool,&cap,vector[@0xA,@0xB],vector[1000000,2000000],vector[0,0],hash(),&clock);
+    let commitment=row_hash(zero_hash(),@0xA,3000000,0);
+    set_allocations(&mut pool,&cap,vector[@0xA],vector[3000000],vector[0],commitment,1,true,&clock);
+    sui::clock::set_for_testing(&mut clock,REVIEW_MS);finalize(&mut pool,&cap,&mut vault,&mut currency,commitment,&clock);abort 999
+}
+#[test]
+fun unfinalized_pool_burns_at_120_days() {
+    let mut ctx=tx_context::dummy();let mut clock=sui::clock::create_for_testing(&mut ctx);let (mut pool,cap)=setup(&mut ctx);
+    let (mut vault,vcap)=test_vault(0,&mut ctx);let (mut currency,metadata)=viper::v1per::test_currency(&mut ctx);
+    sui::clock::set_for_testing(&mut clock,pool.finalize_deadline_ms);burn_unclaimed(&mut pool,&mut vault,&mut currency,&clock);
+    assert!(pool.abandoned && pool.inventory.value()==0 && pool.reward_reserve.value()==0 && pool.burned==viper::allocation::public_reserve());
+    assert!(currency.total_supply().destroy_some()==viper::allocation::initial_supply()-pool.burned);
+    std::unit_test::destroy(pool);std::unit_test::destroy(cap);std::unit_test::destroy(vault);std::unit_test::destroy(vcap);std::unit_test::destroy(currency);std::unit_test::destroy(metadata);sui::clock::destroy_for_testing(clock);
+}
+#[test,expected_failure(abort_code=EState)]
+fun unfinalized_burn_before_deadline_fails() {
+    let mut ctx=tx_context::dummy();let mut clock=sui::clock::create_for_testing(&mut ctx);let (mut pool,_cap)=setup(&mut ctx);let (mut vault,_vcap)=test_vault(0,&mut ctx);let (mut currency,_metadata)=viper::v1per::test_currency(&mut ctx);
+    sui::clock::set_for_testing(&mut clock,pool.finalize_deadline_ms-1);burn_unclaimed(&mut pool,&mut vault,&mut currency,&clock);abort 999
+}
+#[test,expected_failure(abort_code=EState)]
+fun finalize_at_abandonment_deadline_fails() {
+    let mut ctx=tx_context::dummy();let mut clock=sui::clock::create_for_testing(&mut ctx);let (mut pool,cap)=setup(&mut ctx);let (mut vault,_vcap)=test_vault(0,&mut ctx);let (mut currency,_metadata)=viper::v1per::test_currency(&mut ctx);
+    upload(&mut pool,&cap,vector[],vector[],vector[],hash(),&clock);sui::clock::set_for_testing(&mut clock,pool.finalize_deadline_ms);let h=pool.allocations_hash;finalize(&mut pool,&cap,&mut vault,&mut currency,h,&clock);abort 999
+}
+#[test,expected_failure(abort_code=EAllocation)]
+fun batch_above_500_fails() {
+    let mut ctx=tx_context::dummy();let clock=sui::clock::create_for_testing(&mut ctx);let (mut pool,cap)=setup(&mut ctx);
+    let mut addresses=vector[];let mut amounts=vector[];let mut terms=vector[];let mut i=1;
+    while (i <= 501) {addresses.push_back(sui::address::from_u256(i as u256));amounts.push_back(1);terms.push_back(0);i=i+1;};
+    set_allocations(&mut pool,&cap,addresses,amounts,terms,hash(),501,true,&clock);abort 999
 }

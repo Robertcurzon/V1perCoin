@@ -24,7 +24,7 @@ public fun allocate(
     let (claims, claim_admin) = viper::free_claims::create(supply.split(viper::allocation::free_claims(), ctx), clock, ctx);
     viper::free_claims::share(claims);
     transfer::public_transfer(claim_admin, ctx.sender());
-    let (feast, feast_admin) = viper::feast::create(supply.split(viper::allocation::public_reserve(), ctx), ctx);
+    let (feast, feast_admin) = viper::feast::create(supply.split(viper::allocation::public_reserve(), ctx), clock, ctx);
     viper::feast::share(feast);
     transfer::public_transfer(feast_admin, ctx.sender());
     transfer::public_transfer(supply.split(viper::allocation::initial_liquidity(), ctx), liquidity);

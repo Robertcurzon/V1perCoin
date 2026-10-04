@@ -41,7 +41,10 @@ try {
   const { default: Rules } = await server.ssrLoadModule('/src/Rules.tsx');
   const rules = renderToStaticMarkup(React.createElement(Rules));
   for (const anchor of ['status','timeline','feast','claims','claim-action','lock','burns','community','foundation','privacy','questions']) assert(rules.includes(`id="${anchor}"`),anchor);
-  for (const text of ['1,440 one-minute average','no wallet cap','no contribution refund path','seven-day','10,000','whole completed','50%','40%','10%','Seal and Nautilus','wallet is not proof of one person']) assert(rules.includes(text),text);
+  for (const text of ['1,440 one-minute average','No wallet cap','no contribution refund path','seven-day','10,000','whole completed','50%','40%','10%','Seal and Nautilus','wallet is not proof of one person']) assert(rules.includes(text),text);
+  assert(rules.includes('HOW THE FREE') && rules.includes('BITE WORKS.') && rules.includes('THE FEAST,') && rules.includes('STEP BY STEP.'));
+  assert(!rules.includes('02 / FREE COMMUNITY CLAIMS'));
+  assert(rules.includes('Finalization day (F)'));
   assert(!fs.existsSync('public/viper-meme-feast.webp'));
   for (const file of ['src/App.tsx','src/index.css','design/social-kit.html']) assert(!fs.readFileSync(file,'utf8').includes('viper-meme-feast.webp'),file);
   console.log('Website checks passed: safe social URLs, configured-only channels, GitHub fallback and complete Rules anchors/disclosures.');

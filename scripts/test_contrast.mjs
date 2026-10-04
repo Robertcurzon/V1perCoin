@@ -9,8 +9,16 @@ const server=await preview({base:'/ViperCoin/',preview:{host:'127.0.0.1',port:0}
 const origin=server.resolvedUrls.local[0];
 const browser=await chromium.launch({headless:true});
 const failures=[],results=[];
-mkdirSync('tmp/overnight',{recursive:true});
+mkdirSync('tmp/overnight',{recursive:true});mkdirSync('tmp/site-review',{recursive:true});
 const collect=element=>{
+ for(const word of document.querySelectorAll('.v1per')) {
+  if(word.textContent!=='V1PER')throw Error('Wordmark text mismatch: '+word.outerHTML);
+  const rootStyle=getComputedStyle(word);let visible=word.getClientRects().length>0;
+  for(let p=word;p;p=p.parentElement){const s=getComputedStyle(p);if(s.display==='none'||s.visibility!=='visible'||Number(s.opacity)===0)visible=false;}
+  if(visible){const digit=word.querySelector('.one'),s=digit&&getComputedStyle(digit),r=digit?.getBoundingClientRect();
+   if(!digit||!r.width||!r.height||s.display==='none'||s.visibility!=='visible'||Number(s.opacity)===0||s.color===rootStyle.color)throw Error('Hidden or indistinct brand digit: '+word.outerHTML);
+  }
+ }
  const root=element??document.querySelector('dialog:modal')??document,entries=[];
  const canvas=document.createElement('canvas');canvas.width=canvas.height=1;const ctx=canvas.getContext('2d');
  const color=css=>{ctx.clearRect(0,0,1,1);ctx.fillStyle=css;ctx.fillRect(0,0,1,1);return [...ctx.getImageData(0,0,1,1).data];};
@@ -112,7 +120,7 @@ try{
    await page.waitForFunction(()=>document.querySelectorAll('.feast-art[data-menu-state="board"]').length===2);
    for(const image of await page.locator('.feast-art img').all())assert(!await image.isVisible());
    await page.unroute('**/feast-menu.webp');
-   if(process.argv.includes('--capture')){await page.reload({waitUntil:'networkidle'});await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`docs/overnight-review/after-home-${width}.jpg`,type:'jpeg',quality:85,fullPage:true,animations:'disabled'});}
+   if(process.argv.includes('--capture')){await page.reload({waitUntil:'networkidle'});await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`tmp/site-review/after-home-${width}.jpg`,type:'jpeg',quality:85,fullPage:true,animations:'disabled'});}
   }
   results.push({width,route:'/'+route,textRuns:count,hoveredControls:hovered});console.log(JSON.stringify(results.at(-1)));await page.close();
  }

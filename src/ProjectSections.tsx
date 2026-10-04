@@ -29,11 +29,11 @@ export function AllocationSection() {
 
 export function FreeClaimsSection({ detailed = false }: { detailed?: boolean }) {
   return <section id="claims" className="section free-claims-section">
-    <div className="kicker">02 / FREE COMMUNITY CLAIMS</div><h2>FIRST BITE'S<br/><em>FREE.</em></h2>
+    <div className="kicker">FREE COMMUNITY CLAIMS</div><h2>HOW THE FREE<br/><em>BITE WORKS.</em></h2>
     <p className="token-intro">10,000 <V1per /> for up to 10,000 approved wallets. Make something original, apply, claim. Gas only.</p>
     <div className="claim-summary"><span className="status-label">{launch.freeClaimsStartMs > 0 ? `SCHEDULED: ${new Date(launch.freeClaimsStartMs).toISOString()}` : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href={siteUrl('rules/#claims')}>How to apply →</a></div>
     <p className="fine-print">Apply in the seven days before opening; approved wallets have 14 days to claim. <a href={siteUrl('rules/#claims')}>Full rules →</a></p>
-    {detailed && <><p>Apply with a wallet-signed application and one original community entry. Review checks authorship and repeated entries; approvals freeze at opening. A wallet is not proof of one person. No paid referral or promotional purchase is required. Unclaimed tokens can be burned after expiry; the administrator cannot withdraw them.</p><FreeClaimApplication /><FreeClaimAction /></>}
+    {detailed && <><p>Apply with a wallet-signed application and one original community entry. Review checks authorship and repeated entries; approvals freeze at opening. A wallet is not proof of one person. No paid referral or promotional purchase is required. Unclaimed tokens can be burned after expiry; the administrator cannot withdraw them.</p><FreeClaimApplication /><p className="fine-print">The opening must be scheduled and start within 60 days of allocation. If unscheduled at that deadline, anyone may burn the unused pool.</p><FreeClaimAction /></>}
   </section>;
 }
 

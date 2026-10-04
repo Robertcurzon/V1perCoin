@@ -16,6 +16,6 @@ export function isManifestConfigured(manifest: typeof launch): boolean {
   && Number.isSafeInteger(manifest.freeClaimsStartMs) && manifest.freeClaimsStartMs >= 0
   && (manifest.freeClaimsStartMs === 0 || /^https:\/\//.test(manifest.freeClaimsApplicationUrl))
   && typeof manifest.feastOpen === 'boolean'
-  && (!manifest.feastOpen || (manifest.network === 'mainnet' && Number.isSafeInteger(manifest.feastStartMs) && manifest.feastStartMs > 0 && manifest.feastStartMs % 1000 === 0 && /^https:\/\//.test(manifest.feastSubmissionUrl) && manifest.freeClaimsStartMs === manifest.feastStartMs && Object.entries(manifest.feastTreasury).length === 4 && ['ethereum', 'solana', 'dogecoin', 'memecore'].every(chain => treasuryAddressValid(chain, manifest.feastTreasury[chain as keyof typeof manifest.feastTreasury]))));
+  && (!manifest.feastOpen || (manifest.network === 'mainnet' && Number.isSafeInteger(manifest.feastStartMs) && manifest.feastStartMs > 0 && manifest.feastStartMs % 1000 === 0 && manifest.feastBindingDeadlineMs === manifest.feastStartMs+23*86400000 && /^https:\/\//.test(manifest.feastSubmissionUrl) && manifest.freeClaimsStartMs === manifest.feastStartMs && Object.entries(manifest.feastTreasury).length === 4 && ['ethereum', 'solana', 'dogecoin', 'memecore'].every(chain => treasuryAddressValid(chain, manifest.feastTreasury[chain as keyof typeof manifest.feastTreasury]))));
 }
 export const isLaunchConfigured = isManifestConfigured(launch);

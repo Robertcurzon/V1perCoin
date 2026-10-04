@@ -32,13 +32,13 @@ function App() {
         <img className="hero-image" src={siteUrl('viper-art.jpg')} alt="" />
         <div className="hero-overlay" />
         <div className="hero-copy">
-          <div className="eyebrow"><V1per /> Coin (<V1per />) · BUILT ON SUI · PRE-LAUNCH</div>
+          <div className="eyebrow"><span><V1per /> COIN (<V1per />) · BUILT ON SUI · PRE-LAUNCH</span></div>
           <h1>MEMES<br/><em>WITH BITE.</em></h1>
           <p>Cute had its turn.<br/><V1per /> Coin bites back.</p>
           <div className="buttons"><JoinDenButton /></div>
           <p className="fine-print">Pre-launch: <V1per /> is not deployed, and nothing on this site promises gains. <a href={siteUrl('rules/#status')}>Full rules →</a></p>
         </div>
-        <div className="hero-foot"><span><V1per /> Coin / <V1per /></span><span>THE JUNGLE HAS A NEW REGULAR ↓</span></div>
+        <div className="hero-foot"><span><V1per /> COIN</span><span>THE JUNGLE HAS A NEW REGULAR ↓</span></div>
       </section>
       <section id="ways-in" className="section ways-in" aria-labelledby="ways-heading">
         <div className="kicker" id="ways-heading">TWO WAYS IN</div>

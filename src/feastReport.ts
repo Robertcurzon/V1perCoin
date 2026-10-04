@@ -1,5 +1,8 @@
 export interface FeastReport {
   csvSha256: string;
+  allocationCommitment: string;
+  allocationRows: number;
+  bindingDeadline: number;
   scriptCommit: string;
   windowStart: number;
   receivedBaseUnits: Record<string,string>;
@@ -15,6 +18,7 @@ export function parseFeastReport(value: unknown, coinIds: string[], windowStart:
   const r = record(value), eligible = record(r.receivedBaseUnits), received = record(r.treasuryReceivedBaseUnits);
   if (new Set(coinIds).size !== coinIds.length || !Number.isSafeInteger(windowStart) || windowStart <= 0
       || typeof r.csvSha256 !== 'string' || !/^[a-f0-9]{64}$/.test(r.csvSha256)
+      || typeof r.allocationCommitment !== 'string' || !/^[a-f0-9]{64}$/.test(r.allocationCommitment) || !Number.isSafeInteger(r.allocationRows) || Number(r.allocationRows)<0 || r.bindingDeadline!==windowStart+23*86400
       || typeof r.scriptCommit !== 'string' || !/^[a-f0-9]{40}$/.test(r.scriptCommit)
       || r.windowStart !== windowStart || r.liquidityProceedsPercent !== 25
       || r.usdScale !== '100000000'

@@ -121,7 +121,15 @@ jobs:
       - run: npm run test:deployment
       - name: Install pinned Chromium for contrast checks
         run: PLAYWRIGHT_BROWSERS_PATH=tmp/playwright-browsers npx playwright install --with-deps chromium
-      - run: npm run test:contrast
+      - run: npm run test:contrast -- --capture
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: site-review
+          path: |
+            tmp/site-review/
+            tmp/overnight/contrast-results.json
+          if-no-files-found: warn
       - name: Require the published PDF and provenance
         run: |
           test -s dist/whitepaper.pdf
