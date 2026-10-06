@@ -22,6 +22,10 @@ Short lines to test:
 
 Use **V1PER Coin (V1PER)** on the first mention of each page; use Viper or V1PER afterward. Put the verified Sui coin type next to any later claim or trading link; the ticker alone cannot identify the asset. Do not use “relaunch,” price targets, promised yield, or “private transfers” for the public base coin.
 
+## Community identity
+
+V1PER Coin is an independent Sui project, unaffiliated with other projects using $VIPER. The homepage notice states: “Don’t confuse us with lesser coins or communities sharing the name.” The community standard is “Quality. Ferocity. No BS.” Keep rivalry focused on creative standards and brand identity, without inventing accusations about other projects. Direct visitors to the project status and, once published and verified, the exact Sui coin type.
+
 ## Visual system
 
 | Element | Working choice | Use |
