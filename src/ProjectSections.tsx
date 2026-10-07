@@ -8,32 +8,35 @@ import { launch, isLaunchConfigured } from './manifest';
 import ExplorerLink from './ExplorerLink';
 
 const allocations = [
-  { name: 'Free claims', percent: 10, color: '#bdf332', description: '100M · approved community addresses' },
+  { name: 'Free claims', percent: 10, color: '#bdf332', description: '100M · approved community wallets' },
   { name: 'Feast claims', percent: 10, color: '#84c942', description: '100M · contributor allocation pool' },
   { name: 'Initial exchange liquidity', percent: 20, color: '#65bfbd', description: '200M · reserve for initial exchange liquidity' },
   { name: 'Later liquidity reserve', percent: 15, color: '#5895be', description: '150M · future exchange depth' },
   { name: 'Community programs', percent: 20, color: '#e6c768', description: '200M · creators, challenges and onboarding' },
-  { name: 'Lock rewards', percent: 15, color: '#d79263', description: '150M · escrowed rewards, no new minting' },
+  { name: 'Lock rewards', percent: 15, color: '#d79263', description: '150M · reserved lock rewards' },
   { name: 'Ecosystem Operations', percent: 10, color: '#af92c5', description: '100M · V1PER Foundation' },
 ];
 
 export function AllocationSection() {
   return <section id="tokenomics" className="section allocation">
-    <div className="section-heading"><div><div className="kicker">THE INITIAL SUPPLY / 100%</div><h2>EVERY TOKEN.<br/><em>ACCOUNTED FOR.</em></h2></div><p>Deflationary supply: minted once, burn-only. One billion <V1per /> at creation. Claims and rewards use this inventory; burns reduce it.</p></div>
+    <div className="section-heading"><div><div className="kicker">THE INITIAL SUPPLY / 100%</div><h2>EVERY TOKEN.<br/><em>ACCOUNTED FOR.</em></h2></div><p>One billion <V1per /> at launch. No new tokens can be minted. Claims and rewards come from this supply; burns reduce it.</p></div>
     <div className="allocation-bar" aria-hidden="true">{allocations.map(a => <span key={a.name} style={{ width: `${a.percent}%`, background: a.color }} />)}</div>
     <div className="allocation-grid">{allocations.map(a => <article key={a.name}><div><i style={{ background: a.color }} /><span>{a.name}</span><strong>{a.percent}%</strong></div><p><BrandText text={a.description} /></p></article>)}</div>
-    <div className="token-proof"><div><span className="kicker">DEFLATIONARY SUPPLY</span><h3>Less supply. Same bite.</h3><p>Burns come from early exits and unused claim inventory.</p><a className="text-link" href={siteUrl('rules/#burns')}>Full rules →</a></div><div><span className="kicker">SUI COIN TYPE / {isLaunchConfigured ? launch.network.toUpperCase() : 'PRE-LAUNCH'}</span><p className="coin-type">{isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p>{isLaunchConfigured && <ExplorerLink kind="coin" value={launch.coinType}>Verify on Suiscan ↗</ExplorerLink>}<a className="text-link" href={siteUrl('monitor/')}>Open the monitor →</a></div></div>
+    <div className="token-proof"><div><span className="kicker">DEFLATIONARY SUPPLY</span><h3>Less supply. Same bite.</h3><p>Burns come from early exits and unused claim inventory.</p><a className="text-link" href={siteUrl('rules/#burns')}>Full rules →</a></div><div><span className="kicker">OFFICIAL SUI TOKEN / {isLaunchConfigured ? launch.network.toUpperCase() : 'PRE-LAUNCH'}</span><p className="coin-type">{isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p>{isLaunchConfigured && <ExplorerLink kind="coin" value={launch.coinType}>Verify on Suiscan ↗</ExplorerLink>}<a className="text-link" href={siteUrl('monitor/')}>Open the monitor →</a></div></div>
     <p className="fine-print">Liquidity reserves do not prove a funded exchange pool. <a href={siteUrl('rules/#foundation')}>Full rules →</a></p>
   </section>;
 }
 
 export function FreeClaimsSection({ detailed = false }: { detailed?: boolean }) {
   return <section id="claims" className="section free-claims-section">
-    <div className="kicker">FREE COMMUNITY CLAIMS</div><h2>HOW THE FREE<br/><em>BITE WORKS.</em></h2>
-    <p className="token-intro">10,000 <V1per /> for up to 10,000 approved wallets. Make something original, apply, claim. Gas only.</p>
-    <div className="claim-summary"><span className="status-label">{launch.freeClaimsStartMs > 0 ? `SCHEDULED: ${new Date(launch.freeClaimsStartMs).toISOString()}` : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href={siteUrl('rules/#claims')}>How to apply →</a></div>
+    {detailed ? <><div className="kicker">FREE COMMUNITY CLAIMS</div><h2>HOW THE FREE<br/><em>BITE WORKS.</em></h2></> : <h2>FREE TOKENS.</h2>}
+    <p className="token-intro">10,000 <V1per /> per approved wallet. Up to 10,000 wallets. No purchase required; claiming costs Sui network gas.</p>
+    <div className="claim-summary"><span className="status-label">{launch.freeClaimsStartMs > 0 ? `SCHEDULED: ${new Date(launch.freeClaimsStartMs).toISOString()}` : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href={detailed ? siteUrl('rules/#claims') : '#free-application'}>How to apply →</a></div>
     <p className="fine-print">Apply in the seven days before opening; approved wallets have 14 days to claim. <a href={siteUrl('rules/#claims')}>Full rules →</a></p>
-    {detailed && <><p>Apply with a wallet-signed application and one original community entry. Review checks authorship and repeated entries; approvals freeze at opening. A wallet is not proof of one person. No paid referral or promotional purchase is required. Unclaimed tokens can be burned after expiry; the administrator cannot withdraw them.</p><FreeClaimApplication /><p className="fine-print">The opening must be scheduled and start within 60 days of allocation. If unscheduled at that deadline, anyone may burn the unused pool.</p><FreeClaimAction /></>}
+    {!detailed && <ol className="action-steps"><li>Create an original meme, useful guide or testnet issue report.</li><li>Sign an application with your Sui wallet and submit it for review.</li><li>If approved, return here to claim during the 14-day window.</li></ol>}
+    {detailed && <p>Apply with a wallet-signed application and one original community entry. Review checks authorship and repeated entries; approvals freeze at opening. A wallet is not proof of one person. No paid referral or promotional purchase is required. Unclaimed tokens can be burned after expiry; the administrator cannot withdraw them.</p>}
+    <div className="claim-actions"><FreeClaimApplication detailed={detailed} /><FreeClaimAction /></div>
+    {detailed && <p className="fine-print">The opening must be scheduled and start within 60 days of allocation. If unscheduled at that deadline, anyone may burn the unused pool.</p>}
   </section>;
 }
 

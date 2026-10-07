@@ -89,8 +89,8 @@ try{
   await page.goto(new URL(route,origin).href,{waitUntil:'networkidle'});await page.locator('main').waitFor();await page.evaluate(()=>document.fonts.ready);
   if(route==='') {
    const sections=await page.locator('main > section').evaluateAll(nodes=>nodes.map(e=>e.id||e.className));
-   assert.deepEqual(sections,['hero','ways-in','story','claims','feast','lock','tokenomics','den']);
-   for(const text of ['not deployed','nothing on this site promises gains','founder-run','with no refunds'])assert((await page.locator('main').innerText()).includes(text),text);
+   assert.deepEqual(sections,['hero','ways-in','claims','feast','lock','tokenomics','den']);
+   for(const text of ['Not launched yet','token transactions are closed','founder-run','with no refunds'])assert((await page.locator('main').innerText()).includes(text),text);
    assert.equal(await page.getByRole('button',{name:'Not live yet',exact:true}).count(),1);
   }
   await page.evaluate(()=>{for(const el of document.querySelectorAll('details'))el.open=true;});
@@ -104,20 +104,29 @@ try{
    if(await node.evaluate(el=>el.classList.contains('skip-link')))await node.evaluate(el=>el.blur());
   }
   if(route===''){
-   // Open native dialog and mobile navigation too; text on their surfaces counts.
-   const toggle=page.getByRole('button',{name:'Open navigation'});if(await toggle.isVisible()){await toggle.click();await scan(page,{width,route:'/',state:'mobile navigation'});await page.getByRole('button',{name:'Close navigation'}).click();}
-   await page.getByRole('button',{name:'JOIN THE DEN ↗'}).first().click();await scan(page,{width,route:'/',state:'community dialog'});await page.getByRole('button',{name:'Close community links'}).click();
-   const slots=page.locator('.feast-art');assert.equal(await slots.count(),2);
+   // Navigation stays accessible after scrolling; anchors clear the fixed header.
+   await page.evaluate(()=>scrollTo(0,document.body.scrollHeight/2));
+   const header=page.locator('.home-header');
+   assert.equal(await header.evaluate(el=>getComputedStyle(el).position),'fixed');
+   assert.equal(Math.round((await header.boundingBox()).y),0);
+   const toggle=page.getByRole('button',{name:'Open navigation'});if(await toggle.isVisible()){await toggle.click();await scan(page,{width,route:'/',state:'mobile navigation'},header,false);await page.getByRole('button',{name:'Close navigation'}).click();}
+   if(await toggle.isVisible())await toggle.click();
+   await page.getByRole('link',{name:'Free tokens',exact:true}).click();
+   await page.waitForFunction(()=>{const section=document.querySelector('#claims').getBoundingClientRect(),header=document.querySelector('.home-header').getBoundingClientRect();return section.top>=header.bottom&&section.top<header.bottom+70;});
+   if(await toggle.isVisible())assert.equal(await toggle.getAttribute('aria-expanded'),'false');
+   assert(await page.getByRole('button',{name:'CLAIMS NOT OPEN YET',exact:true}).isDisabled());
+   assert(await page.getByRole('button',{name:'FEAST NOT OPEN YET',exact:true}).isDisabled());
+   const slots=page.locator('.feast-art');assert.equal(await slots.count(),1);
    // Reuse an existing project asset as an isolated decode/load fixture. This
    // creates no illustration and is never saved as the owner's menu artwork.
    await page.route('**/feast-menu.webp',route=>route.fulfill({path:'public/social-preview.png',contentType:'image/png'}));
    await page.reload({waitUntil:'networkidle'});
-   await page.waitForFunction(()=>document.querySelectorAll('.feast-art[data-menu-state="art"]').length===2);
+   await page.waitForFunction(()=>document.querySelectorAll('.feast-art[data-menu-state="art"]').length===1);
    for(const image of await page.locator('.feast-art img').all())assert(await image.isVisible());
    await page.unroute('**/feast-menu.webp');
    await page.route('**/feast-menu.webp',route=>route.fulfill({status:404,body:''}));
    await page.reload({waitUntil:'networkidle'});
-   await page.waitForFunction(()=>document.querySelectorAll('.feast-art[data-menu-state="board"]').length===2);
+   await page.waitForFunction(()=>document.querySelectorAll('.feast-art[data-menu-state="board"]').length===1);
    for(const image of await page.locator('.feast-art img').all())assert(!await image.isVisible());
    await page.unroute('**/feast-menu.webp');
    if(process.argv.includes('--capture')){await page.reload({waitUntil:'networkidle'});await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`tmp/site-review/after-home-${width}.jpg`,type:'jpeg',quality:85,fullPage:true,animations:'disabled'});}
@@ -127,5 +136,5 @@ try{
  writeFileSync('tmp/overnight/contrast-results.json',JSON.stringify({results,failures},null,2)+'\n');
  if(failures.length)console.error(JSON.stringify(failures.slice(0,25),null,2));
  assert.equal(failures.length,0,`WCAG AA contrast failures (${failures.length}); see tmp/overnight/contrast-results.json`);
- console.log('Contrast passed: all four routes, 1440/390, rendered text + hover + dialog/navigation; 4.5 body / 3 large.');
+ console.log('Contrast passed: all four routes, 1440/390, text/hover, fixed header, anchor clearance, navigation and closed actions; 4.5 body / 3 large.');
 }finally{await browser.close();await new Promise(r=>server.httpServer.close(r));}

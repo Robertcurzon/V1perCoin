@@ -1,7 +1,6 @@
-import FeastMenu from './FeastMenu';
 import { V1per } from './V1per';
 import { siteUrl, currentPage, site } from './site';
-import { CommunityLinks, JoinDenButton } from './CommunityLinks';
+import { CommunityLinks } from './CommunityLinks';
 import { lazy, Suspense, useState } from 'react';
 const Monitor = lazy(() => import('./Monitor'));
 const Whitepaper = lazy(() => import('./Whitepaper'));
@@ -11,6 +10,8 @@ import FeastPanel from './FeastPanel';
 import { Menu, X } from 'lucide-react';
 import { launch } from './manifest';
 import { AllocationSection, FreeClaimsSection } from './ProjectSections';
+import { ConnectButton } from '@mysten/dapp-kit-react/ui';
+import { isLaunchConfigured } from './manifest';
 
 const repoUrl = site.repository;
 function App() {
@@ -24,8 +25,8 @@ function App() {
       <a href="#top" className="brand" aria-label="V1PER Coin home"><img src={siteUrl('viper-logo.webp')} alt="" /><span><V1per /><span className="accent">.</span><small>COIN / <V1per /></small></span></a>
       <button className="menu-toggle" aria-expanded={menuOpen} aria-controls="home-nav" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={24} /> : <Menu size={24} />}</button>
       <nav id="home-nav" className={menuOpen ? 'is-open' : ''} aria-label="Main navigation" onClick={() => setMenuOpen(false)}>
-        <a href="#claims">Free bite</a><a href="#feast">Feed the Viper</a><a href="#lock">Lock & Earn</a><a href="#tokenomics">Tokenomics</a><a href={siteUrl('rules/')}>Rules</a><a href={siteUrl('monitor/')}>Monitor</a>
-      </nav><JoinDenButton className="button lime header-join" />
+        <a href="#claims">Free tokens</a><a href="#feast">The Feast</a><a href="#lock">Lock & Earn</a><a href="#den">Community</a><a href={siteUrl('rules/')}>Rules</a><a href={siteUrl('monitor/')}>Monitor</a>
+      </nav><div className="header-wallet"><ConnectButton /></div>
     </header>
     <main id="top">
       <section className="hero">
@@ -34,33 +35,30 @@ function App() {
         <div className="hero-copy">
           <div className="eyebrow"><span><V1per /> COIN (<V1per />) · BUILT ON SUI · PRE-LAUNCH</span></div>
           <h1>MEMES<br/><em>WITH BITE.</em></h1>
-          <p>Cute had its turn.<br/><V1per /> Coin bites back.</p>
-          <div className="buttons"><JoinDenButton /></div>
-          <p className="fine-print">Pre-launch: <V1per /> is not deployed, and nothing on this site promises gains. <a href={siteUrl('rules/#status')}>Full rules →</a></p>
+          <p>Cute had its turn.<br/><V1per /> Coin bites back.<br/>A deflationary meme coin on Sui.</p>
+          <div className="buttons"><a className="button lime" href="#ways-in">GET STARTED ↓</a><a className="button outline" href="#den">COMMUNITY ↓</a></div>
+          <p className="fine-print">{isLaunchConfigured ? `Sui ${launch.network}. Check each action’s opening dates below.` : 'Not launched yet. Applications, contributions and token transactions are closed.'} <a href={siteUrl('rules/#status')}>Launch status →</a></p>
         </div>
-        <div className="hero-foot"><span><V1per /> COIN</span><span>THE JUNGLE HAS A NEW REGULAR ↓</span></div>
+        <div className="hero-foot"><span><V1per /> COIN</span><span>FREE TOKENS · THE FEAST · LOCK REWARDS ↓</span></div>
       </section>
-      <aside className="identity-note section" aria-labelledby="identity-heading">
+      <aside id="story" className="identity-note section" aria-labelledby="identity-heading">
         <h2 id="identity-heading">NOT TO BE<br/>MISTAKEN.</h2>
-        <div><p>Don’t confuse us with lesser coins or communities sharing the name. <V1per /> Coin (<V1per />) is an independent Sui project, unaffiliated with other projects using $VIPER.</p><p className="identity-standard">Quality. Ferocity. No BS.</p></div>
+        <div><p><V1per /> Coin (<V1per />) is independent, built on Sui, and unaffiliated with other projects using $VIPER.</p><p className="identity-standard">Quality. Ferocity. No BS.</p></div>
         <a className="text-link" href={siteUrl('rules/#status')}>VERIFY THIS PROJECT →</a>
       </aside>
       <section id="ways-in" className="section ways-in" aria-labelledby="ways-heading">
-        <div className="kicker" id="ways-heading">TWO WAYS IN</div>
+        <h2 id="ways-heading">GET STARTED.</h2>
+        <div className="wallet-start" id="wallet"><div><h3>Connect your Sui wallet</h3><p>Your wallet is used for free claims, Feast allocations and locks. Connecting does not send tokens.</p></div><ConnectButton /></div>
         <div className="entry-grid">
-          <article className="entry-card free-entry"><h2>FIRST BITE'S<br/><em>FREE.</em></h2><p>10,000 <V1per /> per approved wallet.</p><span className="status-label">{launch.freeClaimsStartMs > 0 ? 'WINDOW SCHEDULED' : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href="#claims">How it works ↓</a></article>
-          <article className="entry-card feast-entry"><div><h2>FEED THE<br/><em>VIPER.</em></h2><p>1.00× / 1.10× / 1.25× allocation points</p><a className="text-link" href="#feast">See the menu ↓</a></div><FeastMenu compact /></article>
+          <article className="entry-card free-entry"><h3>FREE TOKENS</h3><p>Submit an original meme, guide or testnet issue report. Approved wallets can claim 10,000 <V1per /> once.</p><span className="status-label">{launch.freeClaimsStartMs > 0 ? 'OPENING DATE SET' : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href="#claims">Apply or claim ↓</a></article>
+          <article className="entry-card"><h3>THE FEAST</h3><p>Contribute accepted meme coins for a <V1per /> allocation. Claim in stages or choose a 12- or 24-month lock.</p><span className="status-label">{launch.feastOpen && isLaunchConfigured ? 'CHECK THE CONTRIBUTION WINDOW' : 'CONTRIBUTIONS CLOSED'}</span><a className="text-link" href="#feast">View coins and participate ↓</a></article>
         </div>
-      </section>
-      <section id="story" className="section story">
-        <div className="kicker">01 / THE FOOD CHAIN</div>
-        <div className="two-col"><h2>THE FOOD CHAIN<br/><em>JUST CHANGED.</em></h2><div className="prose"><p>The meme jungle is full of puppies and kittens. Viper is the predator. One billion <V1per />, minted once, can only shrink.</p><div className="community-strip"><span>Creator grants</span><span>Hunt Board</span><span>Onboarding</span></div><a className="text-link" href={siteUrl('rules/#community')}>Full budget →</a></div></div>
       </section>
       <FreeClaimsSection />
       <FeastPanel />
       <LockPanel />
       <AllocationSection />
-      <section id="den" className="closing"><div className="section closing-grid"><div><div className="kicker">THE JUNGLE IS BETTER WITH COMPANY</div><h2>JOIN THE DEN.<br/><em>STAY SHARP.</em></h2></div><CommunityLinks dark /></div></section>
+      <section id="den" className="closing"><div className="section closing-grid"><div><h2>JOIN THE<br/><em>COMMUNITY.</em></h2><p>Follow launch updates, share memes and meet the community.</p></div><CommunityLinks dark /></div></section>
     </main>
     <footer><span>© {new Date().getFullYear()} <V1per /> Coin (<V1per />)</span><nav aria-label="Footer navigation"><a href={siteUrl('whitepaper/')}>WHITE PAPER</a><a href={siteUrl('rules/')}>RULES</a><a href={siteUrl('rules/#foundation')}>FOUNDATION</a><a href={siteUrl('rules/#privacy')}>PRIVACY</a><a href={repoUrl} target="_blank" rel="noreferrer">GITHUB ↗</a></nav></footer>
   </div>;
