@@ -40,6 +40,11 @@ function App() {
         </div>
         <div className="hero-foot"><span><V1per /> COIN</span><span>THE JUNGLE HAS A NEW REGULAR ↓</span></div>
       </section>
+      <aside className="identity-note section" aria-labelledby="identity-heading">
+        <h2 id="identity-heading">NOT TO BE<br/>MISTAKEN.</h2>
+        <div><p>Don’t confuse us with lesser coins or communities sharing the name. <V1per /> Coin (<V1per />) is an independent Sui project, unaffiliated with other projects using $VIPER.</p><p className="identity-standard">Quality. Ferocity. No BS.</p></div>
+        <a className="text-link" href={siteUrl('rules/#status')}>VERIFY THIS PROJECT →</a>
+      </aside>
       <section id="ways-in" className="section ways-in" aria-labelledby="ways-heading">
         <div className="kicker" id="ways-heading">TWO WAYS IN</div>
         <div className="entry-grid">

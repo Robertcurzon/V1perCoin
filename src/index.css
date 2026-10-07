@@ -267,6 +267,14 @@ button:disabled .v1per {display:inline;gap:0; color: #e9ecdf; }
 
 .text-link { color: #bdf332; }
 
+.identity-note { display: grid; grid-template-columns: 1fr 2fr auto; align-items: center; gap: 32px; padding-top: 32px; padding-bottom: 32px; border-top: 1px solid #475d3f; border-bottom: 1px solid #475d3f; }
+.identity-note h2 { font-size: 32px; line-height: 1.05; letter-spacing: .02em; }
+.identity-note p { margin: 0; color: #c2cbbd; font-size: 14px; line-height: 1.7; }
+.identity-note .identity-standard { margin-top: 10px; color: #bdf332; font-weight: 800; }
+.identity-note .text-link { margin-top: 0; line-height: 1.6; }
+@media(max-width:900px) { .identity-note { grid-template-columns: 1fr 2fr; } .identity-note .text-link { grid-column: 2; } }
+@media(max-width:650px) { .identity-note { grid-template-columns: 1fr; gap: 20px; } .identity-note .text-link { grid-column: auto; } }
+
 /* Optional owner artwork; the text board remains until a valid image loads. */
 [hidden] { display: none !important; }
 .feast-art { margin: 30px 0; width: min(100%,900px); min-width: 0; background: #101510; border: 1px solid #475d3f; }
