@@ -2,7 +2,7 @@ import { createServer } from 'vite';
 import { renderToStaticMarkup } from 'react-dom/server';
 import React from 'react';
 import assert from 'node:assert/strict';
-const server = await createServer({ server: { middlewareMode: true, hmr: false, ws: false }, appType: 'custom' });
+const server = await createServer({ plugins: [{name:'wallet-ui-double',enforce:'pre',transform(code,id){if(id.includes('/src/'))return code.replaceAll("from '@mysten/dapp-kit-react/ui'", "from '/test-connect-button'");},resolveId(id){if(id==='/test-connect-button')return '\0'+id;},load(id){if(id==='\0/test-connect-button')return "import React from 'react'; export const ConnectButton=()=>React.createElement('button',null,'Connect Wallet');";}}], server: { middlewareMode: true, hmr: false, ws: false }, appType: 'custom' });
 try {
   const { default: Whitepaper } = await server.ssrLoadModule('/src/Whitepaper.tsx');
   const html = renderToStaticMarkup(React.createElement(Whitepaper));

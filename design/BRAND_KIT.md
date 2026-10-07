@@ -5,8 +5,8 @@
 ## Owner decisions
 
 1. Viper is a calm, confident apex predator, at the top of the food chain from day one.
-2. Fun first, rules one click away: a seven-block homepage and complete `/rules/` page.
-3. Joining the community is the primary homepage action. The Feast and free claims are secondary.
+2. The homepage provides wallet connection and concise links to dedicated free-token, Feast, lock, community and supply pages. Every page shares fixed navigation and a Back to home link. Rules presents a short timeline and expandable terms.
+3. Clear actions and availability come first. “Get started” leads to the participation overview; community links live on the Community page without a dialog. Unconfigured social channels say “Coming soon.”
 4. Feast art uses generic cute critters only. Never use recognizable third-party coin mascots.
 
 ## Core idea
@@ -24,7 +24,7 @@ Use **V1PER Coin (V1PER)** on the first mention of each page; use Viper or V1PER
 
 ## Community identity
 
-V1PER Coin is an independent Sui project, unaffiliated with other projects using $VIPER. The homepage notice states: “Don’t confuse us with lesser coins or communities sharing the name.” The community standard is “Quality. Ferocity. No BS.” Keep rivalry focused on creative standards and brand identity, without inventing accusations about other projects. Direct visitors to the project status and, once published and verified, the exact Sui coin type.
+V1PER Coin is an independent Sui project, unaffiliated with other projects using $VIPER. The concise homepage notice is headed “Not to be mistaken.” The community standard is “Quality. Ferocity. No BS.” Keep rivalry focused on creative standards and brand identity, without inventing accusations about other projects. Direct visitors to the project status and, once published and verified, the exact Sui coin type.
 
 ## Visual system
 

@@ -1,32 +1,23 @@
-import FeastMenu from './FeastMenu';
 import { V1per } from './V1per';
-import { siteUrl, currentPage, site } from './site';
-import { CommunityLinks, JoinDenButton } from './CommunityLinks';
-import { lazy, Suspense, useState } from 'react';
+import { siteUrl, currentPage } from './site';
+import { lazy, Suspense } from 'react';
+import SiteHeader, { SiteFooter } from './SiteHeader';
+import type { ParticipationRoute } from './ParticipationPage';
+import { ConnectButton } from '@mysten/dapp-kit-react/ui';
+import { launch, isLaunchConfigured } from './manifest';
 const Monitor = lazy(() => import('./Monitor'));
 const Whitepaper = lazy(() => import('./Whitepaper'));
-const Rules = lazy(() => import('./Rules')); 
-import LockPanel from './LockPanel';
-import FeastPanel from './FeastPanel';
-import { Menu, X } from 'lucide-react';
-import { launch } from './manifest';
-import { AllocationSection, FreeClaimsSection } from './ProjectSections';
-
-const repoUrl = site.repository;
+const Rules = lazy(() => import('./Rules'));
+const ParticipationPage = lazy(() => import('./ParticipationPage'));
 function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const page = currentPage();
+  if (['free-tokens','feast','lock','community','tokenomics'].includes(page)) return <Suspense fallback={<p className="section">Loading…</p>}><ParticipationPage page={page as ParticipationRoute}/></Suspense>;
   if (currentPage() === 'rules') return <Suspense fallback={<p className="section">Loading project rules…</p>}><Rules /></Suspense>;
   if (currentPage() === 'monitor') return <Suspense fallback={<p className="section">Loading onchain monitor…</p>}><Monitor /></Suspense>;
   if (currentPage() === 'whitepaper') return <Suspense fallback={<p className="section">Loading white paper…</p>}><Whitepaper /></Suspense>;
   return <div className="site home-page">
     <a className="skip-link" href="#top">Skip to content</a>
-    <header className="header home-header" onKeyDown={e => { if (e.key === 'Escape') { setMenuOpen(false); document.querySelector<HTMLButtonElement>('.menu-toggle')?.focus(); } }}>
-      <a href="#top" className="brand" aria-label="V1PER Coin home"><img src={siteUrl('viper-logo.webp')} alt="" /><span><V1per /><span className="accent">.</span><small>COIN / <V1per /></small></span></a>
-      <button className="menu-toggle" aria-expanded={menuOpen} aria-controls="home-nav" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={24} /> : <Menu size={24} />}</button>
-      <nav id="home-nav" className={menuOpen ? 'is-open' : ''} aria-label="Main navigation" onClick={() => setMenuOpen(false)}>
-        <a href="#claims">Free bite</a><a href="#feast">Feed the Viper</a><a href="#lock">Lock & Earn</a><a href="#tokenomics">Tokenomics</a><a href={siteUrl('rules/')}>Rules</a><a href={siteUrl('monitor/')}>Monitor</a>
-      </nav><JoinDenButton className="button lime header-join" />
-    </header>
+    <SiteHeader/>
     <main id="top">
       <section className="hero">
         <img className="hero-image" src={siteUrl('viper-art.jpg')} alt="" />
@@ -34,35 +25,31 @@ function App() {
         <div className="hero-copy">
           <div className="eyebrow"><span><V1per /> COIN (<V1per />) · BUILT ON SUI · PRE-LAUNCH</span></div>
           <h1>MEMES<br/><em>WITH BITE.</em></h1>
-          <p>Cute had its turn.<br/><V1per /> Coin bites back.</p>
-          <div className="buttons"><JoinDenButton /></div>
-          <p className="fine-print">Pre-launch: <V1per /> is not deployed, and nothing on this site promises gains. <a href={siteUrl('rules/#status')}>Full rules →</a></p>
+          <p>Cute had its turn.<br/><V1per /> Coin bites back.<br/>A deflationary meme coin on Sui.</p>
+          <div className="buttons"><a className="button lime" href="#ways-in">GET STARTED ↓</a><a className="button outline" href={siteUrl('community/')}>COMMUNITY →</a></div>
+          <p className="fine-print">{isLaunchConfigured ? `Sui ${launch.network}. Check each participation page for opening dates.` : 'Not launched yet. Applications, contributions and token transactions are closed.'} <a href={siteUrl('rules/#status')}>Launch status →</a></p>
         </div>
-        <div className="hero-foot"><span><V1per /> COIN</span><span>THE JUNGLE HAS A NEW REGULAR ↓</span></div>
+        <div className="hero-foot"><span><V1per /> COIN</span><span>FREE TOKENS · THE FEAST · LOCK REWARDS ↓</span></div>
       </section>
-      <aside className="identity-note section" aria-labelledby="identity-heading">
+      <aside id="story" className="identity-note section" aria-labelledby="identity-heading">
         <h2 id="identity-heading">NOT TO BE<br/>MISTAKEN.</h2>
-        <div><p>Don’t confuse us with lesser coins or communities sharing the name. <V1per /> Coin (<V1per />) is an independent Sui project, unaffiliated with other projects using $VIPER.</p><p className="identity-standard">Quality. Ferocity. No BS.</p></div>
+        <div><p><V1per /> Coin (<V1per />) is independent, built on Sui, and unaffiliated with other projects using $VIPER.</p><p className="identity-standard">Quality. Ferocity. No BS.</p></div>
         <a className="text-link" href={siteUrl('rules/#status')}>VERIFY THIS PROJECT →</a>
       </aside>
       <section id="ways-in" className="section ways-in" aria-labelledby="ways-heading">
-        <div className="kicker" id="ways-heading">TWO WAYS IN</div>
+        <h2 id="ways-heading">GET STARTED.</h2>
+        <div className="wallet-start" id="wallet"><div><h3>Connect your Sui wallet</h3><p>Your wallet is used for free claims, Feast allocations and locks. Connecting does not send tokens.</p></div><ConnectButton /></div>
         <div className="entry-grid">
-          <article className="entry-card free-entry"><h2>FIRST BITE'S<br/><em>FREE.</em></h2><p>10,000 <V1per /> per approved wallet.</p><span className="status-label">{launch.freeClaimsStartMs > 0 ? 'WINDOW SCHEDULED' : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href="#claims">How it works ↓</a></article>
-          <article className="entry-card feast-entry"><div><h2>FEED THE<br/><em>VIPER.</em></h2><p>1.00× / 1.10× / 1.25× allocation points</p><a className="text-link" href="#feast">See the menu ↓</a></div><FeastMenu compact /></article>
+          <article className="entry-card free-entry"><h3>FREE TOKENS</h3><p>Submit an original meme, guide or testnet issue report. Approved wallets can claim 10,000 <V1per /> once.</p><span className="status-label">{launch.freeClaimsStartMs > 0 ? 'OPENING DATE SET' : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href={siteUrl('free-tokens/')}>Apply or claim →</a></article>
+          <article className="entry-card"><h3>THE FEAST</h3><p>Contribute accepted meme coins for a <V1per /> allocation. Claim in stages or choose a 12- or 24-month lock.</p><span className="status-label">{launch.feastOpen && isLaunchConfigured ? 'CHECK THE CONTRIBUTION WINDOW' : 'CONTRIBUTIONS CLOSED'}</span><a className="text-link" href={siteUrl('feast/')}>View coins and participate →</a></article>
+          <article className="entry-card"><h3>LOCK & EARN</h3><p>Lock tokens for 1–24 months. Longer terms earn higher funded token rewards.</p><a className="text-link" href={siteUrl('lock/')}>Calculate rewards →</a></article>
+          <article className="entry-card"><h3>COMMUNITY</h3><p>Find official social channels and community programs. X, Telegram and Discord are coming soon.</p><a className="text-link" href={siteUrl('community/')}>Join the community →</a></article>
+          <article className="entry-card"><h3>DEFLATIONARY SUPPLY</h3><p>See the one-billion-token allocation and how burns reduce supply.</p><a className="text-link" href={siteUrl('tokenomics/')}>Explore the supply →</a></article>
+          <article className="entry-card"><h3>VERIFY THE PROJECT</h3><p>Read the rules and white paper. Track verified token activity in the monitor after deployment.</p><a className="text-link" href={siteUrl('rules/')}>Read the rules →</a><a className="text-link" href={siteUrl('monitor/')}>Open the monitor →</a></article>
         </div>
       </section>
-      <section id="story" className="section story">
-        <div className="kicker">01 / THE FOOD CHAIN</div>
-        <div className="two-col"><h2>THE FOOD CHAIN<br/><em>JUST CHANGED.</em></h2><div className="prose"><p>The meme jungle is full of puppies and kittens. Viper is the predator. One billion <V1per />, minted once, can only shrink.</p><div className="community-strip"><span>Creator grants</span><span>Hunt Board</span><span>Onboarding</span></div><a className="text-link" href={siteUrl('rules/#community')}>Full budget →</a></div></div>
-      </section>
-      <FreeClaimsSection />
-      <FeastPanel />
-      <LockPanel />
-      <AllocationSection />
-      <section id="den" className="closing"><div className="section closing-grid"><div><div className="kicker">THE JUNGLE IS BETTER WITH COMPANY</div><h2>JOIN THE DEN.<br/><em>STAY SHARP.</em></h2></div><CommunityLinks dark /></div></section>
     </main>
-    <footer><span>© {new Date().getFullYear()} <V1per /> Coin (<V1per />)</span><nav aria-label="Footer navigation"><a href={siteUrl('whitepaper/')}>WHITE PAPER</a><a href={siteUrl('rules/')}>RULES</a><a href={siteUrl('rules/#foundation')}>FOUNDATION</a><a href={siteUrl('rules/#privacy')}>PRIVACY</a><a href={repoUrl} target="_blank" rel="noreferrer">GITHUB ↗</a></nav></footer>
+    <SiteFooter/>
   </div>;
 }
 export default App;

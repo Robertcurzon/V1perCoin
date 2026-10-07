@@ -129,7 +129,7 @@ void (async () => {
   const panel=fs.readFileSync('src/FeastPanel.tsx','utf8');
   assert(panel.includes('!campaignOpen || !consent || !account'));
   assert(panel.includes('FEAST_DISCLOSURE'));
-  assert(panel.includes('SIGN WALLET BINDING'));
+  assert(panel.includes('SIGN TO LINK WALLETS'));
   const rpcManifest = {...manifest, vaultId:`0x${'e'.repeat(64)}`, claimsId:`0x${'f'.repeat(64)}`, feastId:`0x${'1'.repeat(64)}`, upgradeCapId:`0x${'2'.repeat(64)}`};
   fixtures.set(path.resolve('src/launch.json'),rpcManifest);
   const rpcRead = load('src/chainState.ts').readChainState;

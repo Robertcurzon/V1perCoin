@@ -93,18 +93,19 @@ export default function LockPanel({ detailed = false }: { detailed?: boolean }) 
   const lockOpen = configured && vault !== null && chainTime >= BigInt(vault.opens_at_ms);
   const capacity = vault ? BigInt(vault.rewards) : null;
   return <section id="lock" className="section lock-section">
-    <div className="kicker">LOCK & EARN / FUNDED REWARDS</div>
+    <div className="kicker">LOCK & EARN</div>
     <h2>LONGER LOCK.<br/><em>BIGGER BITE.</em></h2>
-    <p className="token-intro">1–10% annual <V1per /> rates for 1–24 months; first come, first fully funded.</p>
+    <p className="token-intro">Lock <V1per /> for 1–24 months. Longer locks earn higher token rewards, while the reward pool has capacity.</p>
     <p className="lock-summary">Early exit: up to 5% of principal × time remaining; no fee at maturity.</p>
     <a className="text-link" href={siteUrl('rules/#lock')}>Full rules →</a>
     <div className="lock-grid">
       <div className="lock-card">
         <label htmlFor="lock-amount"><V1per /> to lock</label><input id="lock-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />
-        <label htmlFor="lock-months">{months} program months · {months * 30} days</label><input id="lock-months" type="range" min="1" max="24" value={months} onChange={(e) => setMonths(Number(e.target.value))} />
-        <div className="facts"><div><span>ANNUAL TOKEN REWARD RATE</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>TOTAL TERM RATE</span><strong>{(Number(ratePpm(months)) / 10000 * months / 12).toFixed(4)}%</strong></div><div><span>MATURE EXIT FEE (0%)</span><strong>0 <V1per /></strong></div><div><span>TOTAL TERM REWARD</span><strong>{formatAmount(reward)} <V1per /></strong></div><div><span>FULL-TERM NET PAYOUT</span><strong>{formatAmount(principal + reward)} <V1per /></strong></div><div><span>AVAILABLE REWARD CAPACITY</span><strong><BrandText text={capacity === null ? 'NOT DEPLOYED / UNAVAILABLE' : `${formatAmount(capacity)} V1PER`} /></strong></div></div>
+        <label htmlFor="lock-months">{months} months · {months * 30} days</label><input id="lock-months" type="range" min="1" max="24" value={months} onChange={(e) => setMonths(Number(e.target.value))} />
+        <div className="facts"><div><span>ANNUAL TOKEN RATE</span><strong>{(Number(ratePpm(months)) / 10000).toFixed(4)}%</strong></div><div><span>TOTAL REWARD RATE</span><strong>{(Number(ratePpm(months)) / 10000 * months / 12).toFixed(4)}%</strong></div><div><span>MATURE EXIT FEE (0%)</span><strong>0 <V1per /></strong></div><div><span>TOTAL TERM REWARD</span><strong>{formatAmount(reward)} <V1per /></strong></div><div><span>PAYOUT AT MATURITY</span><strong>{formatAmount(principal + reward)} <V1per /></strong></div><div><span>AVAILABLE REWARDS</span><strong><BrandText text={capacity === null ? 'Available after launch' : `${formatAmount(capacity)} V1PER`} /></strong></div></div>
         {inputError && <p role="alert">{inputError}</p>}{principal > 0n && netReward(principal, months) === 0n && <p role="alert">Increase the amount to earn at least one <V1per /> base unit for the selected term.</p>}
         {detailed && <p className="fine-print">One month = 30 days. Simple rewards in <V1per />; no compounding or dollar-return promise. No deposit fee. No fee at maturity. Early exit pays the reward for whole completed months and charges up to 5% of principal, tapering continuously to zero. Every completed lock earns a positive net <V1per /> reward before network gas. Early exits can return less than deposited.</p>}
+        {!detailed && <p className="fine-print">Rewards are paid in <V1per />. One month is 30 days. Connecting a wallet does not open a lock.</p>}
         <ConnectButton />
         <div className="buttons"><button className="button lime" disabled={!lockOpen || !account || !vault || vault.paused || pending || Boolean(inputError) || netReward(principal, months) === 0n || (capacity !== null && reward > capacity)} onClick={() => void submit('deposit')}>{!configured ? 'Not live yet' : pending ? 'PROCESSING…' : 'OPEN LOCK'}</button></div>
       </div>
