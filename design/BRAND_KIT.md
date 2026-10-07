@@ -5,8 +5,8 @@
 ## Owner decisions
 
 1. Viper is a calm, confident apex predator, at the top of the food chain from day one.
-2. The homepage provides wallet connection, free-token applications and claims, Feast participation, locks and community channels. The complete `/rules/` page remains one click away.
-3. Clear actions and availability come first. “Get started” leads to the participation overview; community links are available directly without a dialog. Unconfigured social channels say “Coming soon.”
+2. The homepage provides wallet connection and concise links to dedicated free-token, Feast, lock, community and supply pages. Every page shares fixed navigation and a Back to home link. Rules presents a short timeline and expandable terms.
+3. Clear actions and availability come first. “Get started” leads to the participation overview; community links live on the Community page without a dialog. Unconfigured social channels say “Coming soon.”
 4. Feast art uses generic cute critters only. Never use recognizable third-party coin mascots.
 
 ## Core idea

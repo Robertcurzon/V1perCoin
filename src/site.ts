@@ -31,3 +31,7 @@ export function configuredSocials(socials: Socials = site.socials) {
 }
 // Validate configured links before rendering them. The release build validates them too.
 configuredSocials();
+
+export function legacyPage(hash: string) {
+  return ({ '#claims': 'free-tokens/', '#feast': 'feast/', '#lock': 'lock/', '#den': 'community/', '#tokenomics': 'tokenomics/', '#timeline': 'rules/#timeline' } as Record<string,string>)[hash];
+}

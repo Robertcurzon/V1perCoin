@@ -1,6 +1,38 @@
 {
-  "home": { "title": "V1PER Coin (V1PER) — Memes with Bite", "description": "Cute had its turn. Meet V1PER Coin (V1PER), the new top of the Sui meme food chain. Join the den. Pre-launch; not deployed." },
-  "rules": { "title": "Rules — V1PER Coin (V1PER)", "description": "The launch timeline, free claims, Feast terms, lock rewards, Foundation custody and on-chain privacy for V1PER Coin (V1PER)." },
-  "monitor": { "title": "Onchain Monitor — V1PER Coin (V1PER)", "description": "Verify V1PER Coin (V1PER): supply, burns, funded rewards, claims and custody. Live figures appear only after verified deployment." },
-  "whitepaper": { "title": "White Paper — V1PER Coin (V1PER)", "description": "Read the V1PER Coin (V1PER) release specification: deflationary supply, community participation, funded lock rewards and public proof on Sui." }
+  "home": {
+    "title": "V1PER Coin (V1PER) \u2014 Memes with Bite",
+    "description": "Cute had its turn. Meet V1PER Coin (V1PER), the new top of the Sui meme food chain. Join the den. Pre-launch; not deployed."
+  },
+  "rules": {
+    "title": "Rules \u2014 V1PER Coin (V1PER)",
+    "description": "The launch timeline, free claims, Feast terms, lock rewards, Foundation custody and on-chain privacy for V1PER Coin (V1PER)."
+  },
+  "monitor": {
+    "title": "Onchain Monitor \u2014 V1PER Coin (V1PER)",
+    "description": "Verify V1PER Coin (V1PER): supply, burns, funded rewards, claims and custody. Live figures appear only after verified deployment."
+  },
+  "whitepaper": {
+    "title": "White Paper \u2014 V1PER Coin (V1PER)",
+    "description": "Read the V1PER Coin (V1PER) release specification: deflationary supply, community participation, funded lock rewards and public proof on Sui."
+  },
+  "free-tokens": {
+    "title": "Free Tokens \u2014 V1PER Coin (V1PER)",
+    "description": "Apply and claim during the limited community window. Pre-launch; participation is closed."
+  },
+  "feast": {
+    "title": "The Feast \u2014 V1PER Coin (V1PER)",
+    "description": "Accepted meme coins, contribution choices and allocation claims. Pre-launch; participation is closed."
+  },
+  "lock": {
+    "title": "Lock & Earn \u2014 V1PER Coin (V1PER)",
+    "description": "Calculate funded token rewards for 1\u201324 month locks. Pre-launch; participation is closed."
+  },
+  "community": {
+    "title": "Community \u2014 V1PER Coin (V1PER)",
+    "description": "Official channels and creator, onboarding and community programs. Pre-launch; participation is closed."
+  },
+  "tokenomics": {
+    "title": "Deflationary Supply \u2014 V1PER Coin (V1PER)",
+    "description": "One billion initial tokens, transparent allocations and verifiable burns. Pre-launch; participation is closed."
+  }
 }

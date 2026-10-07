@@ -315,3 +315,39 @@ button:disabled .v1per {display:inline;gap:0; color: #e9ecdf; }
 .compact .text-menu-board li { font-size: 20px; }
 .compact .text-menu-board p { font-size: 10px; line-height: 1.7; margin: 0; }
 @media(max-width:650px) { .text-menu-board { padding: 24px 16px; } .text-menu-board ul { grid-template-columns: repeat(2,1fr); gap: 14px; } .feast-art.compact { max-width: 300px; } }
+
+/* Shared fixed navigation and separate participation pages. */
+.with-site-header { padding-top:84px; }
+.site .shared-header { height:84px; min-height:84px; padding-top:0; padding-bottom:0; flex-wrap:nowrap; }
+.site .shared-header nav { flex-wrap:nowrap; gap:clamp(10px,1.3vw,18px); }
+.shared-header nav a[aria-current="page"] { color:#bdf332; }
+.back-home { margin:28px 0 0; text-transform:none; letter-spacing:.05em; }
+.participation-page main { min-height:calc(100dvh - 190px); }
+.participation-page .closing { margin-top:30px; }
+.with-site-header main [id] { scroll-margin-top:108px; }
+.concise-rules { max-width:1150px; padding-bottom:70px; }
+.concise-rules .rules-intro { padding-top:38px; padding-bottom:38px; border-bottom:1px solid #475d3f; }
+.concise-rules h1 { font-size:clamp(60px,7vw,100px); }
+.concise-rules .rules-intro .text-link + .text-link { margin-left:28px; }
+.compact-timeline { padding:40px 0; }
+.concise-rules .compact-timeline h2 { font-size:clamp(36px,4vw,52px); margin-bottom:22px; }
+.compact-timeline > p,.compact-terms p { color:#b2beaf; font-size:14px; line-height:1.8; }
+.compact-timeline ol { padding:0; margin:24px 0; list-style:none; }
+.compact-timeline li { display:grid; grid-template-columns:190px 1fr; gap:24px; padding:15px 0; border-top:1px solid #3a4b34; }
+.compact-timeline li > span { color:#bdf332; font-size:13px; padding-top:5px; }
+.compact-timeline h3 { font-size:25px; margin-bottom:5px; }
+.compact-timeline li p { color:#b2beaf; font-size:14px; line-height:1.65; margin-bottom:0; }
+.compact-terms .info-detail { margin:0; border-bottom:1px solid #475d3f; }
+.compact-terms .info-detail summary { padding:22px 0; font-size:16px; }
+.compact-terms .info-detail > div { padding-bottom:22px; }
+.pdf-toolbar { flex:none; display:flex; flex-wrap:wrap; gap:14px 28px; padding:16px 24px; font-size:12px; background:#101510; align-items:center; }
+.pdf-toolbar .back-home { margin:0; }
+@media(max-width:1100px) {
+  .site .shared-header nav { display:none; flex-wrap:nowrap; }
+  .site .shared-header nav.is-open { display:grid; gap:0; }
+  .site .shared-header nav a { display:block; }
+}
+@media(max-width:650px) {
+  .compact-timeline li { grid-template-columns:1fr; gap:8px; }
+  .concise-rules .rules-intro .text-link + .text-link { margin-left:0; display:flex; }
+}

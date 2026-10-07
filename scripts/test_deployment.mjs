@@ -18,9 +18,10 @@ try {
     const route = page === 'home' ? '' : `${page}/`;
     const content = fs.readFileSync(`dist/${route}index.html`, 'utf8');
     assert(content.includes(`${base}assets/`));
-    assert(content.includes(`<title>${meta.title}</title>`));
-    assert(content.includes(`property="og:title" content="${meta.title}"`));
-    assert(content.includes(`property="og:description" content="${meta.description}"`));
+    const escape = value => value.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+    assert(content.includes(`<title>${escape(meta.title)}</title>`));
+    assert(content.includes(`property="og:title" content="${escape(meta.title)}"`));
+    assert(content.includes(`property="og:description" content="${escape(meta.description)}"`));
     assert(content.includes('property="og:image" content="https://robertcurzon.github.io/V1perCoin/social-preview.png"'));
     assert(content.includes('name="twitter:card" content="summary_large_image"'));
     assert(content.includes(`rel="canonical" href="https://robertcurzon.github.io/V1perCoin/${route}"`));

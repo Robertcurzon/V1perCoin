@@ -1,3 +1,4 @@
+import SiteHeader, { BackHomeLink } from './SiteHeader';
 import { V1per, BrandText } from './V1per';
 import { siteUrl } from './site';
 import { useEffect, useState } from 'react';
@@ -97,7 +98,7 @@ export default function Monitor() {
     return () => { active = false; controller.abort(); window.clearInterval(interval); window.removeEventListener('focus', refresh); };
   }, [client, revision]);
   const value = (key: keyof Omit<Snapshot, 'time' | 'volume24h'>, tokens = true) => latest ? tokens ? formatAmount(BigInt(latest[key])) : BigInt(latest[key]).toLocaleString() : '—';
-  return <div className="site monitor-page"><header className="header"><a className="brand" href={siteUrl('')}><img src={siteUrl('viper-logo.webp')} alt=""/><span><V1per /><span className="accent">.</span></span></a><a className="text-link" href={siteUrl('')}><V1per /> Coin (<V1per />) ↗</a></header><main className="section">
+  return <div className="site monitor-page with-site-header"><SiteHeader/><main className="section"><BackHomeLink/>
     <div className="kicker"><V1per /> / ONCHAIN MONITOR</div><h1>FOLLOW<br/><em>THE BITE.</em></h1>
     <p className="token-intro"><V1per /> Coin (<V1per />): supply, funded rewards and community contract activity. {isLaunchConfigured ? `Sui ${launch.network}; refreshes every 30 seconds.` : 'No verified deployment is configured. No live figures or trading activity are implied.'}</p>
     <p className="fine-print coin-type">Coin type: {isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p>

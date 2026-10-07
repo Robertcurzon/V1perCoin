@@ -1,3 +1,4 @@
+import SiteHeader, { BackHomeLink } from './SiteHeader';
 import { V1per } from './V1per';
 import { useEffect,useState } from 'react';
 import { siteUrl } from './site';
@@ -18,15 +19,9 @@ export default function Whitepaper() {
       }catch(e){if(!controller.signal.aborted)setError((e as Error).message);}
     })();return()=>controller.abort();
   },[]);
-  return <div className="site whitepaper-page">
-    <header className="header">
-      <a className="brand" href={siteUrl('')}><img src={siteUrl('viper-logo.webp')} alt=""/><span><V1per /><span className="accent">.</span></span></a>
-      <nav aria-label="White paper navigation">
-        <a href={siteUrl('')}>Home</a><a href={siteUrl('rules/')}>Rules</a><a href={siteUrl('monitor/')}>Onchain monitor</a>
-        {verified && <><a href={siteUrl('whitepaper.pdf')} target="_blank" rel="noreferrer">Open PDF ↗</a><a href={siteUrl('whitepaper.pdf')} download>Download PDF ↓</a></>}
-        <a href={siteUrl('Viper_Coin_Whitepaper.tex')} download>LaTeX source ↓</a>
-      </nav>
-    </header>
+  return <div className="site whitepaper-page with-site-header">
+    <SiteHeader/>
+    <nav className="pdf-toolbar" aria-label="White paper downloads"><BackHomeLink/>{verified && <><a href={siteUrl('whitepaper.pdf')} target="_blank" rel="noreferrer">Open PDF ↗</a><a href={siteUrl('whitepaper.pdf')} download>Download PDF ↓</a></>}<a href={siteUrl('Viper_Coin_Whitepaper.tex')} download>LaTeX source ↓</a></nav>
     <main className="whitepaper-viewer">
       {verified ? <iframe className="whitepaper-pdf" src={`${siteUrl('whitepaper.pdf')}#toolbar=0&navpanes=0&view=FitH`} title="V1PER Coin (V1PER) white paper PDF" /> : <div className="pdf-status" role="status"><h1><V1per /> Coin (<V1per />)</h1><p>{error || 'Checking the current white paper PDF…'}</p><p>The release build typesets the current LaTeX source. An outdated PDF is not displayed.</p><a className="text-link" href={siteUrl('Viper_Coin_Whitepaper.tex')} download>DOWNLOAD CURRENT LATEX SOURCE ↓</a></div>}
     </main>
