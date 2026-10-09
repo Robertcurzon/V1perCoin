@@ -1,6 +1,6 @@
 # V1PER: website artwork
 
-Use the selected silver snake emblem as the character and style reference. Black gunmetal, sculpted brushed silver scale plates, prominent fangs and lime slit-pupil eyes. Near-black backgrounds, black stone, restrained smoke and lime rim lighting. No text baked into page illustrations. No financial charts, rising price arrows or invented live activity.
+Use the selected silver snake emblem as the character and style reference. Black gunmetal, sculpted brushed silver scale plates, prominent fangs and lime slit-pupil eyes. Near-black backgrounds, black stone, restrained smoke and lime rim lighting. No text baked into page illustrations. No decorative coins, medallions or token stacks in the scenes; the selected header emblem is a separate brand mark. No financial charts, rising price arrows or invented live activity.
 
 ## 1. Home
 
@@ -8,7 +8,7 @@ A silver snake surges diagonally toward the viewer in a twisting S-shaped strike
 
 ## 2. Participation
 
-Free Tokens: a closed-mouth snake hangs in an inverted loop from a stone arch, presenting a single coin with its tail over a finite stack. Lock & Earn: a closed-mouth guardian winds in a figure-eight around a steel vault with a restrained duration motif. Artwork illustrates the subject, not a guarantee of security or return. `public/art/free-tokens.webp`, `public/art/lock.webp`.
+Free Tokens: a closed-mouth snake hangs in an inverted loop from a stone arch, with an expressive curled tail above a clear stone platform. Lock & Earn: a closed-mouth guardian winds in a figure-eight around a steel vault with a restrained duration motif. Artwork illustrates the subject, not a guarantee of security or return. `public/art/free-tokens.webp`, `public/art/lock.webp`.
 
 ## 3. Logo mark
 
@@ -16,11 +16,11 @@ Keep the owner's exact selected emblem. `public/v1per-emblem.png` is the full-re
 
 ## 4. Community, supply and verification
 
-Community: three snakes spiral together in distinct poses with varied angles and expressions. Supply: a sweeping tail whips around a small coin stack and shatters some edge coins into particles. Verification: a watchful closed-mouth snake slides through an open glass frame, seen in a low-angle close-up with abstract connected nodes. These scenes are decorative, never rendered as onchain evidence. `public/art/community.webp`, `public/art/supply.webp`, `public/art/verify.webp`.
+Community: three snakes spiral together in distinct poses with varied angles and expressions. Supply: a sweeping tail whips through lime sparks and silver fragments, with no token medallions or stack props. Verification: a watchful closed-mouth snake slides through an open glass frame, seen in a low-angle close-up with abstract connected nodes. These scenes are decorative, never rendered as onchain evidence. `public/art/community.webp`, `public/art/supply.webp`, `public/art/verify.webp`.
 
 ## 5. Feast menu
 
-`public/feast-menu.webp`: the silver snake lunges horizontally across a banquet table, scooping an original generic puppy into its jaws as a generic frog and another puppy scatter; its tail tips a platter in a comic burst of movement. Non-graphic cartoon rivalry, no blood or injury, no official mascots or third-party logos. Accepted tickers stay in HTML, always readable whether the image loads or fails. The scene does not identify which assets are eligible; exact assets and networks are listed in the participation page.
+`public/feast-menu.webp`: three separate silver vipers pursue a Doge-style tan dog, a Shiba-style orange dog and a Pepe-style frog across a candlelit banquet table. Each snake has a distinct pose and prey target. Non-graphic cartoon rivalry, no blood or injury, stylized meme rivalry, no coin logos or implied affiliation. Accepted tickers stay in HTML, always readable whether the image loads or fails. The scene does not identify which assets are eligible; exact assets and networks are listed in the participation page.
 
 ## Delivery
 

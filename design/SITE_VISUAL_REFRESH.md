@@ -2,13 +2,13 @@
 
 ## Outcome
 
-Carry the owner's selected emblem across every page: fierce silver snake, black and graphite surfaces, silver text, lime eyes and actions. Give each participation topic a distinct narrative and composition: forward strike, inverted coin offering, chaotic banquet, figure-eight vault guardian, interwoven community, sweeping burn and stealthy verification. Closed mouths, varied camera angles and expressive tail gestures add range. Keep the pages separate, the fixed snakeskin navigation visible, and Back to home easy to find.
+Carry the owner's selected emblem across every page: fierce silver snake, black and graphite surfaces, silver text, lime eyes and actions. Give each participation topic a distinct narrative and composition: forward strike, inverted snake greeting, chaotic banquet, figure-eight vault guardian, interwoven community, sweeping burn and stealthy verification. Closed mouths, varied camera angles and expressive tail gestures add range. Keep the pages separate, the fixed snakeskin navigation visible, and Back to home easy to find.
 
 ## Scope and constraints
 
 - Seven generated scenes: home, free tokens, Feast, locks, community, supply, verification.
 - Home cards preview each destination; participation intros put concise copy beside art on desktop and above art on mobile.
-- Forms, status messages, data and disclosures use opaque readable panels. Coin lists are accessible HTML, not image text.
+- All scene artwork omits decorative coins, medallions and token stacks. Feast depicts three separate vipers pursuing distinct Doge-style, Shiba-style and Pepe-style mascots. Forms, status messages, data and disclosures use opaque readable panels. Coin lists are accessible HTML, not image text.
 - Rules stays concise and expandable; Monitor continues to label unavailable data. White Paper keeps the real centered scrollable PDF with black sidebars and the shared header.
 - No changes to contracts, economics, launch configuration, wallet signatures, transaction checks or social destinations. Participation remains closed until verified deployment.
 

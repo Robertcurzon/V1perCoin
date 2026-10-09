@@ -7,7 +7,7 @@
 1. Viper is a calm, confident apex predator, at the top of the food chain from day one.
 2. The homepage provides wallet connection and concise links to dedicated free-token, Feast, lock, community and supply pages. Every page shares fixed navigation and a Back to home link. Rules presents a short timeline and expandable terms.
 3. Clear actions and availability come first. “Get started” leads to the participation overview; community links live on the Community page without a dialog. Unconfigured social channels say “Coming soon.”
-4. Feast art uses generic cute critters only. Never use recognizable third-party coin mascots.
+4. Feast art uses stylized Doge-like and Shiba-like dogs and a Pepe-like frog, each pursued by a different silver snake. Treat this as meme rivalry without implying affiliation or endorsement. No coin props or repeated medallions in scene art.
 
 ## Core idea
 
@@ -39,7 +39,7 @@ V1PER Coin is an independent Sui project, unaffiliated with other projects using
 | Body | DM Sans | Explanations and captions |
 | Main artwork | `public/art/home.webp` | Generated silver snake scene matching the selected emblem |
 | Coin emblem | `public/v1per-emblem.webp` / `.png` | Fierce silver viper, black coin face, lime eye; optimized header/favicon and full-resolution asset |
-| Feast artwork | `public/feast-menu.webp` | Silver snake and original generic critters; accepted coins remain HTML text |
+| Feast artwork | `public/feast-menu.webp` | Three silver snakes pursuing stylized meme mascots; accepted coins remain HTML text |
 | Sharing preview | `public/social-preview.png` | Same metallic hero artwork, 1200 × 675 |
 
 The [editable social layout preview](social-kit.html) uses the current website artwork. It contains a square character card, a square Hunt Board prompt, and a wide “Memes with Bite” card. Follow [ART_BRIEF.md](ART_BRIEF.md) for the replacement illustrations. Replace wording, proofread, and export at the platform's final dimensions. These are campaign mockups, not evidence that a program is live.
