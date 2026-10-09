@@ -13,3 +13,7 @@ Use case: logo-brand. Create a new original V1PER website coin emblem, using the
 ## Banner texture
 
 Use the owner-supplied black snakeskin banner as the background, with a dark overlay for text contrast. Preserve the texture itself; only transcode to WebP for delivery.
+
+## Final lower-tooth edit prompt
+
+Precise minimal edit to the supplied original logo: add exactly ONE small silver tooth on the BOTTOM jaw at the user's marked spot, x=41.6%, y=53.7%. There is already a small triangular tooth on the bottom jaw near x=33.4%, y=53%. Keep that existing small bottom tooth unchanged. The new second bottom tooth should match that SMALL tooth, be only about 3% of canvas height, with its base near (41.6%,53.7%) and upward pointed tip near (41%,51%). It must emerge from the lower gum, not the roof of the mouth. Do not add a pair of new long fangs in the middle of the mouth. Keep the two large upper fangs unchanged. Every other pixel/content of the coin should remain as close to the input as possible: same silver rim, pose, scales, lime eye, tongue, highlights, black coin face, transparent outside, crop. No new large teeth, no changed tongue, no other modifications. Exactly one added small lower tooth.
