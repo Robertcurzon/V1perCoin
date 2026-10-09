@@ -1,3 +1,4 @@
+import PageArt from './PageArt';
 import { V1per, BrandText } from './V1per';
 import { ArrowUpRight, Flame, Fingerprint, Eye } from 'lucide-react';
 import { siteUrl } from './site';
@@ -19,7 +20,7 @@ const allocations = [
 
 export function AllocationSection() {
   return <section id="tokenomics" className="section allocation">
-    <div className="section-heading"><div><div className="kicker">THE INITIAL SUPPLY / 100%</div><h2>EVERY TOKEN.<br/><em>ACCOUNTED FOR.</em></h2></div><p>One billion <V1per /> at launch. No new tokens can be minted. Claims and rewards come from this supply; burns reduce it.</p></div>
+    <div className="art-intro"><div className="intro-copy"><div className="kicker">THE INITIAL SUPPLY / 100%</div><h2>EVERY TOKEN.<br/><em>ACCOUNTED FOR.</em></h2><p>One billion <V1per /> at launch. No new tokens can be minted. Claims and rewards come from this supply; burns reduce it.</p></div><PageArt scene="supply"/></div>
     <div className="allocation-bar" aria-hidden="true">{allocations.map(a => <span key={a.name} style={{ width: `${a.percent}%`, background: a.color }} />)}</div>
     <div className="allocation-grid">{allocations.map(a => <article key={a.name}><div><i style={{ background: a.color }} /><span>{a.name}</span><strong>{a.percent}%</strong></div><p><BrandText text={a.description} /></p></article>)}</div>
     <div className="token-proof"><div><span className="kicker">DEFLATIONARY SUPPLY</span><h3>Less supply. Same bite.</h3><p>Burns come from early exits and unused claim inventory.</p><a className="text-link" href={siteUrl('rules/#burns')}>Full rules →</a></div><div><span className="kicker">OFFICIAL SUI TOKEN / {isLaunchConfigured ? launch.network.toUpperCase() : 'PRE-LAUNCH'}</span><p className="coin-type">{isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p>{isLaunchConfigured && <ExplorerLink kind="coin" value={launch.coinType}>Verify on Suiscan ↗</ExplorerLink>}<a className="text-link" href={siteUrl('monitor/')}>Open the monitor →</a></div></div>
@@ -29,10 +30,10 @@ export function AllocationSection() {
 
 export function FreeClaimsSection({ detailed = false }: { detailed?: boolean }) {
   return <section id="claims" className="section free-claims-section">
-    {detailed ? <><div className="kicker">FREE COMMUNITY CLAIMS</div><h2>HOW THE FREE<br/><em>BITE WORKS.</em></h2></> : <h2>FREE TOKENS.</h2>}
+    <div className="art-intro"><div className="intro-copy">{detailed ? <><div className="kicker">FREE COMMUNITY CLAIMS</div><h2>HOW THE FREE<br/><em>BITE WORKS.</em></h2></> : <h2>FREE TOKENS.</h2>}
     <p className="token-intro">10,000 <V1per /> per approved wallet. Up to 10,000 wallets. No purchase required; claiming costs Sui network gas.</p>
     <div className="claim-summary"><span className="status-label">{launch.freeClaimsStartMs > 0 ? `SCHEDULED: ${new Date(launch.freeClaimsStartMs).toISOString()}` : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href={detailed ? siteUrl('rules/#claims') : '#free-application'}>How to apply →</a></div>
-    <p className="fine-print">Apply in the seven days before opening; approved wallets have 14 days to claim. <a href={siteUrl('rules/#claims')}>Full rules →</a></p>
+    <p className="fine-print">Apply in the seven days before opening; approved wallets have 14 days to claim. <a href={siteUrl('rules/#claims')}>Full rules →</a></p></div><PageArt scene="free-tokens"/></div>
     {!detailed && <ol className="action-steps"><li>Create an original meme, useful guide or testnet issue report.</li><li>Sign an application with your Sui wallet and submit it for review.</li><li>If approved, return here to claim during the 14-day window.</li></ol>}
     {detailed && <p>Apply with a wallet-signed application and one original community entry. Review checks authorship and repeated entries; approvals freeze at opening. A wallet is not proof of one person. No paid referral or promotional purchase is required. Unclaimed tokens can be burned after expiry; the administrator cannot withdraw them.</p>}
     <div className="claim-actions"><FreeClaimApplication detailed={detailed} /><FreeClaimAction /></div>
@@ -53,7 +54,7 @@ export function BurnsSection() {
 
 export function CommunitySection() {
   return <section id="community" className="section feature-section community-section">
-    <div className="section-heading"><div><div className="kicker">COMMUNITY PROGRAMS / 20% OF SUPPLY</div><h2>BUILD THE<br/><em>FOOD CHAIN.</em></h2></div><p>Make the memes. Welcome the next wallet. Grow the jungle together. Programs are budgeted; award rounds will be announced separately.</p></div>
+    <div className="section-heading"><div><div className="kicker">COMMUNITY PROGRAMS / 20% OF SUPPLY</div><h2>BUILD THE<br/><em>FOOD CHAIN.</em></h2></div><p>Make the memes. Welcome the next wallet. Build the community together. Programs are budgeted; award rounds will be announced separately.</p></div>
     <div className="program-grid">{[
       ['6%', 'Creator grants', 'Art, videos, meme packs and community tools.'],
       ['5%', 'Hunt Board', 'Creative challenges and useful contributions.'],

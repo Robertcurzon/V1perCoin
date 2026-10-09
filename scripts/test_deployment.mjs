@@ -9,10 +9,10 @@ try {
   assert.equal(siteUrl('rules/#feast'), `${base}rules/#feast`);
   assert.equal(siteUrl('monitor/'), `${base}monitor/`);
   assert.equal(siteUrl('/whitepaper.pdf'), `${base}whitepaper.pdf`);
-  assert.equal(siteUrl('viper-logo.webp'), `${base}viper-logo.webp`);
+  assert.equal(siteUrl('v1per-emblem.webp'), `${base}v1per-emblem.webp`);
   const html = fs.readFileSync('dist/index.html', 'utf8');
   assert(html.includes(`${base}assets/`));
-  assert(html.includes(`${base}viper-logo.webp`));
+  assert(html.includes(`${base}v1per-emblem.webp`));
   const pages = JSON.parse(fs.readFileSync('site-pages.json','utf8'));
   for (const [page, meta] of Object.entries(pages)) {
     const route = page === 'home' ? '' : `${page}/`;

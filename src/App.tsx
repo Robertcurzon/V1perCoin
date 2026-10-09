@@ -2,6 +2,7 @@ import { V1per } from './V1per';
 import { siteUrl, currentPage } from './site';
 import { lazy, Suspense } from 'react';
 import SiteHeader, { SiteFooter } from './SiteHeader';
+import PageArt from './PageArt';
 import type { ParticipationRoute } from './ParticipationPage';
 import { ConnectButton } from '@mysten/dapp-kit-react/ui';
 import { launch, isLaunchConfigured } from './manifest';
@@ -20,10 +21,10 @@ function App() {
     <SiteHeader/>
     <main id="top">
       <section className="hero">
-        <img className="hero-image" src={siteUrl('viper-art.jpg')} alt="" />
+        <img className="hero-image" src={siteUrl('art/home.webp')} alt="" width="1792" height="1024" />
         <div className="hero-overlay" />
         <div className="hero-copy">
-          <div className="eyebrow"><span><V1per /> COIN (<V1per />) · BUILT ON SUI · PRE-LAUNCH</span></div>
+          <div className="eyebrow"><span><V1per /> TOKEN ON SUI · PRE-LAUNCH</span></div>
           <h1>MEMES<br/><em>WITH BITE.</em></h1>
           <p>Cute had its turn.<br/><V1per /> Coin bites back.<br/>A deflationary meme coin on Sui.</p>
           <div className="buttons"><a className="button lime" href="#ways-in">GET STARTED ↓</a><a className="button outline" href={siteUrl('community/')}>COMMUNITY →</a></div>
@@ -40,12 +41,12 @@ function App() {
         <h2 id="ways-heading">GET STARTED.</h2>
         <div className="wallet-start" id="wallet"><div><h3>Connect your Sui wallet</h3><p>Your wallet is used for free claims, Feast allocations and locks. Connecting does not send tokens.</p></div><ConnectButton /></div>
         <div className="entry-grid">
-          <article className="entry-card free-entry"><h3>FREE TOKENS</h3><p>Submit an original meme, guide or testnet issue report. Approved wallets can claim 10,000 <V1per /> once.</p><span className="status-label">{launch.freeClaimsStartMs > 0 ? 'OPENING DATE SET' : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href={siteUrl('free-tokens/')}>Apply or claim →</a></article>
-          <article className="entry-card"><h3>THE FEAST</h3><p>Contribute accepted meme coins for a <V1per /> allocation. Claim in stages or choose a 12- or 24-month lock.</p><span className="status-label">{launch.feastOpen && isLaunchConfigured ? 'CHECK THE CONTRIBUTION WINDOW' : 'CONTRIBUTIONS CLOSED'}</span><a className="text-link" href={siteUrl('feast/')}>View coins and participate →</a></article>
-          <article className="entry-card"><h3>LOCK & EARN</h3><p>Lock tokens for 1–24 months. Longer terms earn higher funded token rewards.</p><a className="text-link" href={siteUrl('lock/')}>Calculate rewards →</a></article>
-          <article className="entry-card"><h3>COMMUNITY</h3><p>Find official social channels and community programs. X, Telegram and Discord are coming soon.</p><a className="text-link" href={siteUrl('community/')}>Join the community →</a></article>
-          <article className="entry-card"><h3>DEFLATIONARY SUPPLY</h3><p>See the one-billion-token allocation and how burns reduce supply.</p><a className="text-link" href={siteUrl('tokenomics/')}>Explore the supply →</a></article>
-          <article className="entry-card"><h3>VERIFY THE PROJECT</h3><p>Read the rules and white paper. Track verified token activity in the monitor after deployment.</p><a className="text-link" href={siteUrl('rules/')}>Read the rules →</a><a className="text-link" href={siteUrl('monitor/')}>Open the monitor →</a></article>
+          <article className="entry-card free-entry"><PageArt scene="free-tokens" preview/><div className="entry-content"><h3>FREE TOKENS</h3><p>Submit an original meme, guide or testnet issue report. Approved wallets can claim 10,000 <V1per /> once.</p><span className="status-label">{launch.freeClaimsStartMs > 0 ? 'OPENING DATE SET' : 'APPLICATIONS & CLAIMS CLOSED'}</span><a className="text-link" href={siteUrl('free-tokens/')}>Apply or claim →</a></div></article>
+          <article className="entry-card"><PageArt scene="feast" preview/><div className="entry-content"><h3>THE FEAST</h3><p>Contribute accepted meme coins for a <V1per /> allocation. Claim in stages or choose a 12- or 24-month lock.</p><span className="status-label">{launch.feastOpen && isLaunchConfigured ? 'CHECK THE CONTRIBUTION WINDOW' : 'CONTRIBUTIONS CLOSED'}</span><a className="text-link" href={siteUrl('feast/')}>View coins and participate →</a></div></article>
+          <article className="entry-card"><PageArt scene="lock" preview/><div className="entry-content"><h3>LOCK & EARN</h3><p>Lock tokens for 1–24 months. Longer terms earn higher funded token rewards.</p><a className="text-link" href={siteUrl('lock/')}>Calculate rewards →</a></div></article>
+          <article className="entry-card"><PageArt scene="community" preview/><div className="entry-content"><h3>COMMUNITY</h3><p>Find official social channels and community programs. X, Telegram and Discord are coming soon.</p><a className="text-link" href={siteUrl('community/')}>Join the community →</a></div></article>
+          <article className="entry-card"><PageArt scene="supply" preview/><div className="entry-content"><h3>DEFLATIONARY SUPPLY</h3><p>See the one-billion-token allocation and how burns reduce supply.</p><a className="text-link" href={siteUrl('tokenomics/')}>Explore the supply →</a></div></article>
+          <article className="entry-card"><PageArt scene="verify" preview/><div className="entry-content"><h3>VERIFY THE PROJECT</h3><p>Read the rules and white paper. Track verified token activity in the monitor after deployment.</p><a className="text-link" href={siteUrl('rules/')}>Read the rules →</a><a className="text-link" href={siteUrl('monitor/')}>Open the monitor →</a></div></article>
         </div>
       </section>
     </main>

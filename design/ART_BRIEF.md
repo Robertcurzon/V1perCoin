@@ -1,42 +1,27 @@
-# V1PER Coin (V1PER): art brief
+# V1PER: website artwork
 
-The Viper is an apex predator: calm, confident, at the top of the food chain from day one. Humor comes through understatement. No juvenile framing, financial promises, gore or threats.
+Use the selected silver snake emblem as the character and style reference. Black gunmetal, sculpted brushed silver scale plates, prominent fangs and lime slit-pupil eyes. Near-black backgrounds, black stone, restrained smoke and lime rim lighting. No text baked into page illustrations. No decorative coins, medallions or token stacks in the scenes; the selected header emblem is a separate brand mark. No financial charts, rising price arrows or invented live activity.
 
-Use one consistent style across every piece: bold inked illustration, dark jungle (`#101510`), venom-lime (`#BDF332`) scale pattern, bone-white (`#E9ECDF`) highlights, and restrained magenta jungle flowers as the only secondary color. Half-lidded yellow-lime eyes, a slight smirk, and menace through stillness.
+## 1. Home
 
-## 1. Hero
+A silver snake surges diagonally toward the viewer in a twisting S-shaped strike, dominating the right of a wide frame. Quiet negative space on the left accommodates the headline. Mobile places the illustration above the copy. `public/art/home.webp`.
 
-Wide composition with 16:9 and 4:5 crops. Viper coiled on a jungle branch at night, looking straight at the viewer. Leave usable negative space for the website headline and calls to action. Keep the same character proportions and markings in both crops.
+## 2. Participation
 
-## 2. Feast scene
-
-Wide composition. Viper looms over a crowd of generic cute critters: puppies, kittens, a frog and a hamster, all looking up nervously. They must clearly be original characters, not recognizable Doge, Shiba, Pepe or other coins' mascots. Funny and nonviolent; nothing is being bitten. Leave room for “Feed the Viper” without putting text in the artwork.
+Free Tokens: a closed-mouth snake hangs in an inverted loop from a stone arch, with an expressive curled tail above a clear stone platform. Lock & Earn: a closed-mouth guardian winds in a figure-eight around a steel vault with a restrained duration motif. Artwork illustrates the subject, not a guarantee of security or return. `public/art/free-tokens.webp`, `public/art/lock.webp`.
 
 ## 3. Logo mark
 
-Square composition that remains readable at 32 px. A Viper head in profile inside a coin ring, lime on night-jungle. No text inside the mark. The “V1PER.” wordmark sits beside it. Supply a one-color version and transparent exports.
+Keep the owner's exact selected emblem. `public/v1per-emblem.png` is the full-resolution transparent source; `.webp` is the optimized delivery copy. The fixed snakeskin banner says “V1PER TOKEN ON SUI”; all eight navigation links remain visible. [Header provenance](HEADER_ASSETS.md).
 
-## 4. Social cards
+## 4. Community, supply and verification
 
-Re-skin the three layouts in `social-kit.html` with art 1–3: square character reveal, square Hunt Board prompt, and wide Memes with Bite card. Keep headings short and readable at phone size. Never imply a claim window, reward round or product is live before verification.
+Community: three snakes spiral together in distinct poses with varied angles and expressions. Supply: a sweeping tail whips through lime sparks and silver fragments, with no token medallions or stack props. Verification: a watchful closed-mouth snake slides through an open glass frame, seen in a low-angle close-up with abstract connected nodes. These scenes are decorative, never rendered as onchain evidence. `public/art/community.webp`, `public/art/supply.webp`, `public/art/verify.webp`.
 
 ## 5. Feast menu
 
-Owner-generated illustration for `public/feast-menu.webp`. It appears in the Feast section, the Two ways in thumbnail and the social kit. The text menu board remains the fallback until a valid image loads. Supply 16:9 WebP; keep text outside the artwork limited to the short tags specified below. No logos or official mascots.
+`public/feast-menu.webp`: three separate silver vipers pursue a Doge-style tan dog, a Shiba-style orange dog and a Pepe-style frog across a candlelit banquet table. Each snake has a distinct pose and prey target. Non-graphic cartoon rivalry, no blood or injury, stylized meme rivalry, no coin logos or implied affiliation. Accepted tickers stay in HTML, always readable whether the image loads or fails. The scene does not identify which assets are eligible; exact assets and networks are listed in the participation page.
 
-> Bold inked illustration, dark night jungle background (#101510), venom-lime (#BDF332) and bone-white (#E9ECDF) accents, a few magenta jungle flowers. A calm, confident giant green viper with half-lidded yellow-lime eyes and a slight smirk curls around a rustic jungle dinner table under hanging vines, holding a chalkboard menu in its tail. Lined up nervously along the table are generic cartoon critters, each wearing a small paper name tag: a shiba-style dog, a green frog, a dog in a Viking helmet, a penguin, an orange dog holding a toy mallet, a dog in a knitted beanie, a fluffy golden dog, a capsule-shaped pill creature, a tiny rocket-chart creature, and a round creature with an "M" badge. Funny and mischievous, not violent; nothing is being bitten. No real logos, no official mascots, no text other than short name tags. Wide 16:9 composition with empty space on the left for headline text.
+## Delivery
 
-## Deliverables and rights
-
-Provide layered source files, PNG/WebP exports, the specified crops, and written confirmation that the project owns full commercial and remix rights. Record authorship and any licensed inputs. Do not grant public remix permission until that confirmation is complete.
-
-## Current assets
-
-| Asset | Status | Action |
-| --- | --- | --- |
-| `public/viper-art.jpg` | to be replaced / rights to confirm | Current hero has red eyes. Replace with the yellow / venom-lime character above. Temporary hero reference only. |
-| `public/viper-logo.webp` | to be replaced / rights to confirm | Replace with the readable profile mark above; verify commercial and remix rights. |
-| Feast background | CSS-only placeholder | No third-party mascot artwork is used on the site or social templates. |
-| `public/social-preview.svg` / `.png` | Original code-drawn typography and pattern | Temporary sharing card; illustrator cards can replace it after rights are confirmed. |
-
-This change covers code and briefs only. It does not commission or generate replacement illustrations.
+Generated with the built-in image tool. WebP delivery assets are saved in the workspace; originals remain in the tool's generated-image directory. Full prompts: [SITE_ART_PROMPTS.json](SITE_ART_PROMPTS.json). Layout, acceptance checks and asset inventory: [SITE_VISUAL_REFRESH.md](SITE_VISUAL_REFRESH.md). The editable social kit and sharing preview use the matching artwork. These assets do not grant rights to unrelated third-party characters or trademarks.
