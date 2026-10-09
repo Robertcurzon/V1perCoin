@@ -36,7 +36,7 @@ V1PER Coin is an independent Sui project, unaffiliated with other projects using
 | Headline | Barlow Condensed, bold uppercase | Short, punchy lines |
 | Body | DM Sans | Explanations and captions |
 | Current hero | `public/viper-art.jpg` | to be replaced / rights to confirm; current red eyes must become yellow / venom-lime |
-| Current logo | `public/viper-logo.webp` | to be replaced / rights to confirm; replace with a mark readable at 32 px |
+| Coin emblem | `public/v1per-emblem.webp` / `.png` | Fierce silver viper, black coin face, lime eye; optimized header/favicon and full-resolution asset |
 | Feast placeholder | CSS-only scale pattern | No third-party characters |
 | Sharing preview | `public/social-preview.svg` / `.png` | Original code-drawn typography and pattern |
 
@@ -71,3 +71,7 @@ State which logo and artwork the project owns or has a license to share, the all
 ## Digit styling
 
 Styled V1PER uses the shared wordmark: lime digit on dark with bone-white letters; bone-white digit within lime text; dark letters and deep-magenta digit on lime. Plain metadata, alt text, signatures and code identifiers use V1PER. On the white paper's white page, dark letters and the deep-magenta digit preserve contrast. The character remains The Viper.
+
+## Shared banner
+
+Use black snakeskin texture with the silver snake emblem and the exact header wording “V1PER TOKEN ON SUI.” Keep all eight page links visible; they wrap into two rows on phones. No hamburger menu. The banner stays fixed, with content offset to match its responsive height. See [generation prompts and asset paths](HEADER_ASSETS.md).

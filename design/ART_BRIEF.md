@@ -14,7 +14,7 @@ Wide composition. Viper looms over a crowd of generic cute critters: puppies, ki
 
 ## 3. Logo mark
 
-Square composition that remains readable at 32 px. A Viper head in profile inside a coin ring, lime on night-jungle. No text inside the mark. The “V1PER.” wordmark sits beside it. Supply a one-color version and transparent exports.
+The selected header mark is a fierce silver snake on a black coin face, with prominent fangs and a lime eye. Its transparent full-resolution PNG and optimized WebP are in `public/v1per-emblem.*`. The accompanying header wording is “V1PER TOKEN ON SUI.” See [asset provenance and generation prompt](HEADER_ASSETS.md).
 
 ## 4. Social cards
 
@@ -35,8 +35,8 @@ Provide layered source files, PNG/WebP exports, the specified crops, and written
 | Asset | Status | Action |
 | --- | --- | --- |
 | `public/viper-art.jpg` | to be replaced / rights to confirm | Current hero has red eyes. Replace with the yellow / venom-lime character above. Temporary hero reference only. |
-| `public/viper-logo.webp` | to be replaced / rights to confirm | Replace with the readable profile mark above; verify commercial and remix rights. |
+| `public/v1per-emblem.webp` / `.png` | Generated from the owner’s reference | Shared header and favicon; transparent full-resolution export retained. |
 | Feast background | CSS-only placeholder | No third-party mascot artwork is used on the site or social templates. |
 | `public/social-preview.svg` / `.png` | Original code-drawn typography and pattern | Temporary sharing card; illustrator cards can replace it after rights are confirmed. |
 
-This change covers code and briefs only. It does not commission or generate replacement illustrations.
+The header emblem has been generated and installed. Hero and Feast illustrations remain separate items in this brief.

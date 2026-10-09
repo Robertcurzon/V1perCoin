@@ -108,8 +108,18 @@ try{
    const header=page.locator('.shared-header');
    assert.equal(await header.evaluate(el=>getComputedStyle(el).position),'fixed');
    assert.equal(Math.round((await header.boundingBox()).y),0);
-   const toggle=page.getByRole('button',{name:'Open navigation'});
-   if(await toggle.isVisible()){await toggle.click();await scan(page,{width,route,state:'mobile navigation'},header,false);await page.getByRole('button',{name:'Close navigation'}).click();}
+   assert.equal(await page.locator('.menu-toggle').count(),0);
+   const navigation=page.getByRole('navigation',{name:'Main navigation'});
+   assert.equal(await navigation.getByRole('link').count(),8);
+   for(const link of await navigation.getByRole('link').all()) {
+    assert(await link.isVisible());
+    const r=await link.boundingBox(),h=await header.boundingBox();
+    assert(r.x>=0 && r.x+r.width<=width && r.y>=h.y && r.y+r.height<=h.y+h.height, 'Navigation must remain within the banner');
+   }
+   assert(await header.locator('.brand img').evaluate(el=>el.complete&&el.naturalWidth>0));
+   assert(await header.evaluate(el=>getComputedStyle(el).backgroundImage.includes('black-snakeskin')));
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'No horizontal page overflow');
+   await scan(page,{width,route,state:'visible navigation'},header,false);
    if(route)assert(await page.getByRole('link',{name:'← Back to home',exact:true}).isVisible());
   }
   if(route==='free-tokens/')assert(await page.getByRole('button',{name:'CLAIMS NOT OPEN YET',exact:true}).isDisabled());
@@ -132,8 +142,6 @@ try{
 
   }
   if(route==='') {
-   const toggle=page.getByRole('button',{name:'Open navigation'});
-   if(await toggle.isVisible())await toggle.click();
    await page.getByRole('link',{name:'Free tokens',exact:true}).click();
    await page.waitForURL('**/free-tokens/');
    await page.getByRole('link',{name:'← Back to home',exact:true}).click();

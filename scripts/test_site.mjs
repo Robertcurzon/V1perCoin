@@ -46,6 +46,9 @@ try {
   for (const route of ['free-tokens','feast','lock','community','tokenomics']) assert(home.includes(`href="/${route}/"`),route);
   assert(!home.includes('id="claims"') && !home.includes('id="feast"'));
   assert(home.includes('header-wallet'));
+  assert(home.includes('V1PER TOKEN ON SUI home') && home.includes('TOKEN ON SUI'));
+  assert(!home.includes('menu-toggle') && !home.includes('COIN /'));
+  assert(home.includes('/v1per-emblem.webp'));
   const { default: ParticipationPage } = await server.ssrLoadModule('/src/ParticipationPage.tsx');
   for (const [page,content] of [['free-tokens','CLAIMS NOT OPEN YET'],['feast','FEAST NOT OPEN YET'],['lock','Not live yet'],['community','Coming soon'],['tokenomics','DEFLATIONARY SUPPLY']]) {
     globalThis.window.location.pathname = `/${page}/`;
