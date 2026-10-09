@@ -1,6 +1,6 @@
 # V1PER Coin (V1PER) community brand kit
 
-**Working creative kit · 2 October 2026.** This gives the project reusable language and three editable social layouts. The coin, claims, rewards, products and burns are not live. Check rights to every image before publishing or permitting public remixes.
+**Working creative kit · 8 October 2026.** This gives the project reusable language and four editable social layouts. The coin, claims, rewards, products and burns are not live. Check rights to every image before publishing or permitting public remixes.
 
 ## Owner decisions
 
@@ -11,7 +11,7 @@
 
 ## Core idea
 
-**Memes with bite.** The jungle has plenty of puppies and kittens. Viper is already at the top of the food chain. Use dry humor, short sentences and confident understatement. No threats, price talk or promises of gains. The character has half-lidded yellow / venom-lime eyes, a dark-jungle setting, venom-lime markings and a slight smirk.
+**Memes with bite.** The jungle has plenty of puppies and kittens. Viper is already at the top of the food chain. Use dry humor, short sentences and confident understatement. No threats, price talk or promises of gains. The character has sculpted silver scales, a black gunmetal body, lime eyes and prominent fangs.
 
 Short lines to test:
 
@@ -30,17 +30,19 @@ V1PER Coin is an independent Sui project, unaffiliated with other projects using
 
 | Element | Working choice | Use |
 | --- | --- | --- |
-| Night jungle | `#101510` | Main background |
+| Near black | `#08090B` | Main background |
+| Graphite | `#15171A` | Cards and forms |
+| Silver | `#EDF0F2` | Headings and readable copy |
 | Venom lime | `#BDF332` | Headlines, eyes, accents and callouts |
-| Bone white | `#E9ECDF` | Readable body copy |
+| Muted silver | `#B9BEC5` | Secondary copy |
 | Headline | Barlow Condensed, bold uppercase | Short, punchy lines |
 | Body | DM Sans | Explanations and captions |
-| Current hero | `public/viper-art.jpg` | to be replaced / rights to confirm; current red eyes must become yellow / venom-lime |
+| Main artwork | `public/art/home.webp` | Generated silver snake scene matching the selected emblem |
 | Coin emblem | `public/v1per-emblem.webp` / `.png` | Fierce silver viper, black coin face, lime eye; optimized header/favicon and full-resolution asset |
-| Feast placeholder | CSS-only scale pattern | No third-party characters |
-| Sharing preview | `public/social-preview.svg` / `.png` | Original code-drawn typography and pattern |
+| Feast artwork | `public/feast-menu.webp` | Silver snake and original generic critters; accepted coins remain HTML text |
+| Sharing preview | `public/social-preview.png` | Same metallic hero artwork, 1200 × 675 |
 
-The [editable social layout preview](social-kit.html) uses a temporary hero crop and CSS-only patterns. It contains a square character card, a square Hunt Board prompt, and a wide “Memes with Bite” card. Follow [ART_BRIEF.md](ART_BRIEF.md) for the replacement illustrations. Replace wording, proofread, and export at the platform's final dimensions. These are campaign mockups, not evidence that a program is live.
+The [editable social layout preview](social-kit.html) uses the current website artwork. It contains a square character card, a square Hunt Board prompt, and a wide “Memes with Bite” card. Follow [ART_BRIEF.md](ART_BRIEF.md) for the replacement illustrations. Replace wording, proofread, and export at the platform's final dimensions. These are campaign mockups, not evidence that a program is live.
 
 ## Repeatable community loop: The Hunt Board
 

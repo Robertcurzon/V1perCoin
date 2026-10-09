@@ -1,3 +1,4 @@
+import PageArt from './PageArt';
 import { V1per, BrandText } from './V1per';
 import { siteUrl } from './site';
 import { useEffect, useState } from 'react';
@@ -93,11 +94,11 @@ export default function LockPanel({ detailed = false }: { detailed?: boolean }) 
   const lockOpen = configured && vault !== null && chainTime >= BigInt(vault.opens_at_ms);
   const capacity = vault ? BigInt(vault.rewards) : null;
   return <section id="lock" className="section lock-section">
-    <div className="kicker">LOCK & EARN</div>
+    <div className="art-intro"><div className="intro-copy"><div className="kicker">LOCK & EARN</div>
     <h2>LONGER LOCK.<br/><em>BIGGER BITE.</em></h2>
     <p className="token-intro">Lock <V1per /> for 1–24 months. Longer locks earn higher token rewards, while the reward pool has capacity.</p>
     <p className="lock-summary">Early exit: up to 5% of principal × time remaining; no fee at maturity.</p>
-    <a className="text-link" href={siteUrl('rules/#lock')}>Full rules →</a>
+    <a className="text-link" href={siteUrl('rules/#lock')}>Full rules →</a></div><PageArt scene="lock"/></div>
     <div className="lock-grid">
       <div className="lock-card">
         <label htmlFor="lock-amount"><V1per /> to lock</label><input id="lock-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />

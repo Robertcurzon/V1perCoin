@@ -1,3 +1,4 @@
+import PageArt from './PageArt';
 import SiteHeader, { BackHomeLink, SiteFooter } from './SiteHeader';
 import { AllocationSection, FreeClaimsSection, CommunitySection } from './ProjectSections';
 import FeastPanel from './FeastPanel';
@@ -10,6 +11,6 @@ export default function ParticipationPage({ page }: { page: ParticipationRoute }
     {page === 'feast' && <FeastPanel/>}
     {page === 'lock' && <LockPanel/>}
     {page === 'tokenomics' && <AllocationSection/>}
-    {page === 'community' && <><section id="den" className="closing"><div className="section closing-grid"><div><h2>JOIN THE<br/><em>COMMUNITY.</em></h2><p>Follow launch updates, share memes and meet the community.</p></div><CommunityLinks dark/></div></section><CommunitySection/></>}
+    {page === 'community' && <><section id="den" className="closing"><div className="section closing-grid"><div><h2>JOIN THE<br/><em>COMMUNITY.</em></h2><p>Follow launch updates, share memes and meet the community.</p></div><PageArt scene="community"/></div></section><section className="section social-section" aria-label="Official community channels"><h3>OFFICIAL CHANNELS</h3><CommunityLinks/></section><CommunitySection/></>}
   </main><SiteFooter/></div>;
 }

@@ -20,6 +20,6 @@ try{
  const kit=readFileSync('design/social-kit.html','utf8');
  assert(kit.includes('../public/feast-menu.webp'));
  for(const ticker of tickers)assert(kit.includes(ticker));
- const brief=readFileSync('design/ART_BRIEF.md','utf8');assert(brief.includes('## 5. Feast menu'));assert(brief.includes('nothing is being bitten'));
+ const brief=readFileSync('design/ART_BRIEF.md','utf8');assert(brief.includes('## 5. Feast menu'));assert(brief.includes('tickers stay in HTML'));
  console.log('Feast menu passed: accepted ticker parity, accessible fallback, optional image path, both sizes, social slot and owner prompt.');
 }finally{await server.close();}

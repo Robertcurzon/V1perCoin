@@ -81,6 +81,18 @@ async function scan(page,context,target=null,fullPage=true){
  measure(entries,PNG.sync.read(buffer),offset,context);return entries.length;
 }
 try{
+ // All links must fit between the phone and desktop breakpoints too.
+ for(const width of [658,800,801,1100,1280]){
+  const page=await browser.newPage({viewport:{width,height:900},deviceScaleFactor:1});
+  await page.goto(origin,{waitUntil:'networkidle'});
+  const header=page.locator('.shared-header'),h=await header.boundingBox();
+  for(const link of await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link').all()){
+   const r=await link.boundingBox();
+   assert(r.x>=0 && r.x+r.width<=width && r.y>=h.y && r.y+r.height<=h.y+h.height, `Navigation must fit at ${width}px`);
+  }
+  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  await page.close();
+ }
  for(const width of [1440,390])for(const route of ['','free-tokens/','feast/','lock/','community/','tokenomics/','rules/','monitor/','whitepaper/']){
   const page=await browser.newPage({viewport:{width,height:1000},deviceScaleFactor:1,reducedMotion:'reduce'});
   console.log('Checking contrast',width,'/'+route);
@@ -133,6 +145,7 @@ try{
    await page.reload({waitUntil:'networkidle'});
    await page.waitForFunction(()=>document.querySelectorAll('.feast-art[data-menu-state="art"]').length===1);
    for(const image of await page.locator('.feast-art img').all())assert(await image.isVisible());
+   assert.equal(await page.getByRole('list',{name:'Accepted Feast coins'}).count(),1);
    await page.unroute('**/feast-menu.webp');
    await page.route('**/feast-menu.webp',route=>route.fulfill({status:404,body:''}));
    await page.reload({waitUntil:'networkidle'});

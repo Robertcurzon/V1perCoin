@@ -1,3 +1,4 @@
+import PageArt from './PageArt';
 import SiteHeader, { BackHomeLink } from './SiteHeader';
 import { V1per, BrandText } from './V1per';
 import { siteUrl } from './site';
@@ -99,9 +100,9 @@ export default function Monitor() {
   }, [client, revision]);
   const value = (key: keyof Omit<Snapshot, 'time' | 'volume24h'>, tokens = true) => latest ? tokens ? formatAmount(BigInt(latest[key])) : BigInt(latest[key]).toLocaleString() : '—';
   return <div className="site monitor-page with-site-header"><SiteHeader/><main className="section"><BackHomeLink/>
-    <div className="kicker"><V1per /> / ONCHAIN MONITOR</div><h1>FOLLOW<br/><em>THE BITE.</em></h1>
+    <div className="art-intro monitor-intro"><div className="intro-copy"><div className="kicker"><V1per /> / ONCHAIN MONITOR</div><h1>FOLLOW<br/><em>THE BITE.</em></h1>
     <p className="token-intro"><V1per /> Coin (<V1per />): supply, funded rewards and community contract activity. {isLaunchConfigured ? `Sui ${launch.network}; refreshes every 30 seconds.` : 'No verified deployment is configured. No live figures or trading activity are implied.'}</p>
-    <p className="fine-print coin-type">Coin type: {isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p>
+    <p className="fine-print coin-type">Coin type: {isLaunchConfigured ? launch.coinType : 'NOT DEPLOYED'}</p></div><PageArt scene="verify"/></div>
     <div className="monitor-metrics">{[
       ['Current total supply', value('supply')], ['Total actually burned', value('burned')], ['Pending exit burns', value('pendingBurn')], ['Available lock rewards', value('available')], ['Reserved lock rewards', value('committed')], ['Rewards paid', value('paid')], ['Total rewards funded', value('funded')], ['V1PER currently locked', value('locked')], ['Locks opened / closed', `${value('opened', false)} / ${value('closed', false)}`], ['Free claims paid', value('claims', false)], ['Community exit-fee receipts', value('community')], ['V1PER Foundation exit-fee receipts', value('founder')],
     ].map(([label, metric]) => <article key={label}><span><BrandText text={label} /></span><strong>{metric}</strong></article>)}</div>

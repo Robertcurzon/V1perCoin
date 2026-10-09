@@ -91,9 +91,9 @@ export default function FeastPanel({ detailed = false }: { detailed?: boolean })
     const url = URL.createObjectURL(new Blob([binding + '\n'], { type: 'application/json' }));
     const a = document.createElement('a'); a.href = url; a.download = 'v1per-feast-binding.json'; a.click(); URL.revokeObjectURL(url);
   }
-  return <section id="feast" className="section feast-section">{detailed ? <><div className="kicker">THE FEAST / FEED THE VIPER</div><h2>THE FEAST,<br/><em>STEP BY STEP.</em></h2></> : <h2>FEED THE VIPER.</h2>}
-    <p className="token-intro">Contribute accepted meme coins for a <V1per /> allocation on Sui.</p>
-    <FeastMenu />
+  return <section id="feast" className="section feast-section"><div className="art-intro"><div className="intro-copy">{detailed ? <><div className="kicker">THE FEAST / FEED THE VIPER</div><h2>THE FEAST,<br/><em>STEP BY STEP.</em></h2></> : <h2>FEED THE VIPER.</h2>}
+    <p className="token-intro">Contribute accepted meme coins for a <V1per /> allocation on Sui.</p><p className="feast-tagline">Cute had its turn. Feed the Viper.</p></div>
+    <FeastMenu /></div>
 <div className="feast-status"><span className="status-label">{campaignOpen ? 'CAMPAIGN CONFIGURED' : 'CONTRIBUTIONS CLOSED'}</span><span>21-day window · 100 million <V1per /> allocation pool</span></div>
     <div className="feast-steps">{[
       ['01', 'Link your wallets', 'Sign with your source wallet on its accepted network, choose your Sui destination and allocation term. The source signs the binding; the Sui wallet signs the term. Submit and confirm acceptance before transferring.'],
