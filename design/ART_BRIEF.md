@@ -8,7 +8,7 @@ A silver snake surges diagonally toward the viewer in a twisting S-shaped strike
 
 ## 2. Participation
 
-Free Tokens: a closed-mouth snake hangs in an inverted loop from a stone arch, with an expressive curled tail above a clear stone platform. Lock & Earn: a closed-mouth guardian winds in a figure-eight around a steel vault with a restrained duration motif. Artwork illustrates the subject, not a guarantee of security or return. `public/art/free-tokens.webp`, `public/art/lock.webp`.
+Free Tokens: a closed-mouth silver viper rests beside a calm moonlit lake, waterfalls and misty mountains. The serene landscape dominates the scene. Lock & Earn: a closed-mouth guardian winds in a figure-eight around a steel vault with a restrained duration motif. Artwork illustrates the subject, not a guarantee of security or return. `public/art/free-tokens.webp`, `public/art/lock.webp`.
 
 ## 3. Logo mark
 
@@ -16,7 +16,7 @@ Keep the owner's exact selected emblem. `public/v1per-emblem.png` is the full-re
 
 ## 4. Community, supply and verification
 
-Community: three snakes spiral together in distinct poses with varied angles and expressions. Supply: a sweeping tail whips through lime sparks and silver fragments, with no token medallions or stack props. Verification: a watchful closed-mouth snake slides through an open glass frame, seen in a low-angle close-up with abstract connected nodes. These scenes are decorative, never rendered as onchain evidence. `public/art/community.webp`, `public/art/supply.webp`, `public/art/verify.webp`.
+Community: three snakes spiral together in distinct poses with varied angles and expressions. Supply: a sweeping tail whips through lime sparks and silver fragments, with no token medallions or stack props. Verification: a watchful closed-mouth snake slides through an open glass frame, seen in a low-angle close-up with abstract connected nodes. Rules: a closed-mouth viper moves through an ordered monumental stone passage toward daylight. Monitor: a watchful viper rests on a canyon observatory railing above towers connected by subtle lime light. The home Verify the Project preview keeps the glass-frame scene. These scenes are decorative, never rendered as onchain evidence. `public/art/community.webp`, `public/art/supply.webp`, `public/art/verify.webp`, `public/art/rules.webp`, `public/art/monitor.webp`.
 
 ## 5. Feast menu
 

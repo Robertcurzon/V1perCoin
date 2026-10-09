@@ -28,7 +28,7 @@ export default function Rules() {
       <section id="status" className="rules-intro art-intro"><div className="intro-copy"><div className="kicker">RULES & PUBLIC PROOF</div><h1>KNOW THE<br/><em>RULES.</em></h1>
         <p><BrandText text={isLaunchConfigured ? `Sui ${launch.network} deployment records are configured. Verify the full coin type in the monitor; testnet is not a mainnet launch.` : 'V1PER is not deployed. Applications, contributions and claims are closed. No verified mainnet coin type or funded trading pool is live.'}/></p>
         <p>Use the full verified Sui coin type, never the ticker alone. Rewards are tokens; gains and purchasing power are not guaranteed.</p>
-        <a className="text-link" href={siteUrl('monitor/')}>Verify in the monitor →</a><a className="text-link" href={siteUrl('whitepaper/')}>Full white paper →</a></div><PageArt scene="verify"/>
+        <a className="text-link" href={siteUrl('monitor/')}>Verify in the monitor →</a><a className="text-link" href={siteUrl('whitepaper/')}>Full white paper →</a></div><PageArt scene="rules"/>
       </section>
       <section id="timeline" className="compact-timeline"><h2>LAUNCH TIMELINE.</h2><p>{t ? `Day 0: ${new Date(t).toISOString()}.` : 'Opening date not announced.'} Day 0 opens free claims and the Feast. All deadlines use UTC; closing timestamps are exclusive.</p>
         <ol>{phases.map(([when,title,description]) => <li key={title}><span>{when}</span><div><h3>{title}</h3><p>{description}</p></div></li>)}</ol>
