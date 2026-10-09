@@ -135,6 +135,11 @@ try{
    if(route)assert(await page.getByRole('link',{name:'← Back to home',exact:true}).isVisible());
   }
   if(route==='free-tokens/')assert(await page.getByRole('button',{name:'CLAIMS NOT OPEN YET',exact:true}).isDisabled());
+  for(const image of await page.locator('.page-art img,.hero-image').all()){
+   await image.scrollIntoViewIfNeeded();
+   await image.evaluate(el=>el.decode());
+   assert(await image.evaluate(el=>el.complete&&el.naturalWidth>0),'Page artwork must load when brought into view');
+  }
   if(route==='feast/'){
    assert((await page.locator('main').innerText()).includes('with no refunds'));
    assert(await page.getByRole('button',{name:'FEAST NOT OPEN YET',exact:true}).isDisabled());
@@ -168,7 +173,14 @@ try{
    await page.locator('#privacy summary').click();
    assert.equal(await page.locator('#privacy').getAttribute('open'),null);
   }
-  if(process.argv.includes('--capture')){await page.goto(new URL(route,origin).href,{waitUntil:'networkidle'});await page.screenshot({path:`tmp/site-review/after-${route.replace('/','')||'home'}-${width}.jpg`,type:'jpeg',quality:85,fullPage:true,animations:'disabled'});}
+  if(process.argv.includes('--capture')){
+   await page.goto(new URL(route,origin).href,{waitUntil:'networkidle'});
+   for(const image of await page.locator('.page-art img,.hero-image').all()){
+    await image.scrollIntoViewIfNeeded();await image.evaluate(el=>el.decode());
+   }
+   await page.evaluate(()=>scrollTo(0,0));
+   await page.screenshot({path:`tmp/site-review/after-${route.replace('/','')||'home'}-${width}.jpg`,type:'jpeg',quality:85,fullPage:true,animations:'disabled'});
+  }
   results.push({width,route:'/'+route,textRuns:count,hoveredControls:hovered});console.log(JSON.stringify(results.at(-1)));await page.close();
  }
  writeFileSync('tmp/overnight/contrast-results.json',JSON.stringify({results,failures},null,2)+'\n');
