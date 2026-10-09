@@ -1,6 +1,6 @@
 import { siteUrl } from './site';
 
-export type ArtScene = 'home' | 'free-tokens' | 'feast' | 'lock' | 'community' | 'supply' | 'verify';
+export type ArtScene = 'home' | 'free-tokens' | 'feast' | 'lock' | 'community' | 'supply' | 'verify' | 'rules' | 'monitor';
 
 /** Decorative scenes never substitute for terms, asset lists or live data. */
 export default function PageArt({ scene, preview = false }: { scene: ArtScene; preview?: boolean }) {

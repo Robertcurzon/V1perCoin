@@ -2,11 +2,11 @@
 
 ## Outcome
 
-Carry the owner's selected emblem across every page: fierce silver snake, black and graphite surfaces, silver text, lime eyes and actions. Give each participation topic a distinct narrative and composition: forward strike, inverted snake greeting, chaotic banquet, figure-eight vault guardian, interwoven community, sweeping burn and stealthy verification. Closed mouths, varied camera angles and expressive tail gestures add range. Keep the pages separate, the fixed snakeskin navigation visible, and Back to home easy to find.
+Carry the owner's selected emblem across every page: fierce silver snake, black and graphite surfaces, silver text, lime eyes and actions. Give each participation topic a distinct narrative and composition: forward strike, serene waterfall sanctuary, chaotic banquet, figure-eight vault guardian, interwoven community, sweeping burn stone passage and panoramic observatory. Closed mouths, varied camera angles and expressive tail gestures add range. Keep the pages separate, the fixed snakeskin navigation visible, and Back to home easy to find.
 
 ## Scope and constraints
 
-- Seven generated scenes: home, free tokens, Feast, locks, community, supply, verification.
+- Nine generated scenes: home, free tokens, Feast, locks, community, supply, verification, rules and monitor.
 - Home cards preview each destination; participation intros put concise copy beside art on desktop and above art on mobile.
 - All scene artwork omits decorative coins, medallions and token stacks. Feast depicts three separate vipers pursuing distinct Doge-style, Shiba-style and Pepe-style mascots. Forms, status messages, data and disclosures use opaque readable panels. Coin lists are accessible HTML, not image text.
 - Rules stays concise and expandable; Monitor continues to label unavailable data. White Paper keeps the real centered scrollable PDF with black sidebars and the shared header.
@@ -22,11 +22,15 @@ Carry the owner's selected emblem across every page: fierce silver snake, black 
 | `public/art/lock.webp` | Lock & Earn, home preview |
 | `public/art/community.webp` | Community, home preview, social kit |
 | `public/art/supply.webp` | Supply, home preview |
-| `public/art/verify.webp` | Rules, Monitor, home preview |
+| `public/art/verify.webp` | Home Verify the Project preview, unchanged |
+| `public/art/rules.webp` | Rules: monumental stone passage |
+| `public/art/monitor.webp` | Monitor: panoramic observatory |
 | `public/social-preview.png` | Public sharing metadata |
 
-Built-in image generation used the exact selected `public/v1per-emblem.png` as a style and character reference. It did not modify that emblem. Final generation prompts are recorded in [SITE_ART_PROMPTS.json](SITE_ART_PROMPTS.json). Delivery copies use WebP at 1280px wide (1792px for the hero), roughly 150–250 KB each. The social PNG is a mechanical resize of the same hero scene.
+The original scenes used built-in image generation with the exact selected `public/v1per-emblem.png` as a style and character reference. It did not modify that emblem. Final generation prompts are recorded in [SITE_ART_PROMPTS.json](SITE_ART_PROMPTS.json). Delivery copies use WebP at 1280px wide (1792px for the hero), roughly 150–250 KB each. The social PNG is a mechanical resize of the same hero scene.
 
 ## Acceptance checks
 
 All nine physical routes load directly under `/V1perCoin/`; header links stay visible and fixed on desktop and phone. Artwork loads without horizontal overflow; meaningful information is readable without artwork. Verify text and hover contrast, legacy redirects, Back to home, the limited claim copy, Feast closed-state and menu fallback, lock calculator, and PDF proof gating. Review desktop and phone screenshots before publishing through the required GitHub checks.
+
+The new Free Tokens, Rules and Monitor scenes were generated with the built-in image tool from the written brand description. Free Tokens is a quiet moonlit lake and waterfall sanctuary with a resting viper. Rules uses a monumental ordered stone passage; Monitor uses a canyon observatory with abstract connections. The home Verify the Project image remains byte-for-byte unchanged.
