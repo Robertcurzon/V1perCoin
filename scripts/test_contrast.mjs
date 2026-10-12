@@ -160,6 +160,30 @@ try{
 
   }
   if(route==='') {
+   // Images and empty card corners act as native links, with keyboard support.
+   const destinations=['free-tokens/','feast/','lock/','community/','tokenomics/','rules/'];
+   for(const [i,destination] of destinations.entries()){
+    for(const point of ['image','corner']){
+     await page.goto(origin,{waitUntil:'networkidle'});
+     const card=page.locator('.entry-card').nth(i);
+     await card.scrollIntoViewIfNeeded();
+     const box=await card.boundingBox();
+     if(point==='image'){
+      const art=await card.locator('.page-art').boundingBox();
+      await page.mouse.click(art.x+art.width/2,art.y+art.height/2);
+     } else await page.mouse.click(box.x+box.width-8,box.y+box.height-8);
+     await page.waitForURL(new URL(destination,origin).href);
+    }
+   }
+   await page.goto(origin,{waitUntil:'networkidle'});
+   const primary=page.locator('.entry-primary-link').first();
+   await primary.focus();
+   assert.equal(await primary.evaluate(el=>getComputedStyle(el,'::after').outlineStyle),'solid');
+   await primary.press('Enter');await page.waitForURL('**/free-tokens/');
+   await page.goto(origin,{waitUntil:'networkidle'});
+   await page.getByRole('link',{name:'Open the monitor →',exact:true}).click();
+   await page.waitForURL('**/monitor/');
+   await page.goto(origin,{waitUntil:'networkidle'});
    await page.getByRole('link',{name:'Free tokens',exact:true}).click();
    await page.waitForURL('**/free-tokens/');
    await page.getByRole('link',{name:'← Back to home',exact:true}).click();
